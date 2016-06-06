@@ -1,12 +1,13 @@
 ﻿namespace LevelGenerator2D
 {
     using CustomUnityLibrary;
+    using System;
     using UnityEngine;
 
     /// <summary>
     /// An opening where two Rooms can be attached
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class Door
     {
 #pragma warning disable 0414

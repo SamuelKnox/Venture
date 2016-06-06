@@ -5,6 +5,7 @@
     using System.Linq;
     using UnityEngine.Rendering;
     using CustomUnityLibrary;
+
     /// <summary>
     /// The Level containing Rooms which is being generated via a controller
     /// </summary>
@@ -47,11 +48,7 @@
         void Awake()
         {
             transform.hideFlags = HideFlags.HideInInspector;
-            if (EnumUtility.Count<WallWidth>() != WallThicknesses.Count())
-            {
-                Debug.LogError("There must be an equal number of Wall Thickness options and Wall Thickness values!", gameObject);
-            }
-            wallWidth = WallThicknesses[(int)wallThickness];
+            SetWallThickness(wallThickness);
         }
 
         void Update()
@@ -115,12 +112,39 @@
         }
 
         /// <summary>
+        /// Gets whether or not the rooms will be persistant, opposed to being destroyed when out of range
+        /// </summary>
+        /// <returns>Whether or not the rooms will be persistant</returns>
+        public bool IsPersistantRooms()
+        {
+            return persistantRooms;
+        }
+
+        /// <summary>
+        /// Sets whether or not the rooms will be persistant, opposed to being destroyed when out of range
+        /// </summary>
+        /// <param name="roomPersistance">Whether or not the rooms will be persistant</param>
+        public void SetPersistantRooms(bool roomPersistance)
+        {
+            persistantRooms = roomPersistance;
+        }
+
+        /// <summary>
         /// Gets the wall texture for the Rooms
         /// </summary>
         /// <returns>The wall's texture</returns>
         public Texture2D GetWallTexture()
         {
             return wallTexture;
+        }
+
+        /// <summary>
+        /// Sets the wall texture for the rooms
+        /// </summary>
+        /// <param name="wallTexture">The wall texture to be used</param>
+        public void SetWallTexture(Texture2D wallTexture)
+        {
+            this.wallTexture = wallTexture;
         }
 
         /// <summary>
@@ -133,12 +157,44 @@
         }
 
         /// <summary>
+        /// Gets the thickness to be used for walls
+        /// </summary>
+        /// <returns>The wall thickness</returns>
+        public WallWidth GetWallThickness()
+        {
+            return wallThickness;
+        }
+
+        /// <summary>
+        /// Sets the thickness to be used for walls
+        /// </summary>
+        /// <param name="wallWidth">The thickness used for walls</param>
+        public void SetWallThickness(WallWidth wallThickness)
+        {
+            this.wallThickness = wallThickness;
+            if (EnumUtility.Count<WallWidth>() != WallThicknesses.Count())
+            {
+                Debug.LogError("There must be an equal number of Wall Thickness options and Wall Thickness values!", gameObject);
+            }
+            wallWidth = WallThicknesses[(int)this.wallThickness];
+        }
+
+        /// <summary>
         /// Gets the door size for the Rooms
         /// </summary>
         /// <returns>The size of the doorways</returns>
         public float GetDoorSize()
         {
             return doorSize;
+        }
+
+        /// <summary>
+        /// Changes the door size for the Rooms
+        /// </summary>
+        /// <param name="doorSize">The door size to use</param>
+        public void SetDoorSize(float doorSize)
+        {
+            this.doorSize = doorSize;
         }
 
         /// <summary>

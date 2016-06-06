@@ -165,6 +165,15 @@
         }
 
         /// <summary>
+        /// Sets the width of this room in grid units
+        /// </summary>
+        /// <param name="width">The room's new width</param>
+        public void SetWidth(int width)
+        {
+            this.width = width;
+        }
+
+        /// <summary>
         /// Gets the height in grid units
         /// </summary>
         /// <returns>The height of the level</returns>
@@ -174,12 +183,32 @@
         }
 
         /// <summary>
+        /// Sets the height of this room in grid units
+        /// </summary>
+        /// <param name="height">The room's new height</param>
+        public void SetHeight(int height)
+        {
+            this.height = height;
+        }
+
+        /// <summary>
         /// Gets the doors associated with this Room
         /// </summary>
         /// <returns>The level's doors</returns>
         public Door[] GetDoors()
         {
             return doors;
+        }
+
+        /// <summary>
+        /// Sets the doors for the room.
+        /// All null doors will be initialized.
+        /// </summary>
+        /// <param name="doors">The new doors to use</param>
+        public void SetDoors(Door[] doors)
+        {
+            this.doors = doors;
+            InitializeDoors();
         }
 
         /// <summary>
