@@ -34,6 +34,31 @@
         }
 
         /// <summary>
+        /// Rotates the Transform in the direction it is moving
+        /// </summary>
+        /// <param name="transform">The transform to be rotated</param>
+        public static void RotateTowardsVelocity(this Transform transform)
+        {
+            var body2D = transform.GetComponent<Rigidbody2D>();
+            if (body2D)
+            {
+                var velocity = body2D.velocity;
+                if (Mathf.Abs(velocity.x) > 0 || Mathf.Abs(velocity.y) > 0)
+                {
+                    float rotation = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg;
+                    transform.rotation = Quaternion.AngleAxis(rotation, Vector3.forward);
+                }
+                return;
+            }
+            var body = transform.GetComponent<Rigidbody>();
+            if (body)
+            {
+                throw new System.NotImplementedException("Rotating towards velocity has not yet been implemented for 3D use!");
+            }
+            Debug.LogError("A Rigidbody or Rigidbody2D must be attached to the GameObject in order to rotate it towards its velocity!", transform.gameObject);
+        }
+
+        /// <summary>
         /// Finds the child with the specified name at the highest level in the hierarchy.
         /// </summary>
         /// <param name="transform">The parent whose children will be traversed</param>

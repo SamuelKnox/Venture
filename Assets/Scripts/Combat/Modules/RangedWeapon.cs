@@ -72,10 +72,11 @@ public class RangedWeapon : MonoBehaviour
     /// <summary>
     /// Fires the equipped Projectile towards the Ranged Weapon's Right Vector.
     /// </summary>
-    /// <returns>Whether or not the Projectile was successfully fired</returns>
-    public bool Fire()
+    /// <param name="ignoreGravity">Whether or not to ignore gravity when firing the Projectile</param>
+    /// <returns>The projectile that was fired, or null if the fire failed</returns>
+    public Projectile Fire(bool ignoreGravity = false)
     {
-        return Fire(transform.right);
+        return Fire(transform.right, ignoreGravity);
     }
 
     /// <summary>
@@ -83,8 +84,8 @@ public class RangedWeapon : MonoBehaviour
     /// </summary>
     /// <param name="target">Target to fire the projectile at</param>
     /// <param name="ignoreGravity">Whether or not to ignore gravity while firing the projectile</param>
-    /// <returns>Whether or not the projectile was successfully fired</returns>
-    public bool Fire(Transform target, bool ignoreGravity = false)
+    /// <returns>The projectile that was fired, or null if the fire failed</returns>
+    public Projectile Fire(Transform target, bool ignoreGravity = false)
     {
         if (ignoreGravity)
         {
@@ -93,7 +94,7 @@ public class RangedWeapon : MonoBehaviour
         }
         if (!IsValidShot())
         {
-            return false;
+            return null;
         }
         var projectileInstance = Instantiate(projectile, transform.position + projectileSpawnOffset, Quaternion.identity) as Projectile;
         GameObjectUtility.ChildCloneToContainer(projectileInstance.gameObject);
@@ -101,12 +102,12 @@ public class RangedWeapon : MonoBehaviour
         if (!unlimitedRange && !projectileBody.IsWithinRange(target.position, force, arch))
         {
             Destroy(projectileInstance.gameObject);
-            return false;
+            return null;
         }
         projectileBody.SetTrajectory(target.position, force, arch);
         DisableProjectileColliders(projectileInstance);
         fireCooldown = totalCooldown;
-        return true;
+        return projectileInstance;
     }
 
     /// <summary>
@@ -114,12 +115,12 @@ public class RangedWeapon : MonoBehaviour
     /// </summary>
     /// <param name="direction">The direction to fire the Projectile in</param>
     /// <param name="ignoreGravity">Whether or not to ignore gravity when firing the Projectile</param>
-    /// <returns></returns>
-    public bool Fire(Vector2 direction, bool ignoreGravity = false)
+    /// <returns>The projectile that was fired, or null if the fire failed</returns>
+    public Projectile Fire(Vector2 direction, bool ignoreGravity = false)
     {
         if (!IsValidShot(direction))
         {
-            return false;
+            return null;
         }
         direction.Normalize();
         var projectileInstance = Instantiate(projectile, transform.position + projectileSpawnOffset, Quaternion.identity) as Projectile;
@@ -139,7 +140,16 @@ public class RangedWeapon : MonoBehaviour
         }
         DisableProjectileColliders(projectileInstance);
         fireCooldown = totalCooldown;
-        return true;
+        return projectileInstance;
+    }
+
+    /// <summary>
+    /// Checks if the ranged weapon is ready to be fired, opposed to still being on cooldown
+    /// </summary>
+    /// <returns>Whether or not the weapon is ready to fire</returns>
+    public bool IsReady()
+    {
+        return fireCooldown <= 0;
     }
 
     /// <summary>
