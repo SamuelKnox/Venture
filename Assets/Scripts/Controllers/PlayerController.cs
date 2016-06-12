@@ -1,26 +1,28 @@
 ﻿using CustomUnityLibrary;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// This is an example controller for using the CharacterPlatformer
 /// </summary>
 [RequireComponent(typeof(CharacterPlatformer))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Inventory))]
+[RequireComponent(typeof(Player))]
 public class PlayerController : MonoBehaviour
 {
     private const float DropDownForceRequired = 0.5f;
 
     private CharacterPlatformer characterPlatformer;
     private Animator animator;
-    private Inventory inventory;
-    private PlayerWeaponTypes activeWeaponType;
+    private Player player;
+    private Item itemPickedUp;
 
     void Awake()
     {
         characterPlatformer = GetComponent<CharacterPlatformer>();
         animator = GetComponent<Animator>();
-        inventory = GetComponent<Inventory>();
+        player = GetComponent<Player>();
         characterPlatformer.onControllerCollidedEvent += OnCollision;
         characterPlatformer.onTriggerEnterEvent += OnEnter;
         characterPlatformer.onTriggerStayEvent += OnStay;
@@ -41,92 +43,84 @@ public class PlayerController : MonoBehaviour
                 characterPlatformer.Jump();
             }
         }
-        if (Input.GetButtonDown(InputNames.Attack) && IsAttackValid())
+        if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid())
         {
             Attack();
         }
-        else if (Input.GetButtonDown(InputNames.SelectMeleeWeapon))
+        if (Input.GetButtonDown(InputNames.SelectMeleeWeapon))
         {
-            SetActiveWeapon(PlayerWeaponTypes.MeleeWeapon);
+            player.SetActiveWeapon(ItemType.MeleeWeapon);
         }
-        else if (Input.GetButtonDown(InputNames.SelectBow))
+        if (Input.GetButtonDown(InputNames.SelectBow))
         {
-            SetActiveWeapon(PlayerWeaponTypes.Bow);
+            player.SetActiveWeapon(ItemType.Bow);
         }
-        else if (Input.GetButtonDown(InputNames.SelectWand))
+        if (Input.GetButtonDown(InputNames.SelectWand))
         {
-            SetActiveWeapon(PlayerWeaponTypes.Wand);
+            player.SetActiveWeapon(ItemType.Wand);
         }
+        if (Input.GetButtonDown(InputNames.ItemMenu) && !SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
+        {
+            Time.timeScale = 0.0f;
+            SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
+        }
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalSpeed, Mathf.Abs(characterPlatformer.GetVelocity().x));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalSpeed, characterPlatformer.GetVelocity().y);
     }
 
     void OnCollision(RaycastHit2D hit)
     {
-        ///Debug.Log("onControllerCollider: " + hit.transform.gameObject.name);
+        ///Debug.Log("OnCollision: " + hit.transform.gameObject.name);
     }
 
 
     void OnEnter(Collider2D collider2D)
     {
-        ///Debug.Log("onTriggerEnterEvent: " + collider2D.gameObject.name);
+        ///Debug.Log("OnEnter: " + collider2D.gameObject.name);
+        var item = collider2D.GetComponent<Item>();
+        if (item)
+        {
+            CollectItem(item);
+        }
     }
 
     void OnStay(Collider2D collider2D)
     {
-        ///Debug.Log("onTriggerStayEvent: " + collider2D.gameObject.name);
+        ///Debug.Log("OnStay: " + collider2D.gameObject.name);
     }
 
 
     void OnExit(Collider2D collider2D)
     {
-        ///Debug.Log("onTriggerExitEvent: " + collider2D.gameObject.name);
+        ///Debug.Log("OnExit: " + collider2D.gameObject.name);
     }
 
     /// <summary>
-    /// Swings the melee weapon
+    /// Collect an item
     /// </summary>
-    public void BeginMeleeAttack()
+    /// <param name="item">Item to collect</param>
+    private void CollectItem(Item item)
     {
-        var meleeWeapon = GetComponentInChildren<MeleeWeapon>();
-        if (meleeWeapon)
+        if (itemPickedUp)
         {
-            meleeWeapon.BeginSwing();
+            return;
         }
+        itemPickedUp = item;
+        var equippedWeapon = player.GetActiveWeapon();
+        equippedWeapon.gameObject.SetActive(false);
+        player.CollectItem(item);
+        animator.SetTrigger(AnimationNames.Player.Triggers.CollectItem);
     }
 
     /// <summary>
-    /// Finishes the melee weaponn swing
+    /// Finished collecting item
     /// </summary>
-    public void FinishMeleeAttack()
+    private void FinishCollectingItem()
     {
-        var meleeWeapon = GetComponentInChildren<MeleeWeapon>();
-        if (meleeWeapon)
-        {
-            meleeWeapon.FinishSwing();
-        }
-    }
-
-    /// <summary>
-    /// Fires the player's bow
-    /// </summary>
-    public void FireBow()
-    {
-        var bow = GetComponentInChildren<Bow>();
-        if (bow)
-        {
-            bow.Fire();
-        }
-    }
-
-    /// <summary>
-    /// Casts a spell based on the player's currently equipped wand
-    /// </summary>
-    public void CastSpell()
-    {
-        var wand = GetComponentInChildren<Wand>();
-        if (wand)
-        {
-            wand.CastSpell();
-        }
+        itemPickedUp.gameObject.SetActive(false);
+        var equippedWeapon = player.GetActiveWeapon();
+        equippedWeapon.gameObject.SetActive(true);
+        itemPickedUp = null;
     }
 
     /// <summary>
@@ -134,74 +128,26 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Attack()
     {
+        var activeWeapon = player.GetActiveWeapon();
+        if (!activeWeapon)
+        {
+            return;
+        }
+        var activeWeaponType = activeWeapon.GetItemType();
         switch (activeWeaponType)
         {
-            case PlayerWeaponTypes.MeleeWeapon:
-                animator.SetTrigger(AnimationNames.Player.MeleeWeaponAttack);
+            case ItemType.MeleeWeapon:
+                animator.SetTrigger(AnimationNames.Player.Triggers.MeleeWeaponAttack);
                 break;
-            case PlayerWeaponTypes.Bow:
-                animator.SetTrigger(AnimationNames.Player.BowAttack);
+            case ItemType.Bow:
+                animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);
                 break;
-            case PlayerWeaponTypes.Wand:
-                animator.SetTrigger(AnimationNames.Player.WandAttack);
+            case ItemType.Wand:
+                animator.SetTrigger(AnimationNames.Player.Triggers.WandAttack);
                 break;
             default:
-                Debug.LogError("An invalid WeaponType is active!", gameObject);
+                Debug.LogError("An invalid WeaponType is active!", player.gameObject);
                 break;
         }
-    }
-
-    /// <summary>
-    /// Checks whether or not the player is able to perform an attack
-    /// </summary>
-    /// <returns>If the attack is valid</returns>
-    private bool IsAttackValid()
-    {
-        switch (activeWeaponType)
-        {
-            case PlayerWeaponTypes.MeleeWeapon:
-                return GetComponentInChildren<MeleeWeapon>();
-            case PlayerWeaponTypes.Bow:
-                var bow = GetComponentInChildren<Bow>();
-                if (!bow)
-                {
-                    return false;
-                }
-                return bow.IsReady();
-            case PlayerWeaponTypes.Wand:
-                var wand = GetComponentInChildren<Wand>();
-                if (!wand)
-                {
-                    return false;
-                }
-                return wand.IsReady();
-            default:
-                Debug.LogError("An invalid WeaponType is active!", gameObject);
-                return false;
-        }
-    }
-
-    /// <summary>
-    /// Sets the player's currently active weapon
-    /// </summary>
-    /// <param name="weaponType">Type of weapon to activate</param>
-    private void SetActiveWeapon(PlayerWeaponTypes weaponType)
-    {
-        var meleeWeapon = inventory.GetActiveMeleeWeapon();
-        if (meleeWeapon)
-        {
-            meleeWeapon.gameObject.SetActive(weaponType == PlayerWeaponTypes.MeleeWeapon);
-        }
-        var bow = inventory.GetActiveBow();
-        if (bow)
-        {
-            bow.gameObject.SetActive(weaponType == PlayerWeaponTypes.Bow);
-        }
-        var wand = inventory.GetActiveWand();
-        if (wand)
-        {
-            wand.gameObject.SetActive(weaponType == PlayerWeaponTypes.Wand);
-        }
-        activeWeaponType = weaponType;
     }
 }

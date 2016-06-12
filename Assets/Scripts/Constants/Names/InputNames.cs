@@ -37,4 +37,24 @@ public static class InputNames
     /// Input name used to set the currently equipped wand to the active weapon
     /// </summary>
     public const string SelectWand = "Select Wand";
+
+    /// <summary>
+    /// Input name used to open the item menu
+    /// </summary>
+    public const string ItemMenu = "Item Menu";
+
+    /// <summary>
+    /// Input name used to switch tab to the left
+    /// </summary>
+    public const string TabLeft = "Tab to Left";
+
+    /// <summary>
+    /// Input name used to switch tab to the right
+    /// </summary>
+    public const string TabRight = "Tab to Right";
+
+    /// <summary>
+    /// Input name to edit the roons for the currently selected item
+    /// </summary>
+    public const string EditRunes = "Edit Runes";
 }

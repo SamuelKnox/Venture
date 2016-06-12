@@ -1,7 +1,7 @@
 ﻿/// <summary>
 /// Tag options for game objects
 /// </summary>
-public enum Tags
+public enum Tag
 {
     Untagged,
     Respawn,
@@ -11,15 +11,28 @@ public enum Tags
     Player,
     GameController,
     Enemy,
-    Neutral
+    Neutral,
+    Level,
+    UI,
+    Container
 }
 
 /// <summary>
-/// Different types of weapons that can be used by the player
+/// Types of items available
 /// </summary>
-public enum PlayerWeaponTypes
+public enum ItemType
 {
     MeleeWeapon,
     Bow,
     Wand
+}
+
+/// <summary>
+/// Types of runes available
+/// </summary>
+public enum RuneType
+{
+    Health,
+    Poison,
+    Speed
 }

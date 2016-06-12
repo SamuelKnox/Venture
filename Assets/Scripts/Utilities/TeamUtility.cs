@@ -10,6 +10,7 @@ public static class TeamUtility
     /// <returns>Whether or not they are friendly</returns>
     public static bool IsFriendly(GameObject gameObject0, GameObject gameObject1)
     {
-        return gameObject0.tag == gameObject1.tag && gameObject0.tag != Tags.Neutral.ToString() && gameObject1.tag != Tags.Neutral.ToString();
+        bool neutral = gameObject0.tag == Tag.Neutral.ToString() || gameObject1.tag == Tag.Neutral.ToString();
+        return neutral || gameObject0.tag == gameObject1.tag;
     }
 }
