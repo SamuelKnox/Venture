@@ -19,11 +19,6 @@
             public const string WandAttack = "Wand Attack";
 
             /// <summary>
-            /// Animation name for intiating the player's jump
-            /// </summary>
-            public const string Jump = "Jump";
-
-            /// <summary>
             /// Animation name for player collecting an item
             /// </summary>
             public const string CollectItem = "Collect Item";

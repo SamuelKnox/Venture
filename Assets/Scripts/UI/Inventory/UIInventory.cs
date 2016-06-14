@@ -49,6 +49,7 @@ public class UIInventory : MonoBehaviour
     private GameObject currentSelectedGameObject;
     private InventoryMode inventoryMode;
     private List<Tab> tabs;
+    private Item editableItem;
 
     void Awake()
     {
@@ -88,10 +89,22 @@ public class UIInventory : MonoBehaviour
             currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
             UpdateDescription();
         }
-        if (Input.GetButtonDown(InputNames.EditRunes) && inventoryMode == InventoryMode.ItemBrowser)
+        if (Input.GetButtonDown(InputNames.EditRunes))
         {
-            inventoryMode = InventoryMode.RuneEditor;
-            CreateTabs();
+            switch (inventoryMode)
+            {
+                case InventoryMode.ItemBrowser:
+                    inventoryMode = InventoryMode.RuneEditor;
+                    CreateTabs();
+                    break;
+                case InventoryMode.RuneEditor:
+                    inventoryMode = InventoryMode.ItemBrowser;
+                    CreateTabs();
+                    break;
+                default:
+                    Debug.LogError("An invalid InventoryMode (" + inventoryMode + ") is being used!", gameObject);
+                    break;
+            }
         }
         if (Input.GetButtonDown(InputNames.ItemMenu))
         {
@@ -100,8 +113,12 @@ public class UIInventory : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates the tabs for the respective inventory mode
+    /// </summary>
     private void CreateTabs()
     {
+        currentIndex = 0;
         foreach (Transform child in categoryTabPanel)
         {
             Destroy(child.gameObject);
@@ -161,12 +178,12 @@ public class UIInventory : MonoBehaviour
         {
             Debug.LogError("Item Button is missing from the currently selected game object!", EventSystem.current.currentSelectedGameObject);
         }
-        var item = itemButton.GetItem();
-        if (!item)
+        editableItem = itemButton.GetItem();
+        if (!editableItem)
         {
             Debug.LogError("The Item represented by the Item Button is null!", itemButton.gameObject);
         }
-        var runeTypes = item.GetRuneSockets().Select(r => r.GetRuneType());
+        var runeTypes = editableItem.GetRuneTypes();
         int skippedRunes = 0;
         for (int i = 0; i < runeTabs.Length; i++)
         {
@@ -202,6 +219,7 @@ public class UIInventory : MonoBehaviour
             currentIndex = tabs.Count - 1;
         }
         tabs[currentIndex].GetImage().color = Color.red;
+        itemDescription.text = "";
         PopulateContentPanel();
     }
 
@@ -210,17 +228,17 @@ public class UIInventory : MonoBehaviour
     /// </summary>
     private void PopulateContentPanel()
     {
-        foreach (Transform child in itemsContentPanel)
-        {
-            Destroy(child.gameObject);
-        }
         switch (inventoryMode)
         {
             case InventoryMode.ItemBrowser:
-                PopulateItemBrowser();
+                var items = player.GetInventory().GetItems(itemTabs[currentIndex].GetItemType());
+                PopulateItemBrowser(items, EquipItem);
                 break;
             case InventoryMode.RuneEditor:
-                PopulateRuneBrowser();
+                var allRunes = player.GetInventory().GetItems(ItemType.Rune).Select(r => r.GetComponent<Rune>());
+                var runes = allRunes.Where(r => r.GetRuneType() == runeTabs[currentIndex].GetRuneType()).ToArray();
+                Debug.Log(runes.Length);
+                PopulateItemBrowser(runes, AttachRune);
                 break;
             default:
                 Debug.LogError("An invalid InventoryMode (" + inventoryMode.ToString() + ") was used!", gameObject);
@@ -231,9 +249,12 @@ public class UIInventory : MonoBehaviour
     /// <summary>
     /// Fills the content panel with the items of the currently selected category type
     /// </summary>
-    private void PopulateItemBrowser()
+    private void PopulateItemBrowser(Item[] items, Action<Item> actionToTakeWithItems)
     {
-        var items = player.GetInventory().GetItems(itemTabs[currentIndex].GetItemType());
+        foreach (Transform child in itemsContentPanel)
+        {
+            Destroy(child.gameObject);
+        }
         var buttonPrefabTransform = itemButton.GetComponent<RectTransform>();
         if (!buttonPrefabTransform)
         {
@@ -268,7 +289,7 @@ public class UIInventory : MonoBehaviour
             }
             buttonImage.sprite = itemSprite.sprite;
             bool activeItem = player.GetInventory().GetActiveItem(items[i].GetItemType()) == items[i];
-            if (activeItem)
+            if (i == 0 || activeItem)
             {
                 EventSystem.current.SetSelectedGameObject(itemButtonInstance.gameObject);
             }
@@ -277,16 +298,9 @@ public class UIInventory : MonoBehaviour
             {
                 Debug.LogError(button.name = " is missing a Button component!", button.gameObject);
             }
-            button.onClick.AddListener(() => EquipItem(itemButtonInstance.GetItem()));
+            var item = itemButtonInstance.GetItem();
+            button.onClick.AddListener(() => actionToTakeWithItems(item));
         }
-    }
-
-    /// <summary>
-    /// Fills the content panel with the runes of the currently selected category's rune type
-    /// </summary>
-    private void PopulateRuneBrowser()
-    {
-        Debug.LogError("TODO");
     }
 
     /// <summary>
@@ -319,6 +333,20 @@ public class UIInventory : MonoBehaviour
     private void EquipItem(Item item)
     {
         player.Equip(item);
+    }
+
+    /// <summary>
+    /// Attaches a rune to the currently selected item
+    /// </summary>
+    /// <param name="item">Rune to attach</param>
+    private void AttachRune(Item item)
+    {
+        var rune = item.GetComponent<Rune>();
+        if (!rune)
+        {
+            Debug.LogError("Expecting a Rune, but received " + item + "!", item.gameObject);
+        }
+        editableItem.SetRune(rune);
     }
 
     /// <summary>

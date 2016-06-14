@@ -7,6 +7,10 @@ public class Player : Character
     [SerializeField]
     private Transform weaponContainer;
 
+    [Tooltip("Container for player's runes")]
+    [SerializeField]
+    private Transform runeContainer;
+
     private Inventory inventory;
     private Weapon activeWeapon;
 
@@ -33,6 +37,15 @@ public class Player : Character
         }
         if (!inventory.Contains(item))
         {
+            Transform itemContainer;
+            if (item.GetComponent<Weapon>())
+            {
+                itemContainer = weaponContainer;
+            }
+            else if (item.GetComponent<Rune>())
+            {
+                itemContainer = runeContainer;
+            }
             item.transform.SetParent(weaponContainer);
             item.transform.position = weaponContainer.transform.position;
             item.transform.right *= Mathf.Sign(transform.localScale.x);
@@ -49,11 +62,12 @@ public class Player : Character
     /// </summary>
     public void BeginMeleeAttack()
     {
-        var meleeWeapon = GetComponentInChildren<MeleeWeapon>();
-        if (meleeWeapon)
+        var meleeWeapon = activeWeapon.GetComponent<MeleeWeapon>();
+        if (!meleeWeapon)
         {
-            meleeWeapon.BeginSwing();
+            Debug.Log("Attempting to begin melee attack, but a Melee Weapon is not the active weapon!", gameObject);
         }
+        meleeWeapon.BeginSwing();
     }
 
     /// <summary>
@@ -61,11 +75,12 @@ public class Player : Character
     /// </summary>
     public void FinishMeleeAttack()
     {
-        var meleeWeapon = GetComponentInChildren<MeleeWeapon>();
-        if (meleeWeapon)
+        var meleeWeapon = activeWeapon.GetComponent<MeleeWeapon>();
+        if (!meleeWeapon)
         {
-            meleeWeapon.FinishSwing();
+            Debug.Log("Attempting to begin melee attack, but a Melee Weapon is not the active weapon!", gameObject);
         }
+        meleeWeapon.FinishSwing();
     }
 
     /// <summary>
@@ -73,11 +88,12 @@ public class Player : Character
     /// </summary>
     public void FireBow()
     {
-        var bow = GetComponentInChildren<Bow>();
-        if (bow)
+        var bow = activeWeapon.GetComponent<Bow>();
+        if (!bow)
         {
-            bow.Fire(transform.root.right);
+            Debug.LogError("Attempting to fire a Bow, but it is not the active weapon!", gameObject);
         }
+        bow.Fire(transform.root.right);
     }
 
     /// <summary>
@@ -85,11 +101,12 @@ public class Player : Character
     /// </summary>
     public void CastSpell()
     {
-        var wand = GetComponentInChildren<Wand>();
-        if (wand)
+        var wand = activeWeapon.GetComponent<Wand>();
+        if (!wand)
         {
-            wand.CastSpell();
+            Debug.LogError("Attempting to use a Wand, but it is not the active weapon!", gameObject);
         }
+        wand.CastSpell();
     }
 
     /// <summary>

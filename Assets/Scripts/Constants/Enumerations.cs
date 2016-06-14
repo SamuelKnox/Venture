@@ -22,6 +22,7 @@ public enum Tag
 /// </summary>
 public enum ItemType
 {
+    Rune,
     MeleeWeapon,
     Bow,
     Wand

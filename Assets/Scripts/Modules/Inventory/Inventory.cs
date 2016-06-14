@@ -6,9 +6,26 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    [Tooltip("All containers for this inventory")]
+    [Tooltip("Item Containers store items of a specific Item Type")]
     [SerializeField]
     private ItemContainer[] itemContainers;
+
+    void Awake()
+    {
+        foreach (var itemContainer in itemContainers)
+        {
+            var activeItem = itemContainer.GetActiveItem();
+            if (!activeItem)
+            {
+                continue;
+            }
+            if (!itemContainer.Contains(activeItem))
+            {
+                Debug.LogWarning(itemContainer.GetName() + " does not contain its active item, " + activeItem.name + ", so it is being added.", gameObject);
+                itemContainer.Add(activeItem);
+            }
+        }
+    }
 
     void Reset()
     {
@@ -16,6 +33,28 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < itemContainers.Length; i++)
         {
             itemContainers[i] = new ItemContainer((ItemType)i);
+        }
+    }
+
+    void OnValidate()
+    {
+        foreach (var itemContainer in itemContainers)
+        {
+            var itemType = itemContainer.GetItemType();
+            var activeItem = itemContainer.GetActiveItem();
+            if (activeItem && activeItem.GetItemType() != itemType)
+            {
+                Debug.LogWarning(activeItem.name + " is not of the correct type, " + itemType + ", for " + itemContainer.GetName());
+                itemContainer.ClearActiveItem();
+            }
+            foreach (var item in itemContainer.GetItems())
+            {
+                if (item.GetItemType() != itemType)
+                {
+                    Debug.LogWarning(item.name + " is not of the correct type, " + itemType + ", for " + itemContainer.GetName());
+                    itemContainer.Remove(item);
+                }
+            }
         }
     }
 
@@ -136,6 +175,10 @@ public class Inventory : MonoBehaviour
     [Serializable]
     private class ItemContainer
     {
+        [HideInInspector]
+        [SerializeField]
+        private string name;
+
         [Tooltip("Currently active item")]
         [SerializeField]
         private Item activeItem;
@@ -143,10 +186,6 @@ public class Inventory : MonoBehaviour
         [Tooltip("All items in the container")]
         [SerializeField]
         private List<Item> items;
-
-        [HideInInspector]
-        [SerializeField]
-        private string name;
 
         [HideInInspector]
         [SerializeField]
@@ -171,7 +210,6 @@ public class Inventory : MonoBehaviour
             return items.ToArray();
         }
 
-
         /// <summary>
         /// Sets the active item for this item container
         /// </summary>
@@ -179,12 +217,34 @@ public class Inventory : MonoBehaviour
         /// <returns>Whether or not</returns>
         public bool SetActiveItem(Item item)
         {
-            if (!Contains(item))
+            if (!item)
+            {
+                Debug.LogError("You cannot set the active item to null!");
+                Debug.Log("Use ClearActiveItem(Item) instead.");
+            }
+            if (!Contains(item) || item.GetItemType() != GetItemType())
             {
                 return false;
             }
             activeItem = item;
             return true;
+        }
+
+        /// <summary>
+        /// Removes the active item, setting it to null
+        /// </summary>
+        public void ClearActiveItem()
+        {
+            activeItem = null;
+        }
+
+        /// <summary>
+        /// Gets the name of this item container
+        /// </summary>
+        /// <returns>The name</returns>
+        public string GetName()
+        {
+            return name;
         }
 
         /// <summary>
@@ -200,6 +260,20 @@ public class Inventory : MonoBehaviour
             }
             items.Add(item);
             return true;
+        }
+
+        /// <summary>
+        /// Removes an item from the item container
+        /// </summary>
+        /// <param name="item">Item to remove</param>
+        /// <returns>Whether or not the removal was successful</returns>
+        public bool Remove(Item item)
+        {
+            if (!Contains(item))
+            {
+                return false;
+            }
+            return items.Remove(item);
         }
 
         /// <summary>

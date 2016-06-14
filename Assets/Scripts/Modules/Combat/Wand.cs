@@ -10,6 +10,9 @@ public class Wand : RangedWeapon
         var root = transform.root;
         var direction = Mathf.Sign(root.localScale.x) * root.right;
         var projectile = Fire(direction, true);
-        projectile.tag = transform.root.tag;
+        if (projectile)
+        {
+            projectile.tag = transform.root.tag;
+        }
     }
 }
