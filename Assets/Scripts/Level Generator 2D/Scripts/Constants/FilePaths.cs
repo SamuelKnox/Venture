@@ -3,7 +3,7 @@
     /// <summary>
     /// This is a list of file paths
     /// </summary>
-    public static class FilePaths
+    public class FilePaths
     {
         /// <summary>
         /// File path for the door gizmo sprite

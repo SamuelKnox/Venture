@@ -6,25 +6,34 @@ public class Damage : MonoBehaviour
     /// <summary>
     /// Delegate for dealing damage
     /// </summary>
-    public delegate void DamageDealt();
+    public delegate void DamageDealt(Health health);
 
     /// <summary>
     /// Event called when damage is dealt
     /// </summary>
     public event DamageDealt OnDamageDealt;
 
-    [Tooltip("Damage dealt by this")]
+    [Tooltip("Base Damage dealt by this")]
     [SerializeField]
     [Range(0.0f, 10.0f)]
-    private float damagePoints = 10.0f;
+    private float baseDamage = 10.0f;
 
     [Tooltip("How much the damage knocks back")]
     [SerializeField]
-    [Range(0.0f, 10.0f)]
-    private float knockBack = 2.0f;
+    [Range(0.0f, 1000.0f)]
+    private float knockBack = 250.0f;
+
+    [Tooltip("Amount of damage over time applied by this damage")]
+    [SerializeField]
+    [Range(0.0f, 100.0f)]
+    private float damageOverTime = 0.0f;
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (gameObject.GetComponent<Player>())
+        {
+            return;
+        }
         var health = other.GetComponent<Health>();
         if (!health)
         {
@@ -33,10 +42,10 @@ public class Damage : MonoBehaviour
         var friendly = TeamUtility.IsFriendly(gameObject, health.gameObject);
         if (!friendly)
         {
-            health.TakeDamage(this);
+            health.ApplyDamage(this);
             if (OnDamageDealt != null)
             {
-                OnDamageDealt();
+                OnDamageDealt(health);
             }
         }
     }
@@ -45,9 +54,9 @@ public class Damage : MonoBehaviour
     /// Gets the amount of damage dealt by this
     /// </summary>
     /// <returns>Damage points</returns>
-    public float GetDamagePoints()
+    public float GetBaseDamage()
     {
-        return damagePoints;
+        return baseDamage;
     }
 
     /// <summary>
@@ -57,5 +66,23 @@ public class Damage : MonoBehaviour
     public float GetKnockBack()
     {
         return knockBack;
+    }
+
+    /// <summary>
+    /// Gets the damage over time applied by this damage
+    /// </summary>
+    /// <returns>Damage over time</returns>
+    public float GetDamageOverTime()
+    {
+        return damageOverTime;
+    }
+
+    /// <summary>
+    /// Sets the damage over time
+    /// </summary>
+    /// <param name="damage">Damage over time</param>
+    public void SetDamageOverTime(float damage)
+    {
+        damageOverTime = damage;
     }
 }

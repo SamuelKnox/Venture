@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 /// </summary>
 [RequireComponent(typeof(CharacterPlatformer))]
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(Damage))]
 [RequireComponent(typeof(Player))]
 public class PlayerController : MonoBehaviour
 {
@@ -15,13 +16,16 @@ public class PlayerController : MonoBehaviour
     private CharacterPlatformer characterPlatformer;
     private Animator animator;
     private Player player;
+    private Damage damage;
     private Item itemPickedUp;
+    private float speedModifier = 1.0f;
 
     void Awake()
     {
         characterPlatformer = GetComponent<CharacterPlatformer>();
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
+        damage = GetComponent<Damage>();
         characterPlatformer.onControllerCollidedEvent += OnCollision;
         characterPlatformer.onTriggerEnterEvent += OnEnter;
         characterPlatformer.onTriggerStayEvent += OnStay;
@@ -30,41 +34,36 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        characterPlatformer.Move(Input.GetAxis(InputNames.Horizontal));
-        if (Input.GetButton(InputNames.Jump))
+        if (!SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
         {
-            if (Input.GetAxis(InputNames.Vertical) <= -DropDownForceRequired)
+            characterPlatformer.Move(Input.GetAxis(InputNames.Horizontal) * speedModifier);
+            if (Input.GetButton(InputNames.Jump))
             {
-                characterPlatformer.DropDownPlatform();
+                if (Input.GetAxis(InputNames.Vertical) <= -DropDownForceRequired)
+                {
+                    characterPlatformer.DropDownPlatform();
+                }
+                else
+                {
+                    characterPlatformer.Jump();
+                }
             }
-            else
+            if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid())
             {
-                characterPlatformer.Jump();
+                Attack();
             }
+            if (Input.GetButtonDown(InputNames.ToggleWeapon))
+            {
+                player.ToggleWeapon();
+            }
+            if (Input.GetButtonDown(InputNames.Inventory) && !SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
+            {
+                Time.timeScale = 0.0f;
+                SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
+            }
+            animator.SetFloat(AnimationNames.Player.Floats.HorizontalSpeed, Mathf.Abs(characterPlatformer.GetVelocity().x));
+            animator.SetFloat(AnimationNames.Player.Floats.VerticalSpeed, characterPlatformer.GetVelocity().y);
         }
-        if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid())
-        {
-            Attack();
-        }
-        if (Input.GetButtonDown(InputNames.SelectMeleeWeapon))
-        {
-            player.SetActiveWeapon(ItemType.MeleeWeapon);
-        }
-        if (Input.GetButtonDown(InputNames.SelectBow))
-        {
-            player.SetActiveWeapon(ItemType.Bow);
-        }
-        if (Input.GetButtonDown(InputNames.SelectWand))
-        {
-            player.SetActiveWeapon(ItemType.Wand);
-        }
-        if (Input.GetButtonDown(InputNames.ItemMenu) && !SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
-        {
-            Time.timeScale = 0.0f;
-            SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
-        }
-        animator.SetFloat(AnimationNames.Player.Floats.HorizontalSpeed, Mathf.Abs(characterPlatformer.GetVelocity().x));
-        animator.SetFloat(AnimationNames.Player.Floats.VerticalSpeed, characterPlatformer.GetVelocity().y);
     }
 
     void OnCollision(RaycastHit2D hit)
@@ -86,12 +85,35 @@ public class PlayerController : MonoBehaviour
     void OnStay(Collider2D collider2D)
     {
         ///Debug.Log("OnStay: " + collider2D.gameObject.name);
+        var health = collider2D.GetComponent<Health>();
+        if (health)
+        {
+            health.ApplyDamage(damage);
+        }
     }
 
 
     void OnExit(Collider2D collider2D)
     {
         ///Debug.Log("OnExit: " + collider2D.gameObject.name);
+    }
+
+    /// <summary>
+    /// Gets the speed modifier
+    /// </summary>
+    /// <returns>Rate by which the speed will be modified</returns>
+    public float GetSpeedModifier()
+    {
+        return speedModifier;
+    }
+
+    /// <summary>
+    /// Sets the speed modifier
+    /// </summary>
+    /// <param name="speed">New speed modifier</param>
+    public void SetSpeedModifier(float speed)
+    {
+        speedModifier = speed;
     }
 
     /// <summary>
@@ -138,11 +160,19 @@ public class PlayerController : MonoBehaviour
             case ItemType.MeleeWeapon:
                 animator.SetTrigger(AnimationNames.Player.Triggers.MeleeWeaponAttack);
                 break;
-            case ItemType.Bow:
-                animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);
-                break;
-            case ItemType.Wand:
-                animator.SetTrigger(AnimationNames.Player.Triggers.WandAttack);
+            case ItemType.RangedWeapon:
+                if (activeWeapon.GetComponent<Bow>())
+                {
+                    animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);
+                }
+                else if (activeWeapon.GetComponent<Wand>())
+                {
+                    animator.SetTrigger(AnimationNames.Player.Triggers.WandAttack);
+                }
+                else
+                {
+                    Debug.LogError("Attempting to attack with a Ranged Weapon that is neither a bow nor a wand!", activeWeapon.gameObject);
+                }
                 break;
             default:
                 Debug.LogError("An invalid WeaponType is active!", player.gameObject);

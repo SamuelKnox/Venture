@@ -20,7 +20,8 @@ public class Projectile : MonoBehaviour
         damage = GetComponent<Damage>();
     }
 
-    void Start() {
+    void Start()
+    {
         gameObject.layer = LayerMask.NameToLayer(LayerNames.Trigger);
         areaOfEffect.isTrigger = true;
         transform.RotateTowardsVelocity();
@@ -61,7 +62,7 @@ public class Projectile : MonoBehaviour
     /// <summary>
     /// Destroys projectile after it has finished dealing damage
     /// </summary>
-    private void OnDamageDealt()
+    private void OnDamageDealt(Health health)
     {
         Destroy(gameObject);
     }

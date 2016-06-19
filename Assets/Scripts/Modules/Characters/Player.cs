@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using UnityEngine;
 
 [RequireComponent(typeof(Inventory))]
+[RequireComponent(typeof(Damage))]
 public class Player : Character
 {
     [Tooltip("Container for player's weapons")]
@@ -12,17 +15,29 @@ public class Player : Character
     private Transform runeContainer;
 
     private Inventory inventory;
+    private Damage damage;
     private Weapon activeWeapon;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         inventory = GetComponent<Inventory>();
+        damage = GetComponent<Damage>();
         SetStartingActiveWeapon();
     }
 
     void Start()
     {
         TurnOffMeleeWeaponColliders();
+    }
+
+    /// <summary>
+    /// Gets the player's damage
+    /// </summary>
+    /// <returns>Damage</returns>
+    public Damage GetDamage()
+    {
+        return damage;
     }
 
     /// <summary>
@@ -37,7 +52,7 @@ public class Player : Character
         }
         if (!inventory.Contains(item))
         {
-            Transform itemContainer;
+            Transform itemContainer = null;
             if (item.GetComponent<Weapon>())
             {
                 itemContainer = weaponContainer;
@@ -46,7 +61,7 @@ public class Player : Character
             {
                 itemContainer = runeContainer;
             }
-            item.transform.SetParent(weaponContainer);
+            item.transform.SetParent(itemContainer);
             item.transform.position = weaponContainer.transform.position;
             item.transform.right *= Mathf.Sign(transform.localScale.x);
             inventory.Add(item);
@@ -66,6 +81,7 @@ public class Player : Character
         if (!meleeWeapon)
         {
             Debug.Log("Attempting to begin melee attack, but a Melee Weapon is not the active weapon!", gameObject);
+            return;
         }
         meleeWeapon.BeginSwing();
     }
@@ -78,7 +94,8 @@ public class Player : Character
         var meleeWeapon = activeWeapon.GetComponent<MeleeWeapon>();
         if (!meleeWeapon)
         {
-            Debug.Log("Attempting to begin melee attack, but a Melee Weapon is not the active weapon!", gameObject);
+            Debug.Log("Attempting to finish melee attack, but a Melee Weapon is not the active weapon!", gameObject);
+            return;
         }
         meleeWeapon.FinishSwing();
     }
@@ -120,13 +137,7 @@ public class Player : Character
             Debug.LogError("Equipping " + item.name + ", but " + inventory + " does not contain it!", inventory.gameObject);
         }
         inventory.SetActiveItem(item);
-        var weapon = item.GetComponent<Weapon>();
-        if (weapon)
-        {
-            activeWeapon.gameObject.SetActive(false);
-            activeWeapon = weapon;
-            activeWeapon.gameObject.SetActive(true);
-        }
+        SetActiveWeapon(item.GetItemType());
     }
 
     /// <summary>
@@ -148,15 +159,56 @@ public class Player : Character
     }
 
     /// <summary>
-    /// Sets the player's currently active weapon
+    /// Toggles between melee and ranged weapon
     /// </summary>
-    /// <param name="weaponType">Type of weapon to activate</param>
+    public void ToggleWeapon()
+    {
+        if (activeWeapon.GetComponent<MeleeWeapon>())
+        {
+            SetActiveWeapon(ItemType.RangedWeapon);
+        }
+        else if (activeWeapon.GetComponent<RangedWeapon>())
+        {
+            SetActiveWeapon(ItemType.MeleeWeapon);
+        }
+        else
+        {
+            Debug.LogError("Neither " + ItemType.MeleeWeapon.ToString() + " nor " + ItemType.RangedWeapon.ToString() + " are equipped!", gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Sets a weapon type to be the player's currently equipped weapon, or disables the weapon type
+    /// </summary>
+    /// <param name="weaponType">Type of weapon to change</param>
     public void SetActiveWeapon(ItemType weaponType)
     {
-        activeWeapon = null;
-        SetActiveWeapon(ItemType.MeleeWeapon, weaponType == ItemType.MeleeWeapon);
-        SetActiveWeapon(ItemType.Bow, weaponType == ItemType.Bow);
-        SetActiveWeapon(ItemType.Wand, weaponType == ItemType.Wand);
+        if (activeWeapon)
+        {
+            activeWeapon.gameObject.SetActive(false);
+        }
+        if (!inventory.GetActiveItem(weaponType))
+        {
+            return;
+        }
+        var meleeWeapon = inventory.GetActiveItem(ItemType.MeleeWeapon);
+        if (meleeWeapon)
+        {
+            if (weaponType == ItemType.MeleeWeapon)
+            {
+                meleeWeapon.gameObject.SetActive(true);
+                activeWeapon = meleeWeapon.GetComponent<Weapon>();
+            }
+        }
+        var rangedWeapon = inventory.GetActiveItem(ItemType.RangedWeapon);
+        if (rangedWeapon)
+        {
+            if (weaponType == ItemType.RangedWeapon)
+            {
+                rangedWeapon.gameObject.SetActive(true);
+                activeWeapon = rangedWeapon.GetComponent<Weapon>();
+            }
+        }
     }
 
     /// <summary>
@@ -174,20 +226,13 @@ public class Player : Character
         {
             case ItemType.MeleeWeapon:
                 return true;
-            case ItemType.Bow:
-                var bow = activeWeapon.GetComponent<Bow>();
-                if (!bow)
+            case ItemType.RangedWeapon:
+                var rangedWeapon = activeWeapon.GetComponent<RangedWeapon>();
+                if (!rangedWeapon)
                 {
-                    Debug.LogError("The item of type " + ItemType.Bow.ToString() + " does not have a Bow component!", activeWeapon.gameObject);
+                    Debug.LogError("The item of type " + ItemType.RangedWeapon.ToString() + " does not have a Ranged Weapon Component!", activeWeapon.gameObject);
                 }
-                return bow.IsReady();
-            case ItemType.Wand:
-                var wand = activeWeapon.GetComponent<Wand>();
-                if (!wand)
-                {
-                    Debug.LogError("The item of type " + ItemType.Wand.ToString() + " does not have a Wand component!", activeWeapon.gameObject);
-                }
-                return wand.IsReady();
+                return rangedWeapon.IsReady();
             default:
                 Debug.LogError("An invalid WeaponType is active!", activeWeapon.gameObject);
                 return false;
@@ -218,11 +263,7 @@ public class Player : Character
         }
         if (!activeWeapon)
         {
-            SetActiveWeapon(ItemType.Bow);
-        }
-        if (!activeWeapon)
-        {
-            SetActiveWeapon(ItemType.Wand);
+            SetActiveWeapon(ItemType.RangedWeapon);
         }
         if (!activeWeapon)
         {
@@ -231,20 +272,11 @@ public class Player : Character
     }
 
     /// <summary>
-    /// Sets a weapon type to be the player's currently equipped weapon, or disables the weapon type
+    /// Player dies
     /// </summary>
-    /// <param name="weaponType">Type of weapon to change</param>
-    /// <param name="active">Whether to set the weapon to be the currently equipped weapon or not</param>
-    private void SetActiveWeapon(ItemType weaponType, bool active)
+    public override void Die()
     {
-        var activeItem = inventory.GetActiveItem(weaponType);
-        if (activeItem)
-        {
-            activeItem.gameObject.SetActive(active);
-            if (active)
-            {
-                activeWeapon = activeItem.GetComponent<Weapon>();
-            }
-        }
+        Debug.Log("Player died.");
+        throw new NotImplementedException();
     }
 }

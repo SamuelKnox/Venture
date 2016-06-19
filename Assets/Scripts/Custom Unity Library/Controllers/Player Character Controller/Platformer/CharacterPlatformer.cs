@@ -42,7 +42,6 @@
         [Range(0, 1)]
         private float jumpIncreaseRate = 0.5f;
 
-
         /// <summary>
         /// Called when colliding with an object
         /// </summary>

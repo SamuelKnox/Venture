@@ -3,6 +3,9 @@
     using UnityEngine;
     using UnityEditor;
 
+    /// <summary>
+    /// Custom editor UI for inspector for Level
+    /// </summary>
     [CustomEditor(typeof(Level))]
     public class LevelEditor : Editor
     {

@@ -53,6 +53,11 @@
         [SerializeField]
         private Door[] doors = new Door[1];
 
+        [Tooltip("How often the Room will spawn.")]
+        [SerializeField]
+        [Range(0.0f, 1.0f)]
+        private float weight = 0.5f;
+
         private Level level;
 
         void Awake()
@@ -171,6 +176,24 @@
         public void SetWidth(int width)
         {
             this.width = width;
+        }
+
+        /// <summary>
+        /// Gets the weight of this room, determining how often it is spawned
+        /// </summary>
+        /// <returns>Weight of room</returns>
+        public float GetWeight()
+        {
+            return weight;
+        }
+
+        /// <summary>
+        /// Sets the weight for this room, determining how often it is spawned
+        /// </summary>
+        /// <param name="weight">Room weight</param>
+        public void SetWeight(float weight)
+        {
+            this.weight = weight;
         }
 
         /// <summary>
@@ -596,6 +619,10 @@
             var descendents = transform.GetComponentsInChildren<Transform>();
             foreach (Transform child in descendents)
             {
+                if(!child.parent != transform)
+                {
+                    continue;
+                }
                 var extents = new Vector2(width, height) * Level.GridSize / 2.0f;
                 if (level.GetWallTexture() && child.name != WallName)
                 {
@@ -621,7 +648,8 @@
                 }
                 float newX = Mathf.Clamp(child.position.x, transform.position.x - extents.x, transform.position.x + extents.x);
                 float newY = Mathf.Clamp(child.position.y, transform.position.y - extents.y, transform.position.y + extents.y);
-                child.transform.position = new Vector2(newX, newY);
+                float newZ = child.transform.position.z;
+                child.transform.position = new Vector3(newX, newY, newZ);
             }
         }
 

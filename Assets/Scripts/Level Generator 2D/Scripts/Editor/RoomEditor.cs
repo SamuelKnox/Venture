@@ -20,12 +20,17 @@
         private const string DoorLabelPrefix = "Door #";
         private const string DoorTooltipPrefix = "This is the Door at index #";
         private const string DoorTooltipSuffix = ".  The number to the right is its position in the room.";
+        private const string WeightLabel = "Weight";
+        private const string WeightTooltip = "This determines how often the room will spawn.";
+        private const float MinWeight = 0.0f;
+        private const float MaxWeight = 1.0f;
 
         public override void OnInspectorGUI()
         {
             var room = (Room)target;
             MaintainGlobalPoint(room);
             MaintainSize(room);
+            MaintainWeight(room);
             MaintainDoors(room);
             UpdateGUI(room);
         }
@@ -74,6 +79,13 @@
                 var index = EditorGUILayout.IntSlider(doorGUIContent, doors[i].GetIndex(), 0, maxDoors - 1);
                 doors[i].SetIndex(index);
             }
+        }
+
+        private void MaintainWeight(Room room)
+        {
+            var guiContent = new GUIContent(WeightLabel, WeightTooltip);
+            float weight = EditorGUILayout.Slider(guiContent, room.GetWeight(), MinWeight, MaxWeight);
+            room.SetWeight(weight);
         }
 
         /// <summary>

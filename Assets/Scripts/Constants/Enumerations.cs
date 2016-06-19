@@ -24,8 +24,11 @@ public enum ItemType
 {
     Rune,
     MeleeWeapon,
-    Bow,
-    Wand
+    RangedWeapon,
+    Boots,
+    Gloves,
+    Helmet,
+    Leggings,
 }
 
 /// <summary>

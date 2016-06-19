@@ -259,6 +259,10 @@ public class Inventory : MonoBehaviour
                 return false;
             }
             items.Add(item);
+            if (!activeItem)
+            {
+                activeItem = item;
+            }
             return true;
         }
 

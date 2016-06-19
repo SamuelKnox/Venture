@@ -1,4 +1,21 @@
-﻿public static class AnimationNames {
+﻿public static class AnimationNames
+{
+    public static class Mortar
+    {
+        public static class Triggers
+        {
+            /// <summary>
+            /// Animation name to fire weapon
+            /// </summary>
+            public const string Fire = "Fire";
+
+            /// <summary>
+            /// Animation name for when mortar dies
+            /// </summary>
+            public const string Die = "Die";
+        }
+    }
+
     public static class Player
     {
         public static class Triggers

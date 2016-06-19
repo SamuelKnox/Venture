@@ -5,7 +5,7 @@ using UnityEngine;
 /// Ranged Weapons can be used to spawn and fire Projectiles
 /// </summary>
 [ExecuteInEditMode]
-public class RangedWeapon : Weapon
+public class RangedWeapon : MonoBehaviour
 {
     private const string SpawnPositionGizmoName = "gizmo_ranged_weapon_spawn_position.png";
 
@@ -43,6 +43,7 @@ public class RangedWeapon : Weapon
 
     private float totalCooldown;
     private Vector3 oldRightVector;
+    private float damageOverTime;
 
     void Awake()
     {
@@ -82,13 +83,14 @@ public class RangedWeapon : Weapon
             var direction = target.position - transform.position + projectileSpawnOffset;
             return Fire(direction, ignoreGravity);
         }
-        if (!IsValidShot())
+        if (!IsValidShot(target.position - transform.position))
         {
             return null;
         }
         var projectileInstance = Instantiate(projectile, transform.position + projectileSpawnOffset, Quaternion.identity) as Projectile;
         GameObjectUtility.ChildCloneToContainer(projectileInstance.gameObject);
         projectileInstance.tag = gameObject.tag;
+        SetProjectileDamageOverTime(projectileInstance);
         var projectileBody = projectileInstance.GetRigidBody2D();
         if (!unlimitedRange && !projectileBody.IsWithinRange(target.position, force, arch))
         {
@@ -99,6 +101,23 @@ public class RangedWeapon : Weapon
         DisableProjectileColliders(projectileInstance);
         fireCooldown = totalCooldown;
         return projectileInstance;
+    }
+
+    /// <summary>
+    /// Check whether the target is within range and the Ranged Weapon is ready to fire
+    /// </summary>
+    /// <param name="target">Target to aim at</param>
+    /// <returns>Whether or not the target is a valid shot</returns>
+    public bool IsValidShot(Transform target)
+    {
+        if (!IsValidShot(target.position - transform.position))
+        {
+            return false;
+        }
+        var projectileBody = new GameObject().AddComponent<Rigidbody2D>();
+        bool inRange = projectileBody.IsWithinRange(target.position, force, arch);
+        Destroy(projectileBody.gameObject);
+        return inRange;
     }
 
     /// <summary>
@@ -117,6 +136,7 @@ public class RangedWeapon : Weapon
         var projectileInstance = Instantiate(projectile, transform.position + projectileSpawnOffset, Quaternion.identity) as Projectile;
         GameObjectUtility.ChildCloneToContainer(projectileInstance.gameObject);
         projectileInstance.tag = gameObject.tag;
+        SetProjectileDamageOverTime(projectileInstance);
         var projectileBody = projectileInstance.GetRigidBody2D();
         if (ignoreGravity)
         {
@@ -142,6 +162,24 @@ public class RangedWeapon : Weapon
     public bool IsReady()
     {
         return fireCooldown <= 0;
+    }
+
+    /// <summary>
+    /// Gets the amount of damage dealt over time by the ranged weapon's projectiles
+    /// </summary>
+    /// <returns>Damage over time</returns>
+    public float GetDamageOverTime()
+    {
+        return damageOverTime;
+    }
+
+    /// <summary>
+    /// Sets the damage over time to be dealt by the ranged weapon's projectiles
+    /// </summary>
+    /// <param name="damageOverTime">Damage over time</param>
+    public void SetDamageOverTime(float damageOverTime)
+    {
+        this.damageOverTime = damageOverTime;
     }
 
     /// <summary>
@@ -185,35 +223,22 @@ public class RangedWeapon : Weapon
     }
 
     /// <summary>
-    /// Checks to make sure the shot is valid
-    /// </summary>
-    /// <returns>Whether or not the shot is valid</returns>
-    private bool IsValidShot()
-    {
-        if (fireCooldown > 0)
-        {
-            return false;
-        }
-        if (!projectile)
-        {
-            Debug.LogWarning(name + " is missing a Projectile.");
-            return false;
-        }
-        return true;
-    }
-
-    /// <summary>
     /// Checks to make sure the shot power required is within the capabilities of this Ranged Weapon
     /// </summary>
     /// <param name="direction">The direction whose magnitude will be used</param>
     /// <returns>Whether or not the shot is within range</returns>
     private bool IsValidShot(Vector2 direction)
     {
-        if (!unlimitedRange && direction.magnitude > range)
+        if (!projectile)
+        {
+            Debug.LogWarning(name + " is missing a Projectile.");
+            return false;
+        }
+        if (!unlimitedRange && direction.magnitude > range || fireCooldown > 0)
         {
             return false;
         }
-        return IsValidShot();
+        return true;
     }
 
     /// <summary>
@@ -223,5 +248,19 @@ public class RangedWeapon : Weapon
     {
         fireCooldown -= Time.deltaTime;
         fireCooldown = Mathf.Max(0, fireCooldown);
+    }
+
+    /// <summary>
+    /// Sets the damage over time for the projectile
+    /// </summary>
+    /// <param name="projectile">Projectile to set damage over time for</param>
+    private void SetProjectileDamageOverTime(Projectile projectile)
+    {
+        var damage = projectile.GetComponent<Damage>();
+        if (!damage)
+        {
+            Debug.LogError(projectile + " is required to have a Damage component!", projectile);
+        }
+        damage.SetDamageOverTime(damageOverTime);
     }
 }

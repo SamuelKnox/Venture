@@ -23,6 +23,8 @@
         private const string WallBlockName = "Wall";
         private static readonly float[] WallThicknesses = { 0.125f, 0.25f, 0.5f, 1.0f, 2.0f };
         private const string CloneSuffix = "(Clone)";
+        private const float MinRandomWeight = 0.01f;
+        private const float MaxRandomWeight = 1.0f;
 
         [Tooltip("Whether or not to retain Rooms after they leave the Main Camera.  This could create latency issues in larger levels if enabled.")]
         [SerializeField]
@@ -418,13 +420,18 @@
         }
 
         /// <summary>
-        /// Adds random neighbors too all open rooms within range.
-        /// Neighbors are loaded from the Resources folder, or a subfolder of the Resources folder if specified.
-        /// The folders will be prioritized in the order they are received.
-        /// If wallBlocks, then the grid points in that zone which have no applicable paths will be blocked off with walls.
-        /// To set wallBlocks to false without prioritizing file paths, set prioritizedFilePaths to null and wallBlocks to true
-        /// When passing larger sections, wallBlocks can lead towards more linear paths
+        /// Adds random neighbors to all open Rooms within range, where an open Room is a Room with a Door that does not have a connecting Room.
+        /// Neighbors must be loaded from the Resources folder.
+        /// To set wallBlocks to false without prioritizing file paths, set prioritizedFilePaths to null and wallBlocks to true.
+        /// When passing larger sections, wallBlocks can lead towards more linear paths.
         /// </summary>
+        /// <param name="x0">Minimum x to where a neighbor can be</param>
+        /// <param name="y0">Minimum y to where a neighbor can be</param>
+        /// <param name="x1">Maximum x to where a neighbor can be</param>
+        /// <param name="y1">Maximum y to where a neighbor can be</param>
+        /// <param name="prioritizedFilePaths">File paths, in order or preference, that will be used to find the Rooms to use</param>
+        /// <param name="wallBlocks">Whether or not to create rooms of walls in areas within the specified coordinates if no other room can be reached or fit.  A wall texture mustbe selected in order for wall blocks to be created.</param>
+        /// <returns>The Rooms which were created</returns>
         public Room[] AddNeighbors(int x0, int y0, int x1, int y1, string[] prioritizedFilePaths = null, bool wallBlocks = true)
         {
             var neighborsAdded = new List<Room>();
@@ -438,7 +445,7 @@
                     neighborsAdded.AddRange(roomNeighborsAdded);
                 }
             }
-            if (wallTexture)
+            if (wallTexture && wallBlocks)
             {
                 for (int x = x0; x <= x1; x++)
                 {
@@ -457,11 +464,11 @@
 
         /// <summary>
         /// Adds random neighbors surrounding the room.
-        /// Neighbors are loaded from the Resources folder, or a subfolder of the Resources folder if specified.
-        /// The folders will be prioritized in the order they are received.
-        /// Primitive rooms must be loaded in order to prevent failures in searching for neighbors.
-        /// Primitive rooms must be loaded last, or else any paths following will not be reached.
+        /// Neighbors must be loaded from the Resources folder.
         /// </summary>
+        /// <param name="room">Room to which neighbors will be added</param>
+        /// <param name="prioritizedFilePaths">File paths, in order or preference, that will be used to find the Rooms to use</param>
+        /// <returns>Neighboring Rooms which were added</returns>
         public Room[] AddNeighbors(Room room, string[] prioritizedFilePaths = null)
         {
             if (!room)
@@ -487,7 +494,7 @@
                 foreach (var filePath in prioritizedFilePaths)
                 {
                     var potentialNeighbors = Resources.LoadAll<Room>(filePath);
-                    potentialNeighbors = potentialNeighbors.OrderBy(c => Random.Range(float.MinValue, float.MaxValue)).ToArray();
+                    potentialNeighbors = potentialNeighbors.OrderBy(r => r.GetWeight() / Random.Range(MinRandomWeight, MaxRandomWeight)).ToArray();
                     neighborAdded = AddNeighbor(roomDoor, potentialNeighbors);
                     if (neighborAdded)
                     {

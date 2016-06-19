@@ -24,24 +24,14 @@ public static class InputNames
     public const string Attack = "Attack";
 
     /// <summary>
-    /// Input name used to set the currently equipped melee weapon to the active weapon
+    /// Toggles between melee and ranged weapons
     /// </summary>
-    public const string SelectMeleeWeapon = "Select Melee Weapon";
+    public const string ToggleWeapon = "Toggle Weapon";
 
     /// <summary>
-    /// Input name used to set the currently equipped bow to the active weapon
+    /// Input name used to open/close the inventory
     /// </summary>
-    public const string SelectBow = "Select Bow";
-
-    /// <summary>
-    /// Input name used to set the currently equipped wand to the active weapon
-    /// </summary>
-    public const string SelectWand = "Select Wand";
-
-    /// <summary>
-    /// Input name used to open the item menu
-    /// </summary>
-    public const string ItemMenu = "Item Menu";
+    public const string Inventory = "Inventory";
 
     /// <summary>
     /// Input name used to switch tab to the left
