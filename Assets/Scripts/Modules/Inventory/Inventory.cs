@@ -99,6 +99,7 @@ public class Inventory : MonoBehaviour
         if (itemContainer == null)
         {
             Debug.LogError("The Item Container for " + item.GetItemType() + " is missing!", gameObject);
+            return false;
         }
         bool success = itemContainer.Add(item);
         if (success)
@@ -154,10 +155,12 @@ public class Inventory : MonoBehaviour
         if (!item)
         {
             Debug.LogError("Attempted to set null item as the active item!", gameObject);
+            return false;
         }
         if (!Contains(item))
         {
             Debug.LogError("Attempting to set " + item.name + " as the active item, but it is not contained in " + name + "!", gameObject);
+            return false;
         }
         return GetItemContainer(item.GetItemType()).SetActiveItem(item);
     }
@@ -219,8 +222,8 @@ public class Inventory : MonoBehaviour
         {
             if (!item)
             {
-                Debug.LogError("You cannot set the active item to null!");
-                Debug.Log("Use ClearActiveItem(Item) instead.");
+                Debug.LogError("You cannot set the active item to null!  Use ClearActiveItem(Item) instead!");
+                return false;
             }
             if (!Contains(item) || item.GetItemType() != GetItemType())
             {

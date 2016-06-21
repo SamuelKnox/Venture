@@ -260,6 +260,7 @@ public class RangedWeapon : MonoBehaviour
         if (!damage)
         {
             Debug.LogError(projectile + " is required to have a Damage component!", projectile);
+            return;
         }
         damage.SetDamageOverTime(damageOverTime);
     }

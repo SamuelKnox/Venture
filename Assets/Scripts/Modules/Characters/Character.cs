@@ -1,13 +1,17 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Health))]
 public abstract class Character : MonoBehaviour
 {
-    private Health health;
+    protected Health health;
 
     protected virtual void Awake()
     {
-        health = GetComponent<Health>();
+        health = GetComponentInChildren<Health>();
+        if (!health)
+        {
+            Debug.LogError(gameObject + " or one of its children must have a Health component!", gameObject);
+            return;
+        }
     }
 
     protected virtual void OnEnable()
@@ -20,7 +24,7 @@ public abstract class Character : MonoBehaviour
         health.OnDamageDealt -= OnDamageDealt;
     }
 
-    private void OnDamageDealt(Damage damage)
+    protected virtual void OnDamageDealt(Damage damage)
     {
         if (health.IsDead())
         {
@@ -28,5 +32,5 @@ public abstract class Character : MonoBehaviour
         }
     }
 
-    public abstract void Die();
+    protected abstract void Die();
 }

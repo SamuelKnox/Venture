@@ -420,6 +420,7 @@ namespace CreativeSpore.SuperTilemapEditor
                     if (m_brushes.Count >= maxId)
                     {
                         Debug.LogError(" Max number of brushes reached! " + maxId);
+                        return;
                     }
                     else
                     {

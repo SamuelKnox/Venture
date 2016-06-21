@@ -56,6 +56,7 @@
                 throw new System.NotImplementedException("Rotating towards velocity has not yet been implemented for 3D use!");
             }
             Debug.LogError("A Rigidbody or Rigidbody2D must be attached to the GameObject in order to rotate it towards its velocity!", transform.gameObject);
+            return;
         }
 
         /// <summary>

@@ -1,18 +1,35 @@
 ﻿public static class AnimationNames
 {
-    public static class Mortar
+    public static class Enemy
     {
-        public static class Triggers
+        public static class Floats
         {
             /// <summary>
-            /// Animation name to fire weapon
+            /// Animation name for an enemy's horizontal speed
             /// </summary>
-            public const string Fire = "Fire";
+            public const string HorizontalSpeed = "Horizontal Speed";
 
             /// <summary>
-            /// Animation name for when mortar dies
+            /// Animation name for an enemy's vertical speed
+            /// </summary>
+            public const string VerticalSpeed = "Vertical Speed";
+        }
+        public static class Triggers
+        {
+
+            /// <summary>
+            /// Animation name for enemy's primary attack
+            /// </summary>
+            public const string Attack = "Attack";
+            /// <summary>
+            /// Animation name for when enemy dies
             /// </summary>
             public const string Die = "Die";
+
+            /// <summary>
+            /// Animation name for when enemy is hurt
+            /// </summary>
+            public const string Hurt = "Hurt";
         }
     }
 

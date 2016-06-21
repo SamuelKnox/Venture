@@ -5,7 +5,6 @@ using UnityEngine;
 /// Projectiles are specified components with a Rigidbody2D
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Damage))]
 public class Projectile : MonoBehaviour
 {
@@ -16,14 +15,11 @@ public class Projectile : MonoBehaviour
     void Awake()
     {
         body2D = GetComponent<Rigidbody2D>();
-        areaOfEffect = GetComponent<Collider2D>();
         damage = GetComponent<Damage>();
     }
 
     void Start()
     {
-        gameObject.layer = LayerMask.NameToLayer(LayerNames.Trigger);
-        areaOfEffect.isTrigger = true;
         transform.RotateTowardsVelocity();
     }
 

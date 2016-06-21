@@ -48,4 +48,14 @@
     /// Layers for one way platforms for players
     /// </summary>
     public const string OneWayPlatform = "One Way Platform";
+
+    /// <summary>
+    /// Layers for GameObjects whose Health received Damage
+    /// </summary>
+    public const string Health = "Health";
+
+    /// <summary>
+    /// Layers for GameObjects that deal Damage to Health
+    /// </summary>
+    public const string Damage = "Damage";
 }

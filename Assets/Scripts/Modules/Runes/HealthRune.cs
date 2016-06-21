@@ -35,11 +35,13 @@ public class HealthRune : Rune
         if (!player)
         {
             Debug.LogError(gameObject + " could not find player!", gameObject);
+            return;
         }
         var health = player.GetComponent<Health>();
         if (!health)
         {
             Debug.LogError(player + " did not have Health!", player.gameObject);
+            return;
         }
         health.SetMaxHitPoints(health.GetMaxHitPoints() + change);
     }

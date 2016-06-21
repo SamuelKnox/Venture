@@ -36,6 +36,7 @@ public class SpeedRune : Rune
         if (!playerController)
         {
             Debug.LogError(gameObject + " could not find Player Controller!", gameObject);
+            return;
         }
         playerController.SetSpeedModifier(playerController.GetSpeedModifier() + change);
     }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public abstract class Armor : MonoBehaviour
 {
@@ -26,11 +27,19 @@ public abstract class Armor : MonoBehaviour
         if (!player)
         {
             Debug.LogError("Could not find player!", gameObject);
+            return;
         }
-        var playerDamage = player.GetDamage();
+        var playerDamages = player.GetComponentsInChildren<Damage>().Where(d => !d.GetComponent<MeleeWeapon>());
+        if (playerDamages.Count() != 1)
+        {
+            Debug.LogError(playerDamages.Count() + " non-MeleeWeapon Damage children were found on the player, but there must be exactly one!", player.gameObject);
+            return;
+        }
+        var playerDamage = playerDamages.FirstOrDefault();
         if (!playerDamage)
         {
             Debug.LogError("Could not find Damage on " + player + "!", player.gameObject);
+            return;
         }
         float change = damageOverTime - this.damageOverTime;
         this.damageOverTime = damageOverTime;

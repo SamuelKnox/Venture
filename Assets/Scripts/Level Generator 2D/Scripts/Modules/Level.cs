@@ -177,6 +177,7 @@
             if (EnumUtility.Count<WallWidth>() != WallThicknesses.Count())
             {
                 Debug.LogError("There must be an equal number of Wall Thickness options and Wall Thickness values!", gameObject);
+                return;
             }
             wallWidth = WallThicknesses[(int)this.wallThickness];
         }
@@ -221,6 +222,7 @@
                     if (grid.ContainsKey(gridPoint))
                     {
                         Debug.LogError("Attempting to place " + room + " at " + gridPoint + ", but " + grid[gridPoint] + " already exists there!", room.gameObject);
+                        return;
                     }
                     grid.Add(gridPoint, room);
                 }
@@ -513,6 +515,7 @@
                     else
                     {
                         Debug.LogError("Failed to find primitive neighbor for " + room.name + " at Door #" + roomDoor.GetIndex() + "!", room.gameObject);
+                        return null;
                     }
                 }
             }
@@ -582,6 +585,7 @@
             if (grid.ContainsKey(gridPoint))
             {
                 Debug.LogError("Attempting to place " + wallChunk + " at " + gridPoint + ", but " + grid[gridPoint] + " already exists there!", wallChunk.gameObject);
+                return;
             }
             grid.Add(gridPoint, wallChunk);
         }
@@ -624,6 +628,7 @@
             if (grid.ContainsKey(gridPoint))
             {
                 Debug.LogError("Attempting to place " + primitiveRoom + " at " + gridPoint + ", but " + grid[gridPoint] + " already exists there!", primitiveRoom.gameObject);
+                return;
             }
             grid.Add(gridPoint, primitiveRoom);
             CloseDoors(primitiveRoom);
@@ -889,7 +894,7 @@
                         break;
                     default:
                         Debug.LogError("Invalid Door Direction (" + door.GetSide() + " received!", gameObject);
-                        break;
+                        return false;
                 }
             }
             return false;

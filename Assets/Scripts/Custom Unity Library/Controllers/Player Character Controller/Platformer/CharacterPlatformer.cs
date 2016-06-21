@@ -8,6 +8,7 @@
     /// This is an extension to Prime31's CharacterController2D for platformer controls
     /// </summary>
     [RequireComponent(typeof(CharacterController2D))]
+    [RequireComponent(typeof(Rigidbody2D))]
     public class CharacterPlatformer : MonoBehaviour
     {
         private const float DropDownRate = 3.0f;
@@ -178,9 +179,10 @@
         /// Applies a force to the character's velocity
         /// </summary>
         /// <param name="force">Force to apply</param>
-        public void AddForce(Vector2 force)
+        public void AddImpulse(Vector2 force)
         {
-            velocity += force;
+            velocity += force / body2D.mass;
+            characterController2D.velocity += (Vector3)force / body2D.mass;
         }
 
         /// <summary>
@@ -190,6 +192,16 @@
         public Vector2 GetVelocity()
         {
             return characterController2D.velocity;
+        }
+
+        /// <summary>
+        /// Sets the velocity of the character
+        /// </summary>
+        /// <param name="velocity">Velocity to set</param>
+        public void SetVelocity(Vector2 velocity)
+        {
+            this.velocity = velocity / body2D.mass;
+            characterController2D.velocity = velocity / body2D.mass;
         }
 
         /// <summary>

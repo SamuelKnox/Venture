@@ -11,7 +11,6 @@ public class Mortar : Enemy
     private float maximumWaitTime = 10.0f;
 
     private RangedWeapon rangedWeapon;
-    private Animator animator;
     private Player player;
     private bool firing = false;
 
@@ -19,7 +18,6 @@ public class Mortar : Enemy
     {
         base.Awake();
         rangedWeapon = GetComponent<RangedWeapon>();
-        animator = GetComponent<Animator>();
         player = FindObjectOfType<Player>();
     }
 
@@ -49,7 +47,7 @@ public class Mortar : Enemy
             if (!firing && rangedWeapon.IsValidShot(player.transform))
             {
                 firing = true;
-                animator.SetTrigger(AnimationNames.Mortar.Triggers.Fire);
+                animator.SetTrigger(AnimationNames.Enemy.Triggers.Attack);
             }
         }
     }
@@ -57,9 +55,9 @@ public class Mortar : Enemy
     /// <summary>
     /// Causes mortar to die
     /// </summary>
-    public override void Die()
+    protected override void Die()
     {
-        animator.SetTrigger(AnimationNames.Mortar.Triggers.Die);
+        animator.SetTrigger(AnimationNames.Enemy.Triggers.Die);
         var damage = GetComponent<Damage>();
         if (damage)
         {

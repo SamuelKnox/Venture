@@ -57,14 +57,17 @@ public class UIInventory : MonoBehaviour
         if (!player)
         {
             Debug.LogError("Player was not found!", gameObject);
+            return;
         }
         if (equipmentTabs.Length == 0)
         {
             Debug.LogError("There must be at least one item tab!", gameObject);
+            return;
         }
         if (runeTabs.Length == 0)
         {
             Debug.LogError("There must be at least one rune tab!", gameObject);
+            return;
         }
     }
 
@@ -108,7 +111,7 @@ public class UIInventory : MonoBehaviour
                     break;
                 default:
                     Debug.LogError("An invalid InventoryMode (" + inventoryMode + ") is being used!", gameObject);
-                    break;
+                    return;
             }
         }
     }
@@ -137,7 +140,7 @@ public class UIInventory : MonoBehaviour
                 break;
             default:
                 Debug.LogError("An invalid InventoryMode (" + inventoryMode.ToString() + ") was used!", gameObject);
-                break;
+                return;
         }
         MoveTab(0);
     }
@@ -155,6 +158,7 @@ public class UIInventory : MonoBehaviour
             if (!equipmentTabTransform)
             {
                 Debug.LogError(equipmentTabInstance.name + " is missing a RectTransform!", equipmentTabInstance.gameObject);
+                return;
             }
             equipmentTabTransform.SetParent(categoryTabPanel);
             float xPosition = i * (equipmentTabTransform.sizeDelta.x + HorizontalTabSpacing) + HorizontalTabSpacing;
@@ -175,16 +179,19 @@ public class UIInventory : MonoBehaviour
         if (!itemButton)
         {
             Debug.LogError("Item Button is missing from the currently selected game object!", EventSystem.current.currentSelectedGameObject);
+            return false;
         }
         activeItem = itemButton.GetItem();
         if (!activeItem)
         {
             Debug.LogError("The Item represented by the Item Button is null!", itemButton.gameObject);
+            return false;
         }
         var equipment = activeItem.GetComponent<Equipment>();
         if (!equipment)
         {
             Debug.LogError(activeItem + " is not Equipment, and it needs to be to access Runes!", activeItem.gameObject);
+            return false;
         }
         var runeTypes = equipment.GetRuneTypes();
         int skippedRunes = 0;
@@ -200,6 +207,7 @@ public class UIInventory : MonoBehaviour
             if (!runeTabTransform)
             {
                 Debug.LogError(runeTabInstance.name + " is missing a RectTransform!", runeTabInstance.gameObject);
+                return false;
             }
             runeTabTransform.SetParent(categoryTabPanel);
             float xPosition = (i - skippedRunes) * (runeTabTransform.sizeDelta.x + HorizontalTabSpacing) + HorizontalTabSpacing;
@@ -245,7 +253,7 @@ public class UIInventory : MonoBehaviour
                 break;
             default:
                 Debug.LogError("An invalid InventoryMode (" + inventoryMode.ToString() + ") was used!", gameObject);
-                break;
+                return;
         }
     }
 
@@ -262,6 +270,7 @@ public class UIInventory : MonoBehaviour
         if (!buttonPrefabTransform)
         {
             Debug.LogError(itemButton.name + " needs a RectTransform, but does not have one!", gameObject);
+            return;
         }
         var buttonSize = new Vector2(buttonPrefabTransform.sizeDelta.x, buttonPrefabTransform.sizeDelta.y);
         float contentWidth = horizontalItems * (buttonSize.x + itemSpacing.x) + itemSpacing.x;
@@ -272,12 +281,14 @@ public class UIInventory : MonoBehaviour
             if (!items[i])
             {
                 Debug.LogError("There is a null Item in the inventory!", player.GetInventory().gameObject);
+                return;
             }
             var itemButtonInstance = Instantiate(itemButton);
             var buttonTransform = itemButtonInstance.GetComponent<RectTransform>();
             if (!buttonTransform)
             {
                 Debug.LogError(itemButtonInstance.name + " is missing a RectTransform!", itemButtonInstance.gameObject);
+                return;
             }
             buttonTransform.SetParent(itemsContentPanel);
             float xPosition = (-itemsContentPanel.sizeDelta.x + buttonTransform.sizeDelta.x) / 2.0f + (i % horizontalItems) * (buttonTransform.sizeDelta.x + itemSpacing.x) + itemSpacing.x;
@@ -289,6 +300,7 @@ public class UIInventory : MonoBehaviour
             if (!itemSprite)
             {
                 Debug.LogError(items[i] + " is missing a child Sprite Renderer!", items[i].gameObject);
+                return;
             }
             buttonImage.sprite = itemSprite.sprite;
             bool activeItem = player.GetInventory().GetActiveItem(items[i].GetItemType()) == items[i];
@@ -300,6 +312,7 @@ public class UIInventory : MonoBehaviour
             if (!button)
             {
                 Debug.LogError(button.name = " is missing a Button component!", button.gameObject);
+                return;
             }
             var item = itemButtonInstance.GetItem();
             button.onClick.AddListener(() => actionToTakeWithItems(item));
@@ -315,11 +328,13 @@ public class UIInventory : MonoBehaviour
         if (!itemButton)
         {
             Debug.LogError("Item Button is missing from the currently selected game object!", EventSystem.current.currentSelectedGameObject);
+            return;
         }
         var item = itemButton.GetItem();
         if (!item)
         {
             Debug.LogError("The Item represented by the Item Button is null!", itemButton.gameObject);
+            return;
         }
         var description = item.GetDescription();
         if (string.IsNullOrEmpty(description))
@@ -338,11 +353,13 @@ public class UIInventory : MonoBehaviour
         if (!item)
         {
             Debug.LogError("Cannot equip a null item!", gameObject);
+            return;
         }
         var equipment = item.GetComponent<Equipment>();
         if (!equipment)
         {
             Debug.LogError(item + " is not Equipment!", item.gameObject);
+            return;
         }
         player.Equip(item);
     }
@@ -357,11 +374,13 @@ public class UIInventory : MonoBehaviour
         if (!rune)
         {
             Debug.LogError("Expecting a Rune, but received " + item + "!", item.gameObject);
+            return;
         }
         var equipment = activeItem.GetComponent<Equipment>();
         if (!equipment)
         {
             Debug.LogError(activeItem + " must be an Equipment to have Runes!", activeItem.gameObject);
+            return;
         }
         equipment.SetRune(rune);
     }

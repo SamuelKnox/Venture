@@ -6,7 +6,7 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private Player player;
 
-    void Update()
+    void LateUpdate()
     {
         UpdateCameraPosition();
     }

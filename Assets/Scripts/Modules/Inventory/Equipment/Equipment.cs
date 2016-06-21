@@ -26,6 +26,7 @@ public abstract class Equipment : Item
         if (runeSocket == null)
         {
             Debug.LogError(gameObject + " cannot hold does not have a Rune Socket of type " + runeType + "!", gameObject);
+            return null;
         }
         return runeSocket.GetRune();
     }
@@ -45,6 +46,7 @@ public abstract class Equipment : Item
         if (runeSocket == null)
         {
             Debug.LogError("There is no rune socket that can hold " + rune + " in " + gameObject + "!", gameObject);
+            return;
         }
         runeSocket.SetRune(rune);
         rune.AttachRune(this);
@@ -96,6 +98,7 @@ public abstract class Equipment : Item
         if (runeTypes.Count() != runeTypes.Distinct().Count())
         {
             Debug.LogError("You cannot have more than one Rune Socket of the same type on one item!", gameObject);
+            return;
         }
     }
 

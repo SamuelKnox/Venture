@@ -41,6 +41,7 @@ public class LevelController : MonoBehaviour
         else
         {
             Debug.LogError("There is no initial Room.  The Level Controller has failed to build the Level.  Add a Room to the Scene, so that the Level Controller can build off of it.", gameObject);
+            return;
         }
     }
 

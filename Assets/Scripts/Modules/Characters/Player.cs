@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Inventory))]
-[RequireComponent(typeof(Damage))]
 public class Player : Character
 {
     [Tooltip("Container for player's weapons")]
@@ -15,29 +14,13 @@ public class Player : Character
     private Transform runeContainer;
 
     private Inventory inventory;
-    private Damage damage;
     private Weapon activeWeapon;
 
     protected override void Awake()
     {
         base.Awake();
         inventory = GetComponent<Inventory>();
-        damage = GetComponent<Damage>();
         SetStartingActiveWeapon();
-    }
-
-    void Start()
-    {
-        TurnOffMeleeWeaponColliders();
-    }
-
-    /// <summary>
-    /// Gets the player's damage
-    /// </summary>
-    /// <returns>Damage</returns>
-    public Damage GetDamage()
-    {
-        return damage;
     }
 
     /// <summary>
@@ -109,6 +92,7 @@ public class Player : Character
         if (!bow)
         {
             Debug.LogError("Attempting to fire a Bow, but it is not the active weapon!", gameObject);
+            return;
         }
         bow.Fire(transform.root.right);
     }
@@ -122,6 +106,7 @@ public class Player : Character
         if (!wand)
         {
             Debug.LogError("Attempting to use a Wand, but it is not the active weapon!", gameObject);
+            return;
         }
         wand.CastSpell();
     }
@@ -135,6 +120,7 @@ public class Player : Character
         if (!inventory.Contains(item))
         {
             Debug.LogError("Equipping " + item.name + ", but " + inventory + " does not contain it!", inventory.gameObject);
+            return;
         }
         inventory.SetActiveItem(item);
         SetActiveWeapon(item.GetItemType());
@@ -174,6 +160,7 @@ public class Player : Character
         else
         {
             Debug.LogError("Neither " + ItemType.MeleeWeapon.ToString() + " nor " + ItemType.RangedWeapon.ToString() + " are equipped!", gameObject);
+            return;
         }
     }
 
@@ -231,24 +218,12 @@ public class Player : Character
                 if (!rangedWeapon)
                 {
                     Debug.LogError("The item of type " + ItemType.RangedWeapon.ToString() + " does not have a Ranged Weapon Component!", activeWeapon.gameObject);
+                    return false;
                 }
                 return rangedWeapon.IsReady();
             default:
                 Debug.LogError("An invalid WeaponType is active!", activeWeapon.gameObject);
                 return false;
-        }
-    }
-
-    /// <summary>
-    /// Disables the colliders for all melee weapons in the player's inventory
-    /// </summary>
-    private void TurnOffMeleeWeaponColliders()
-    {
-        var meleeWeapons = inventory.GetItems(ItemType.MeleeWeapon);
-        foreach (var meleeWeapon in meleeWeapons)
-        {
-            var collider = meleeWeapon.GetComponent<BoxCollider2D>();
-            collider.enabled = false;
         }
     }
 
@@ -274,7 +249,7 @@ public class Player : Character
     /// <summary>
     /// Player dies
     /// </summary>
-    public override void Die()
+    protected override void Die()
     {
         Debug.Log("Player died.");
         throw new NotImplementedException();

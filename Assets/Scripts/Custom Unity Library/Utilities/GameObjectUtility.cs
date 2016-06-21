@@ -21,11 +21,13 @@
             if (gameObjectNames == null)
             {
                 Debug.LogError("The Game Object name(s) cannot be null when attempting to get or add a Game Object!");
+                return null;
             }
             gameObjectNames = gameObjectNames.Where(n => !string.IsNullOrEmpty(n)).ToArray();
             if (gameObjectNames.Length == 0)
             {
                 Debug.LogError("At least one valid Game Object name is required when attempting to get or add a Game Object!");
+                return null;
             }
             var parent = GameObject.Find(gameObjectNames[0]);
             if (!parent)

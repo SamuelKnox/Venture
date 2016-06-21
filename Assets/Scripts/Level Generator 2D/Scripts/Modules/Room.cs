@@ -117,7 +117,7 @@
                         break;
                     default:
                         Debug.LogError("Invalid Door Direction (" + door.GetSide() + " received!", gameObject);
-                        break;
+                        return;
                 }
                 door.SetGlobalPoint(globalPoint + door.GetLocalPoint());
             }
@@ -474,7 +474,7 @@
                         break;
                     default:
                         Debug.LogError("Invalid Door Direction (" + door.GetSide() + " received!", gameObject);
-                        break;
+                        return null;
                 }
             }
             verticesMap[Direction.West].Add(westEndingPosition);
@@ -570,7 +570,7 @@
                         break;
                     default:
                         Debug.LogError("Invalid Vertex Direction (" + verticesPair.Key + " received!", gameObject);
-                        break;
+                        return;
                 }
             }
         }

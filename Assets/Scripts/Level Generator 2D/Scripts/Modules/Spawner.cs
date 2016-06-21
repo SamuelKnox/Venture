@@ -71,6 +71,7 @@ public class Spawner : MonoBehaviour
         if (!spawnables.Contains(spawnable))
         {
             Debug.LogError("Attempting to remove " + spawnable + ", but " + gameObject + " does not contain it!", gameObject);
+            return;
         }
         int index = spawnables.IndexOf(spawnable);
         spawnables.RemoveAt(index);
@@ -87,6 +88,7 @@ public class Spawner : MonoBehaviour
         if (!spawnables.Contains(spawnable))
         {
             Debug.LogError("Attemping to set the weight for " + spawnable + ", but it does not exist in " + gameObject + "!", gameObject);
+            return;
         }
         int index = spawnables.IndexOf(spawnable);
         weights[index] = weight;
@@ -134,6 +136,7 @@ public class Spawner : MonoBehaviour
             }
         }
         Debug.LogError(gameObject + " failed to spawn random object!", gameObject);
+        return;
     }
 
     /// <summary>

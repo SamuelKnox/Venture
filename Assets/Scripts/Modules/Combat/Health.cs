@@ -2,9 +2,10 @@
 using UnityEngine;
 
 public class Health : MonoBehaviour
-{    /// <summary>
-     /// Delegate for taking damage
-     /// </summary>
+{
+    /// <summary>
+    /// Delegate for taking damage
+    /// </summary>
     public delegate void DamageDealt(Damage damage);
 
     /// <summary>
@@ -21,11 +22,6 @@ public class Health : MonoBehaviour
     [SerializeField]
     [Range(0.0f, 1000.0f)]
     private float maxHitPoints = 100.0f;
-
-    [Tooltip("How resistant it is to a Damage's knockback")]
-    [SerializeField]
-    [Range(1.0f, 10.0f)]
-    private float knockBackResistance = 1.0f;
 
     [Tooltip("Damage over time left to be applied")]
     [SerializeField]
@@ -47,6 +43,11 @@ public class Health : MonoBehaviour
     void Awake()
     {
         totalInvincibilityCooldown = invincibilityCooldown;
+    }
+
+    void Start()
+    {
+        gameObject.layer = LayerMask.NameToLayer(LayerNames.Health);
     }
 
     void Update()
@@ -96,8 +97,9 @@ public class Health : MonoBehaviour
         if (!damage)
         {
             Debug.LogError("Cannot apply null damage to " + gameObject + "!", gameObject);
+            return;
         }
-        bool harmful = damage.GetBaseDamage() == 0 || damage.GetDamageOverTime() == 0;
+        bool harmful = damage.GetBaseDamage() > 0 || damage.GetDamageOverTime() > 0 || damage.GetKnockBack() > 0;
         bool friendly = TeamUtility.IsFriendly(gameObject, damage.gameObject);
         bool coolingDown = invincibilityCooldown > 0;
         if (!harmful || friendly || coolingDown)
@@ -108,12 +110,11 @@ public class Health : MonoBehaviour
         damageOverTime += damage.GetDamageOverTime();
         invincibilityCooldown = totalInvincibilityCooldown;
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
-        float knockBackForce = damage.GetKnockBack() / knockBackResistance;
-        var knockBack = knockBackDirection * knockBackForce;
+        var knockBack = knockBackDirection * damage.GetKnockBack();
         var characterPlatformer = GetComponent<CharacterPlatformer>();
         if (characterPlatformer)
         {
-            characterPlatformer.AddForce(knockBack);
+            characterPlatformer.SetVelocity(knockBack);
             return;
         }
         var body = GetComponent<Rigidbody2D>();

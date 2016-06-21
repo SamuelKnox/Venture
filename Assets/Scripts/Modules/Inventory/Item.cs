@@ -13,11 +13,6 @@ public abstract class Item : MonoBehaviour
     [SerializeField]
     private string description;
 
-    protected virtual void Start()
-    {
-        gameObject.layer = LayerMask.NameToLayer(LayerNames.Trigger);
-    }
-
     /// <summary>
     /// Gets the Item's type
     /// </summary>

@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 /// </summary>
 [RequireComponent(typeof(CharacterPlatformer))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Damage))]
 [RequireComponent(typeof(Player))]
 public class PlayerController : MonoBehaviour
 {
@@ -16,7 +15,6 @@ public class PlayerController : MonoBehaviour
     private CharacterPlatformer characterPlatformer;
     private Animator animator;
     private Player player;
-    private Damage damage;
     private Item itemPickedUp;
     private float speedModifier = 1.0f;
 
@@ -25,7 +23,6 @@ public class PlayerController : MonoBehaviour
         characterPlatformer = GetComponent<CharacterPlatformer>();
         animator = GetComponent<Animator>();
         player = GetComponent<Player>();
-        damage = GetComponent<Damage>();
         characterPlatformer.onControllerCollidedEvent += OnCollision;
         characterPlatformer.onTriggerEnterEvent += OnEnter;
         characterPlatformer.onTriggerStayEvent += OnStay;
@@ -85,11 +82,6 @@ public class PlayerController : MonoBehaviour
     void OnStay(Collider2D collider2D)
     {
         ///Debug.Log("OnStay: " + collider2D.gameObject.name);
-        var health = collider2D.GetComponent<Health>();
-        if (health)
-        {
-            health.ApplyDamage(damage);
-        }
     }
 
 
@@ -172,11 +164,12 @@ public class PlayerController : MonoBehaviour
                 else
                 {
                     Debug.LogError("Attempting to attack with a Ranged Weapon that is neither a bow nor a wand!", activeWeapon.gameObject);
+                    return;
                 }
                 break;
             default:
                 Debug.LogError("An invalid WeaponType is active!", player.gameObject);
-                break;
+                return;
         }
     }
 }
