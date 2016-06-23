@@ -5,6 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(Inventory))]
 public class Player : Character
 {
+    private static readonly ItemType[] WeaponTypes = new ItemType[] { ItemType.MeleeWeapon, ItemType.RangedWeapon };
+
     [Tooltip("Container for player's weapons")]
     [SerializeField]
     private Transform weaponContainer;
@@ -20,6 +22,10 @@ public class Player : Character
     {
         base.Awake();
         inventory = GetComponent<Inventory>();
+    }
+
+    void Start()
+    {
         SetStartingActiveWeapon();
     }
 
@@ -27,10 +33,16 @@ public class Player : Character
     /// Adds an item to the player's inventory
     /// </summary>
     /// <param name="item">Item to add</param>
-    public void CollectItem(Item item)
+    public void CollectItem(Collectable collectable)
     {
+        if (!collectable)
+        {
+            return;
+        }
+        var item = collectable.GetComponent<Item>();
         if (!item)
         {
+            Debug.Log("Cannot move Collectable into inventory, because it is not an Item!", collectable.gameObject);
             return;
         }
         if (!inventory.Contains(item))
@@ -115,15 +127,24 @@ public class Player : Character
     /// Equips the specified item
     /// </summary>
     /// <param name="item">Item to equip</param>
-    public void Equip(Item item)
+    public void Equip(Equipment equipment)
     {
-        if (!inventory.Contains(item))
+        if (!inventory.Contains(equipment))
         {
-            Debug.LogError("Equipping " + item.name + ", but " + inventory + " does not contain it!", inventory.gameObject);
+            Debug.LogError("Equipping " + equipment.name + ", but " + inventory + " does not contain it!", inventory.gameObject);
             return;
         }
-        inventory.SetActiveItem(item);
-        SetActiveWeapon(item.GetItemType());
+        var currentlyEquipped = inventory.GetItems(equipment.GetItemType()).Where(e => e.IsEquipped()).FirstOrDefault();
+        if (currentlyEquipped)
+        {
+            currentlyEquipped.SetEquipped(false);
+        }
+        equipment.SetEquipped(true);
+        var weapon = equipment.GetComponent<Weapon>();
+        if (weapon)
+        {
+            SetActiveWeapon(weapon.GetItemType());
+        }
     }
 
     /// <summary>
@@ -149,19 +170,14 @@ public class Player : Character
     /// </summary>
     public void ToggleWeapon()
     {
-        if (activeWeapon.GetComponent<MeleeWeapon>())
+        var activeWeaponType = activeWeapon.GetItemType();
+        var newWeaponIndex = (Array.IndexOf(WeaponTypes, activeWeaponType) + 1) % WeaponTypes.Length;
+        if (newWeaponIndex < 0)
         {
-            SetActiveWeapon(ItemType.RangedWeapon);
+            newWeaponIndex = 0;
         }
-        else if (activeWeapon.GetComponent<RangedWeapon>())
-        {
-            SetActiveWeapon(ItemType.MeleeWeapon);
-        }
-        else
-        {
-            Debug.LogError("Neither " + ItemType.MeleeWeapon.ToString() + " nor " + ItemType.RangedWeapon.ToString() + " are equipped!", gameObject);
-            return;
-        }
+        var newActiveWeaponType = WeaponTypes[newWeaponIndex];
+        SetActiveWeapon(newActiveWeaponType);
     }
 
     /// <summary>
@@ -174,28 +190,20 @@ public class Player : Character
         {
             activeWeapon.gameObject.SetActive(false);
         }
-        if (!inventory.GetActiveItem(weaponType))
+        var newActiveItem = inventory.GetItems(weaponType).Where(w => w.IsEquipped()).FirstOrDefault();
+        if (!newActiveItem)
         {
+            Debug.LogError("Attemping to grab the equipped item of type " + weaponType + ", but it does not exist in the inventory!", gameObject);
             return;
         }
-        var meleeWeapon = inventory.GetActiveItem(ItemType.MeleeWeapon);
-        if (meleeWeapon)
+        var newActiveWeapon = newActiveItem.GetComponent<Weapon>();
+        if (!newActiveWeapon)
         {
-            if (weaponType == ItemType.MeleeWeapon)
-            {
-                meleeWeapon.gameObject.SetActive(true);
-                activeWeapon = meleeWeapon.GetComponent<Weapon>();
-            }
+            Debug.LogError(newActiveItem + " does not have a Weapon attached!", newActiveItem.gameObject);
+            return;
         }
-        var rangedWeapon = inventory.GetActiveItem(ItemType.RangedWeapon);
-        if (rangedWeapon)
-        {
-            if (weaponType == ItemType.RangedWeapon)
-            {
-                rangedWeapon.gameObject.SetActive(true);
-                activeWeapon = rangedWeapon.GetComponent<Weapon>();
-            }
-        }
+        activeWeapon = newActiveWeapon;
+        activeWeapon.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -232,13 +240,13 @@ public class Player : Character
     /// </summary>
     private void SetStartingActiveWeapon()
     {
-        if (!activeWeapon)
+        foreach (var weaponType in WeaponTypes)
         {
-            SetActiveWeapon(ItemType.MeleeWeapon);
-        }
-        if (!activeWeapon)
-        {
-            SetActiveWeapon(ItemType.RangedWeapon);
+            if (activeWeapon)
+            {
+                break;
+            }
+            SetActiveWeapon(weaponType);
         }
         if (!activeWeapon)
         {

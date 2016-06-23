@@ -137,7 +137,12 @@ public abstract class Equipment : Item
         /// <param name="rune">Rune to set</param>
         public void SetRune(Rune rune)
         {
+            if (this.rune)
+            {
+                this.rune.SetEquipped(false);
+            }
             this.rune = rune;
+            this.rune.SetEquipped(true);
         }
     }
 }

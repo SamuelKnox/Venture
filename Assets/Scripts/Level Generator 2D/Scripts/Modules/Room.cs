@@ -1,4 +1,6 @@
-﻿namespace LevelGenerator2D
+﻿#define USING_SUPER_TILEMAP_EDITOR
+
+namespace LevelGenerator2D
 {
     using UnityEngine;
     using System;
@@ -6,6 +8,9 @@
     using System.Linq;
     using UnityEngine.Rendering;
     using CustomUnityLibrary;
+#if USING_SUPER_TILEMAP_EDITOR
+    using CreativeSpore.SuperTilemapEditor;
+#endif
 
     /// <summary>
     /// A predefined segment of a level to be used in the Level
@@ -619,10 +624,12 @@
             var descendents = transform.GetComponentsInChildren<Transform>();
             foreach (Transform child in descendents)
             {
-                if(!child.parent != transform)
+#if USING_SUPER_TILEMAP_EDITOR
+                if (child.GetComponentsInParent<Tilemap>().Length > 0)
                 {
                     continue;
                 }
+#endif
                 var extents = new Vector2(width, height) * Level.GridSize / 2.0f;
                 if (level.GetWallTexture() && child.name != WallName)
                 {

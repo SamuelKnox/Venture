@@ -10,23 +10,6 @@ public class Inventory : MonoBehaviour
     [SerializeField]
     private ItemContainer[] itemContainers;
 
-    void Awake()
-    {
-        foreach (var itemContainer in itemContainers)
-        {
-            var activeItem = itemContainer.GetActiveItem();
-            if (!activeItem)
-            {
-                continue;
-            }
-            if (!itemContainer.Contains(activeItem))
-            {
-                Debug.LogWarning(itemContainer.GetName() + " does not contain its active item, " + activeItem.name + ", so it is being added.", gameObject);
-                itemContainer.Add(activeItem);
-            }
-        }
-    }
-
     void Reset()
     {
         itemContainers = new ItemContainer[EnumUtility.Count<ItemType>()];
@@ -41,12 +24,6 @@ public class Inventory : MonoBehaviour
         foreach (var itemContainer in itemContainers)
         {
             var itemType = itemContainer.GetItemType();
-            var activeItem = itemContainer.GetActiveItem();
-            if (activeItem && activeItem.GetItemType() != itemType)
-            {
-                Debug.LogWarning(activeItem.name + " is not of the correct type, " + itemType + ", for " + itemContainer.GetName());
-                itemContainer.ClearActiveItem();
-            }
             foreach (var item in itemContainer.GetItems())
             {
                 if (item.GetItemType() != itemType)
@@ -56,6 +33,20 @@ public class Inventory : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Gets all items, regardless of type
+    /// </summary>
+    /// <returns>All items</returns>
+    public Item[] GetItems()
+    {
+        var items = new List<Item>();
+        foreach (var itemContainer in itemContainers)
+        {
+            items.AddRange(itemContainer.GetItems());
+        }
+        return items.ToArray();
     }
 
     /// <summary>
@@ -130,42 +121,6 @@ public class Inventory : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the active item for a specified item type
-    /// </summary>
-    /// <param name="itemType">Type of item to get</param>
-    /// <returns>The active item</returns>
-    public Item GetActiveItem(ItemType itemType)
-    {
-        var itemContainer = GetItemContainer(itemType);
-        if (itemContainer != null)
-        {
-            return itemContainer.GetActiveItem();
-        }
-        return null;
-    }
-
-
-    /// <summary>
-    /// Sets the active item for the category
-    /// </summary>
-    /// <param name="item">Item to set</param>
-    /// <returns>Whether or not the item was successfully set as the active item</returns>
-    public bool SetActiveItem(Item item)
-    {
-        if (!item)
-        {
-            Debug.LogError("Attempted to set null item as the active item!", gameObject);
-            return false;
-        }
-        if (!Contains(item))
-        {
-            Debug.LogError("Attempting to set " + item.name + " as the active item, but it is not contained in " + name + "!", gameObject);
-            return false;
-        }
-        return GetItemContainer(item.GetItemType()).SetActiveItem(item);
-    }
-
-    /// <summary>
     /// Gets the item container for the specified item type
     /// </summary>
     /// <param name="itemType">Type of container to get</param>
@@ -181,10 +136,6 @@ public class Inventory : MonoBehaviour
         [HideInInspector]
         [SerializeField]
         private string name;
-
-        [Tooltip("Currently active item")]
-        [SerializeField]
-        private Item activeItem;
 
         [Tooltip("All items in the container")]
         [SerializeField]
@@ -214,34 +165,6 @@ public class Inventory : MonoBehaviour
         }
 
         /// <summary>
-        /// Sets the active item for this item container
-        /// </summary>
-        /// <param name="item">Item to set</param>
-        /// <returns>Whether or not</returns>
-        public bool SetActiveItem(Item item)
-        {
-            if (!item)
-            {
-                Debug.LogError("You cannot set the active item to null!  Use ClearActiveItem(Item) instead!");
-                return false;
-            }
-            if (!Contains(item) || item.GetItemType() != GetItemType())
-            {
-                return false;
-            }
-            activeItem = item;
-            return true;
-        }
-
-        /// <summary>
-        /// Removes the active item, setting it to null
-        /// </summary>
-        public void ClearActiveItem()
-        {
-            activeItem = null;
-        }
-
-        /// <summary>
         /// Gets the name of this item container
         /// </summary>
         /// <returns>The name</returns>
@@ -262,10 +185,6 @@ public class Inventory : MonoBehaviour
                 return false;
             }
             items.Add(item);
-            if (!activeItem)
-            {
-                activeItem = item;
-            }
             return true;
         }
 
@@ -309,15 +228,6 @@ public class Inventory : MonoBehaviour
         public ItemType GetItemType()
         {
             return itemType;
-        }
-
-        /// <summary>
-        /// Gets the active item for this container
-        /// </summary>
-        /// <returns>Active item</returns>
-        public Item GetActiveItem()
-        {
-            return activeItem;
         }
     }
 }

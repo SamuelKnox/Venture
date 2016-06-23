@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Item : MonoBehaviour
@@ -8,6 +6,14 @@ public abstract class Item : MonoBehaviour
     [Tooltip("Type of item")]
     [SerializeField]
     private ItemType itemType;
+
+    [Tooltip("Whether or not this item is equipped")]
+    [SerializeField]
+    private bool equipped;
+
+    [Tooltip("Icon associated with this item")]
+    [SerializeField]
+    private Sprite icon;
 
     [Tooltip("Description of this item")]
     [SerializeField]
@@ -29,6 +35,33 @@ public abstract class Item : MonoBehaviour
     public void SetItemType(ItemType itemType)
     {
         this.itemType = itemType;
+    }
+
+    /// <summary>
+    /// Checks whether or not this item is equipped
+    /// </summary>
+    /// <returns>Whether or not this is an equipped item</returns>
+    public bool IsEquipped()
+    {
+        return equipped;
+    }
+
+    /// <summary>
+    /// Sets whether or not this is an equipped item
+    /// </summary>
+    /// <param name="equipped">Whether or not to set this item as equipped</param>
+    public void SetEquipped(bool equipped)
+    {
+        this.equipped = equipped;
+    }
+
+    /// <summary>
+    /// Gets the icon associated with this item
+    /// </summary>
+    /// <returns>Item's icon sprite</returns>
+    public Sprite GetIcon()
+    {
+        return icon;
     }
 
     /// <summary>

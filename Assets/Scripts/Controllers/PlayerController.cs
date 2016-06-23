@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
     private CharacterPlatformer characterPlatformer;
     private Animator animator;
     private Player player;
-    private Item itemPickedUp;
+    private Collectable itemBeingCollected;
     private float speedModifier = 1.0f;
 
     void Awake()
@@ -72,22 +72,21 @@ public class PlayerController : MonoBehaviour
     void OnEnter(Collider2D collider2D)
     {
         ///Debug.Log("OnEnter: " + collider2D.gameObject.name);
-        var item = collider2D.GetComponent<Item>();
-        if (item)
-        {
-            CollectItem(item);
-        }
+    }
+    
+    void OnExit(Collider2D collider2D)
+    {
+        ///Debug.Log("OnExit: " + collider2D.gameObject.name);
     }
 
     void OnStay(Collider2D collider2D)
     {
         ///Debug.Log("OnStay: " + collider2D.gameObject.name);
-    }
-
-
-    void OnExit(Collider2D collider2D)
-    {
-        ///Debug.Log("OnExit: " + collider2D.gameObject.name);
+        var collectable = collider2D.GetComponent<Collectable>();
+        if (collectable)
+        {
+            CollectItem(collectable);
+        }
     }
 
     /// <summary>
@@ -112,16 +111,16 @@ public class PlayerController : MonoBehaviour
     /// Collect an item
     /// </summary>
     /// <param name="item">Item to collect</param>
-    private void CollectItem(Item item)
+    private void CollectItem(Collectable collectable)
     {
-        if (itemPickedUp)
+        if (itemBeingCollected)
         {
             return;
         }
-        itemPickedUp = item;
+        itemBeingCollected = collectable;
         var equippedWeapon = player.GetActiveWeapon();
         equippedWeapon.gameObject.SetActive(false);
-        player.CollectItem(item);
+        player.CollectItem(collectable);
         animator.SetTrigger(AnimationNames.Player.Triggers.CollectItem);
     }
 
@@ -130,10 +129,11 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void FinishCollectingItem()
     {
-        itemPickedUp.gameObject.SetActive(false);
+        itemBeingCollected.gameObject.SetActive(false);
         var equippedWeapon = player.GetActiveWeapon();
         equippedWeapon.gameObject.SetActive(true);
-        itemPickedUp = null;
+        Destroy(itemBeingCollected);
+        itemBeingCollected = null;
     }
 
     /// <summary>

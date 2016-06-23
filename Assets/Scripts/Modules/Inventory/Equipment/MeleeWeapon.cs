@@ -13,11 +13,6 @@ public class MeleeWeapon : Weapon
         damage = GetComponent<Damage>();
     }
 
-    void Start()
-    {
-        areaOfEffect.enabled = false;
-    }
-
     void OnEnable()
     {
         damage.OnDamageDealt += OnDamageDealt;
