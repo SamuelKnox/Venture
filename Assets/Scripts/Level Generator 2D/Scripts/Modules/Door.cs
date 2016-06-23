@@ -73,7 +73,7 @@
                     break;
                 default:
                     Debug.LogError("Invalid Door Direction (" + GetSide() + " received!");
-                    return Point2.zero;
+                    break;
             }
             return neighborPoint;
         }

@@ -24,6 +24,8 @@
         private const string WeightTooltip = "This determines how often the room will spawn.";
         private const float MinWeight = 0.0f;
         private const float MaxWeight = 1.0f;
+        private const string RemoveDoorButtonName = "X";
+        private const float RemoveDoorButtonWidth = 25.0f;
 
         public override void OnInspectorGUI()
         {
@@ -75,9 +77,15 @@
             room.SetDoors(doors);
             for (int i = 0; i < doors.Length; i++)
             {
-                var doorGUIContent = new GUIContent(DoorLabelPrefix + i, DoorTooltipPrefix + i + DoorTooltipSuffix);
-                var index = EditorGUILayout.IntSlider(doorGUIContent, doors[i].GetIndex(), 0, maxDoors - 1);
+                EditorGUILayout.BeginHorizontal();
+                var doorGuiContent = new GUIContent(DoorLabelPrefix + i, DoorTooltipPrefix + i + DoorTooltipSuffix);
+                var index = EditorGUILayout.IntSlider(doorGuiContent, doors[i].GetIndex(), 0, maxDoors - 1);
                 doors[i].SetIndex(index);
+                if (GUILayout.Button(RemoveDoorButtonName, GUILayout.Width(RemoveDoorButtonWidth)))
+                {
+                    room.RemoveDoor(i);
+                }
+                EditorGUILayout.EndHorizontal();
             }
         }
 

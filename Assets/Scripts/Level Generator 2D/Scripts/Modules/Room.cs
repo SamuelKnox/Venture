@@ -1,4 +1,5 @@
-﻿#define USING_SUPER_TILEMAP_EDITOR
+﻿///Uncomment the line below if you are using Creative Spore's Super Tilemap Editor
+//#define USING_SUPER_TILEMAP_EDITOR
 
 namespace LevelGenerator2D
 {
@@ -122,7 +123,7 @@ namespace LevelGenerator2D
                         break;
                     default:
                         Debug.LogError("Invalid Door Direction (" + door.GetSide() + " received!", gameObject);
-                        return;
+                        break;
                 }
                 door.SetGlobalPoint(globalPoint + door.GetLocalPoint());
             }
@@ -144,6 +145,21 @@ namespace LevelGenerator2D
                 }
             }
             return doorList.ToArray();
+        }
+
+        /// <summary>
+        /// Removes a door with the specified index
+        /// </summary>
+        /// <param name="index">Index for Door to be removed</param>
+        public void RemoveDoor(int index)
+        {
+            if (index < 0 || index >= doors.Length)
+            {
+                Debug.LogError("Cannot remove a door at an index outside of the range of existing doors!", gameObject);
+                return;
+            }
+            doors[index] = null;
+            doors = doors.Where(d => d != null).ToArray();
         }
 
         /// <summary>
@@ -479,7 +495,7 @@ namespace LevelGenerator2D
                         break;
                     default:
                         Debug.LogError("Invalid Door Direction (" + door.GetSide() + " received!", gameObject);
-                        return null;
+                        break;
                 }
             }
             verticesMap[Direction.West].Add(westEndingPosition);
@@ -575,7 +591,7 @@ namespace LevelGenerator2D
                         break;
                     default:
                         Debug.LogError("Invalid Vertex Direction (" + verticesPair.Key + " received!", gameObject);
-                        return;
+                        break;
                 }
             }
         }
@@ -655,8 +671,7 @@ namespace LevelGenerator2D
                 }
                 float newX = Mathf.Clamp(child.position.x, transform.position.x - extents.x, transform.position.x + extents.x);
                 float newY = Mathf.Clamp(child.position.y, transform.position.y - extents.y, transform.position.y + extents.y);
-                float newZ = child.transform.position.z;
-                child.transform.position = new Vector3(newX, newY, newZ);
+                child.transform.position = new Vector2(newX, newY);
             }
         }
 

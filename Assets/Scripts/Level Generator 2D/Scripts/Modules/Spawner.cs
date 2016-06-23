@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 [Serializable]
 public class Spawner : MonoBehaviour
 {
     private const float DefaultWeight = 1.0f;
+    private const float MinSpawnChance = 0.0f;
+    private const float MaxSpawnChance = 1.0f;
     private static readonly Color OutlineColor = Color.yellow;
+
+    [Tooltip("Chances that any GameObject will spawn")]
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    private float spawnChance = 1.0f;
 
     [Tooltip("List of GameObjects which can be spawned")]
     [SerializeField]
@@ -22,11 +30,30 @@ public class Spawner : MonoBehaviour
     void Start()
     {
         SpawnGameObject();
+        Destroy(gameObject);
     }
 
     void OnDrawGizmosSelected()
     {
         OutlineLargestMaximumSize();
+    }
+
+    /// <summary>
+    /// Gets the chance a GameObject will be spawned
+    /// </summary>
+    /// <returns>Chance of spawn</returns>
+    public float GetSpawnChance()
+    {
+        return spawnChance;
+    }
+
+    /// <summary>
+    /// Sets the chance of a GameObject spawning
+    /// </summary>
+    /// <param name="spawnChance">Spawn chance</param>
+    public void SetSpawnChance(float spawnChance)
+    {
+        this.spawnChance = spawnChance;
     }
 
     /// <summary>
@@ -71,7 +98,6 @@ public class Spawner : MonoBehaviour
         if (!spawnables.Contains(spawnable))
         {
             Debug.LogError("Attempting to remove " + spawnable + ", but " + gameObject + " does not contain it!", gameObject);
-            return;
         }
         int index = spawnables.IndexOf(spawnable);
         spawnables.RemoveAt(index);
@@ -88,7 +114,6 @@ public class Spawner : MonoBehaviour
         if (!spawnables.Contains(spawnable))
         {
             Debug.LogError("Attemping to set the weight for " + spawnable + ", but it does not exist in " + gameObject + "!", gameObject);
-            return;
         }
         int index = spawnables.IndexOf(spawnable);
         weights[index] = weight;
@@ -116,6 +141,7 @@ public class Spawner : MonoBehaviour
             }
         }
         maxSpawnableSize = maxSize;
+        SceneView.RepaintAll();
     }
 
     /// <summary>
@@ -123,6 +149,11 @@ public class Spawner : MonoBehaviour
     /// </summary>
     private void SpawnGameObject()
     {
+        float spawnChanceValue = UnityEngine.Random.Range(MinSpawnChance, MaxSpawnChance);
+        if (spawnChanceValue > spawnChance)
+        {
+            return;
+        }
         float randomValue = UnityEngine.Random.Range(0.0f, weights.Sum());
         float accumulatedValue = 0.0f;
         for (int i = 0; i < weights.Count; i++)
@@ -136,7 +167,6 @@ public class Spawner : MonoBehaviour
             }
         }
         Debug.LogError(gameObject + " failed to spawn random object!", gameObject);
-        return;
     }
 
     /// <summary>

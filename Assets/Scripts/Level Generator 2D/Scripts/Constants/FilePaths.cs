@@ -8,11 +8,11 @@
         /// <summary>
         /// File path for the door gizmo sprite
         /// </summary>
-        public const string DoorGizmo = "gizmo_door.png";
+        public const string DoorGizmo = "door.png";
 
         /// <summary>
         /// File path for the absent door gizmo sprite
         /// </summary>
-        public const string NoDoorGizmo = "gizmo_no_door.png";
+        public const string NoDoorGizmo = "no_door.png";
     }
 }
