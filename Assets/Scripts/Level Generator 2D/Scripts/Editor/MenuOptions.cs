@@ -39,6 +39,7 @@
             }
             var spawner = new GameObject(SpawnerName).AddComponent<Spawner>();
             spawner.transform.SetParent(selectedTransform);
+            Selection.activeGameObject = spawner.gameObject;
         }
     }
 }

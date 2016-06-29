@@ -28,11 +28,6 @@ public class Damage : MonoBehaviour
     [Range(0.0f, 100.0f)]
     private float damageOverTime = 0.0f;
 
-    void Start()
-    {
-        gameObject.layer = LayerMask.NameToLayer(LayerNames.Damage);
-    }
-
     void OnTriggerEnter2D(Collider2D other)
     {
         var health = other.GetComponent<Health>();

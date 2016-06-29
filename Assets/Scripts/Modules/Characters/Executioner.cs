@@ -11,11 +11,11 @@ public class Executioner : Enemy
         pacer = GetComponent<Pacer>();
     }
 
-    void OnVisionEnter(Collider2D other)
+    void OnVisionStay(Collider2D other)
     {
         if (other.GetComponent<Player>())
         {
-            animator.SetTrigger(AnimationNames.Enemy.Triggers.Attack);
+            enemyView.Attack();
             pacer.SetPacingActive(false);
         }
     }
@@ -36,13 +36,5 @@ public class Executioner : Enemy
     {
         base.OnDamageDealt(damage);
         pacer.SetPacingActive(false);
-    }
-
-    /// <summary>
-    /// Dies
-    /// </summary>
-    protected override void Die()
-    {
-        //throw new NotImplementedException();
     }
 }

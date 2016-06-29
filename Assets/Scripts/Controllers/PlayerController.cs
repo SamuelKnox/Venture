@@ -1,50 +1,43 @@
-﻿using CustomUnityLibrary;
+﻿using System;
+using CreativeSpore.SmartColliders;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// This is an example controller for using the CharacterPlatformer
-/// </summary>
-[RequireComponent(typeof(CharacterPlatformer))]
-[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Player))]
+[RequireComponent(typeof(Player
+    
+    ))]
 public class PlayerController : MonoBehaviour
 {
-    private const float DropDownForceRequired = 0.5f;
+    [Tooltip("Whether or not to use input to determine speed, or snap speed to a constant")]
+    [SerializeField]
+    public bool UseAxisAsSpeedFactor = true;
 
-    private CharacterPlatformer characterPlatformer;
-    private Animator animator;
+    [Tooltip("Minimum axis value to start moving")]
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    public float AxisMovingThreshold = 0.2f;
+
     private Player player;
-    private Collectable itemBeingCollected;
-    private float speedModifier = 1.0f;
+    private PlatformCharacterController platformCharacterController;
+    private PlayerView playerView;
+    private Vector2 speedModifier = Vector2.one;
 
     void Awake()
     {
-        characterPlatformer = GetComponent<CharacterPlatformer>();
-        animator = GetComponent<Animator>();
         player = GetComponent<Player>();
-        characterPlatformer.onControllerCollidedEvent += OnCollision;
-        characterPlatformer.onTriggerEnterEvent += OnEnter;
-        characterPlatformer.onTriggerStayEvent += OnStay;
-        characterPlatformer.onTriggerExitEvent += OnExit;
+        platformCharacterController = GetComponent<PlatformCharacterController>();
+        playerView = GetComponent<PlayerView>();
     }
 
     void Update()
     {
         if (!SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
         {
-            characterPlatformer.Move(Input.GetAxis(InputNames.Horizontal) * speedModifier);
-            if (Input.GetButton(InputNames.Jump))
-            {
-                if (Input.GetAxis(InputNames.Vertical) <= -DropDownForceRequired)
-                {
-                    characterPlatformer.DropDownPlatform();
-                }
-                else
-                {
-                    characterPlatformer.Jump();
-                }
-            }
+            var directionalInput = GetDirectionalInput();
+            Move(directionalInput);
+            Jump(directionalInput.y);
             if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid())
             {
                 Attack();
@@ -58,30 +51,21 @@ public class PlayerController : MonoBehaviour
                 Time.timeScale = 0.0f;
                 SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
             }
-            animator.SetFloat(AnimationNames.Player.Floats.HorizontalSpeed, Mathf.Abs(characterPlatformer.GetVelocity().x));
-            animator.SetFloat(AnimationNames.Player.Floats.VerticalSpeed, characterPlatformer.GetVelocity().y);
         }
     }
 
-    void OnCollision(RaycastHit2D hit)
+    public Vector2 GetSpeedModifier()
     {
-        ///Debug.Log("OnCollision: " + hit.transform.gameObject.name);
+        return speedModifier;
     }
 
-
-    void OnEnter(Collider2D collider2D)
+    public void SetSpeedModifier(Vector2 speedModifier)
     {
-        ///Debug.Log("OnEnter: " + collider2D.gameObject.name);
-    }
-    
-    void OnExit(Collider2D collider2D)
-    {
-        ///Debug.Log("OnExit: " + collider2D.gameObject.name);
+        this.speedModifier = speedModifier;
     }
 
-    void OnStay(Collider2D collider2D)
+    void OnCollectorStay(Collider2D collider2D)
     {
-        ///Debug.Log("OnStay: " + collider2D.gameObject.name);
         var collectable = collider2D.GetComponent<Collectable>();
         if (collectable)
         {
@@ -90,21 +74,51 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the speed modifier
+    /// Gets the gamepad/keyboard controller input for horizontal and vertical
     /// </summary>
-    /// <returns>Rate by which the speed will be modified</returns>
-    public float GetSpeedModifier()
+    /// <returns>Horizontal and vertical input</returns>
+    public Vector2 GetDirectionalInput()
     {
-        return speedModifier;
+        float horizontalInput = Input.GetAxis(InputNames.Horizontal);
+        float verticalInput = Input.GetAxis(InputNames.Vertical);
+        var input = new Vector2(horizontalInput, verticalInput);
+        return input;
     }
 
     /// <summary>
-    /// Sets the speed modifier
+    /// Applies movement to the player
     /// </summary>
-    /// <param name="speed">New speed modifier</param>
-    public void SetSpeedModifier(float speed)
+    private void Move(Vector2 input)
     {
-        speedModifier = speed;
+        float horizontalMovement = input.x * Mathf.Abs(input.x);
+        float absoluteHorizontalMovement = Mathf.Abs(horizontalMovement);
+        float verticalMovement = input.y * Mathf.Abs(input.y);
+        float absoluteVerticalMovement = Mathf.Abs(verticalMovement);
+        if (absoluteHorizontalMovement >= AxisMovingThreshold)
+        {
+            platformCharacterController.HorizontalSpeedScale = UseAxisAsSpeedFactor ? absoluteHorizontalMovement : 1.0f;
+        }
+        if (absoluteVerticalMovement >= AxisMovingThreshold)
+        {
+            platformCharacterController.VerticalSpeedScale = UseAxisAsSpeedFactor ? absoluteVerticalMovement : 1.0f;
+        }
+        platformCharacterController.SetActionState(eControllerActions.Left, horizontalMovement <= -AxisMovingThreshold);
+        platformCharacterController.SetActionState(eControllerActions.Right, horizontalMovement >= AxisMovingThreshold);
+        platformCharacterController.SetActionState(eControllerActions.Down, verticalMovement <= -AxisMovingThreshold);
+        platformCharacterController.SetActionState(eControllerActions.Up, verticalMovement >= AxisMovingThreshold);
+    }
+
+    /// <summary>
+    /// Applies jump and drop down to the player
+    /// </summary>
+    private void Jump(float verticalInput)
+    {
+        bool jumping = Input.GetButton(InputNames.Jump) && verticalInput > -AxisMovingThreshold;
+        bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -AxisMovingThreshold;
+        platformCharacterController.SetActionState(eControllerActions.Jump, jumping);
+        platformCharacterController.SetActionState(eControllerActions.PlatformDropDown, droppingDown);
+        platformCharacterController.HorizontalSpeedScale = 1.0f;
+        platformCharacterController.VerticalSpeedScale = 1.0f;
     }
 
     /// <summary>
@@ -113,27 +127,8 @@ public class PlayerController : MonoBehaviour
     /// <param name="item">Item to collect</param>
     private void CollectItem(Collectable collectable)
     {
-        if (itemBeingCollected)
-        {
-            return;
-        }
-        itemBeingCollected = collectable;
-        var equippedWeapon = player.GetActiveWeapon();
-        equippedWeapon.gameObject.SetActive(false);
-        player.CollectItem(collectable);
-        animator.SetTrigger(AnimationNames.Player.Triggers.CollectItem);
-    }
-
-    /// <summary>
-    /// Finished collecting item
-    /// </summary>
-    private void FinishCollectingItem()
-    {
-        itemBeingCollected.gameObject.SetActive(false);
-        var equippedWeapon = player.GetActiveWeapon();
-        equippedWeapon.gameObject.SetActive(true);
-        Destroy(itemBeingCollected);
-        itemBeingCollected = null;
+        player.Collect(collectable);
+        playerView.Collect(collectable);
     }
 
     /// <summary>
@@ -150,16 +145,16 @@ public class PlayerController : MonoBehaviour
         switch (activeWeaponType)
         {
             case ItemType.MeleeWeapon:
-                animator.SetTrigger(AnimationNames.Player.Triggers.MeleeWeaponAttack);
+                playerView.MeleeWeaponAttack();
                 break;
             case ItemType.RangedWeapon:
                 if (activeWeapon.GetComponent<Bow>())
                 {
-                    animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);
+                    playerView.BowAttack();
                 }
                 else if (activeWeapon.GetComponent<Wand>())
                 {
-                    animator.SetTrigger(AnimationNames.Player.Triggers.WandAttack);
+                    playerView.WantAttack();
                 }
                 else
                 {

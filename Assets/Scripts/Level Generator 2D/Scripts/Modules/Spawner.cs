@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomUnityLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -21,6 +22,24 @@ public class Spawner : MonoBehaviour
     [SerializeField]
     private List<GameObject> spawnables = new List<GameObject>();
 
+    [Tooltip("Spawn on start, opposed to waiting for spawn to be called manually")]
+    [SerializeField]
+    private bool spawnOnStart = true;
+
+    [Tooltip("Minimum number of GameObjects this spawner will spawn")]
+    [SerializeField]
+    [Range(1, 25)]
+    private int minSpawns = 1;
+
+    [Tooltip("Maximum number of GameObjects this spawner will spawn")]
+    [SerializeField]
+    [Range(1, 25)]
+    private int maxSpawns = 25;
+
+    [Tooltip("Particle effect used when spawning")]
+    [SerializeField]
+    private ParticleSystem visualEffect;
+
     [Tooltip("Weights associated with the spawnable Game Objects")]
     [SerializeField]
     private List<float> weights = new List<float>();
@@ -29,13 +48,69 @@ public class Spawner : MonoBehaviour
 
     void Start()
     {
-        SpawnGameObject();
-        Destroy(gameObject);
+        if (spawnOnStart)
+        {
+            Spawn();
+        }
     }
 
     void OnDrawGizmosSelected()
     {
         OutlineLargestMaximumSize();
+    }
+
+    /// <summary>
+    /// Gets the minimum number of GameObjects this spawner will spawn
+    /// </summary>
+    /// <returns>Number of game objects</returns>
+    public int GetMinSpawns()
+    {
+        return minSpawns;
+    }
+
+    /// <summary>
+    /// Sets the minimum number of GameObjects that this spawner will spawn
+    /// </summary>
+    /// <param name="minSpawns">Number of game objects</param>
+    public void SetMinSpawns(int minSpawns)
+    {
+        this.minSpawns = minSpawns;
+    }
+
+    /// <summary>
+    /// gets the maximum number of game objects that this spawner will spawn
+    /// </summary>
+    /// <returns>Max number of gameobjects</returns>
+    public int GetMaxSpawns()
+    {
+        return maxSpawns;
+    }
+
+    /// <summary>
+    /// Sets the maximum number of gameobjects that will be spawned
+    /// </summary>
+    /// <param name="maxSpawns">Maximum number of gameobjects</param>
+    public void SetMaxSpawns(int maxSpawns)
+    {
+        this.maxSpawns = maxSpawns;
+    }
+
+    /// <summary>
+    /// Gets whether or not the spawner will spawn on start
+    /// </summary>
+    /// <returns>If spawns on start</returns>
+    public bool GetSpawnOnStart()
+    {
+        return spawnOnStart;
+    }
+
+    /// <summary>
+    /// Set whether or not the spawner should spawn on start
+    /// </summary>
+    /// <param name="spawnOnStart">Whether or not to spawn on start</param>
+    public void SetSpawnOnStart(bool spawnOnStart)
+    {
+        this.spawnOnStart = spawnOnStart;
     }
 
     /// <summary>
@@ -120,6 +195,39 @@ public class Spawner : MonoBehaviour
     }
 
     /// <summary>
+    /// Spawns random game objects based on their weights
+    /// </summary>
+    /// <returns>GameObjects which spawned</returns>
+    public GameObject[] Spawn()
+    {
+        var spawnedGameObjects = new List<GameObject>();
+        int spawnCount = UnityEngine.Random.Range(GetMinSpawns(), GetMaxSpawns() + 1);
+        for (int i = 0; i < spawnCount; i++)
+        {
+            float spawnChanceValue = UnityEngine.Random.Range(MinSpawnChance, MaxSpawnChance);
+            if (spawnChanceValue > spawnChance)
+            {
+                continue;
+            }
+            float randomValue = UnityEngine.Random.Range(0.0f, weights.Sum());
+            float accumulatedValue = 0.0f;
+            for (int j = 0; j < weights.Count; j++)
+            {
+                accumulatedValue += weights[j];
+                if (randomValue < accumulatedValue)
+                {
+                    var spawnablePrefab = spawnables[j];
+                    var spawn = Instantiate(spawnablePrefab, transform.position, Quaternion.identity) as GameObject;
+                    spawn.transform.SetParent(transform.parent);
+                    spawnedGameObjects.Add(spawn);
+                    break;
+                }
+            }
+        }
+        return spawnedGameObjects.ToArray();
+    }
+
+    /// <summary>
     /// Sets the size for the spawnable outline
     /// </summary>
     public void SetMaxSpawnableSize()
@@ -142,31 +250,6 @@ public class Spawner : MonoBehaviour
         }
         maxSpawnableSize = maxSize;
         SceneView.RepaintAll();
-    }
-
-    /// <summary>
-    /// Spawns a random game object based on their weights
-    /// </summary>
-    private void SpawnGameObject()
-    {
-        float spawnChanceValue = UnityEngine.Random.Range(MinSpawnChance, MaxSpawnChance);
-        if (spawnChanceValue > spawnChance)
-        {
-            return;
-        }
-        float randomValue = UnityEngine.Random.Range(0.0f, weights.Sum());
-        float accumulatedValue = 0.0f;
-        for (int i = 0; i < weights.Count; i++)
-        {
-            accumulatedValue += weights[i];
-            if (randomValue < accumulatedValue)
-            {
-                var spawnablePrefab = spawnables[i];
-                Instantiate(spawnablePrefab, transform.position, Quaternion.identity);
-                return;
-            }
-        }
-        Debug.LogError(gameObject + " failed to spawn random object!", gameObject);
     }
 
     /// <summary>

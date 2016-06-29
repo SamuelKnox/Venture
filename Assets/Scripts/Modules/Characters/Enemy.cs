@@ -1,25 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(EnemyView))]
+[RequireComponent(typeof(Spawner))]
 public abstract class Enemy : Character
 {
-    protected Animator animator;
-    private Rigidbody2D body2d;
+    private static readonly Vector2 RewardForce = new Vector2(250.0f, 500.0f);
+
+    protected EnemyView enemyView;
+
+    private Spawner spawner;
 
     protected override void Awake()
     {
         base.Awake();
-        animator = GetComponent<Animator>();
-        body2d = GetComponent<Rigidbody2D>();
-    }
-
-    void Update()
-    {
-        if (body2d)
-        {
-            animator.SetFloat(AnimationNames.Enemy.Floats.HorizontalSpeed, Mathf.Abs(body2d.velocity.x));
-            animator.SetFloat(AnimationNames.Enemy.Floats.VerticalSpeed, body2d.velocity.y);
-        }
+        enemyView = GetComponent<EnemyView>();
+        spawner = GetComponent<Spawner>();
     }
 
     /// <summary>
@@ -31,16 +27,34 @@ public abstract class Enemy : Character
         base.OnDamageDealt(damage);
         if (health.IsDead())
         {
-            animator.SetTrigger(AnimationNames.Enemy.Triggers.Die);
-            foreach (var monoBehaviour in GetComponentsInChildren<MonoBehaviour>())
-            {
-                monoBehaviour.enabled = false;
-            }
-            gameObject.layer = LayerMask.NameToLayer(LayerNames.Trigger);
+            enemyView.Die();
         }
         else
         {
-            animator.SetTrigger(AnimationNames.Enemy.Triggers.Hurt);
+            enemyView.Hurt();
+        }
+    }
+
+    /// <summary>
+    /// Death for enemy
+    /// </summary>
+    protected override void Die()
+    {
+        if (spawner)
+        {
+            var stats = spawner.Spawn();
+            foreach (var stat in stats)
+            {
+                var body2D = stat.GetComponent<Rigidbody2D>();
+                if (body2D)
+                {
+                    body2D.AddForce(new Vector2(UnityEngine.Random.Range(-RewardForce.x, RewardForce.x), UnityEngine.Random.Range(0.0f, RewardForce.y)));
+                }
+            }
+        }
+        foreach (var monoBehaviour in GetComponentsInChildren<MonoBehaviour>())
+        {
+            monoBehaviour.enabled = false;
         }
     }
 }

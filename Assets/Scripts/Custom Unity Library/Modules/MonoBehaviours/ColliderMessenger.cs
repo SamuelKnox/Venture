@@ -16,13 +16,13 @@ public class ColliderMessenger : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, collision);
+        SendMessageUpwards(methodName, collision, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnCollisionExit(Collision collisionInfo)
     {
         string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + ExitMethodNameSuffix;
-        SendMessageUpwards(methodName, collisionInfo);
+        SendMessageUpwards(methodName, collisionInfo, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnCollisionStay(Collision collisionInfo)
@@ -33,53 +33,53 @@ public class ColliderMessenger : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, other);
+        SendMessageUpwards(methodName, other, SendMessageOptions.DontRequireReceiver);
     }
     void OnTriggerExit(Collider other)
     {
         string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + ExitMethodNameSuffix;
-        SendMessageUpwards(methodName, other);
+        SendMessageUpwards(methodName, other, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnTriggerStay(Collider other)
     {
         string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + StayMethodNameSuffix;
-        SendMessageUpwards(methodName, other);
+        SendMessageUpwards(methodName, other, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnCollisionEnter2D(Collision2D coll)
     {
         string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, coll);
+        SendMessageUpwards(methodName, coll, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnCollisionExit2D(Collision2D coll)
     {
-        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, coll);
+        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + ExitMethodNameSuffix;
+        SendMessageUpwards(methodName, coll, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnCollisionStay2D(Collision2D coll)
     {
-        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, coll);
+        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + StayMethodNameSuffix;
+        SendMessageUpwards(methodName, coll, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, other);
+        SendMessageUpwards(methodName, other, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, other);
+        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + ExitMethodNameSuffix;
+        SendMessageUpwards(methodName, other, SendMessageOptions.DontRequireReceiver);
     }
 
     void OnTriggerStay2D(Collider2D other)
     {
-        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + EnterMethodNameSuffix;
-        SendMessageUpwards(methodName, other);
+        string methodName = MethodNamePrefix + Regex.Replace(name, WhitespaceRegex, "") + StayMethodNameSuffix;
+        SendMessageUpwards(methodName, other, SendMessageOptions.DontRequireReceiver);
     }
 }

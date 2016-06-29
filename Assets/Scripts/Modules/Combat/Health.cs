@@ -45,11 +45,6 @@ public class Health : MonoBehaviour
         totalInvincibilityCooldown = invincibilityCooldown;
     }
 
-    void Start()
-    {
-        gameObject.layer = LayerMask.NameToLayer(LayerNames.Health);
-    }
-
     void Update()
     {
         ApplyDamageOverTime();

@@ -7,11 +7,17 @@ using UnityEngine;
 public class SpawnerEditor : Editor
 {
     private const string SpawnChanceLabel = "Spawn Chance";
-    private const string SpawnChanceTooltip = "This is the chance that any GameObject will be spawned.  0 means no GameObject will every spawn, and 1 means a GameObject will always spawn.";
+    private const string SpawnChanceTooltip = "This is the chance that a GameObject will be successfully spawned when attempted.  0 means no GameObject will every spawn, and 1 means every GameObject will always spawn.";
     private const string DefaultLabel = "Add GameObject";
     private const string GameObjectTooltip = "GameObject which can be spawned at a given rate.";
+    private const string SpawnOnStartLabel = "Spawn on Start";
+    private const string SpawnOnStartTooltip = "Whether or not to spawn the GameObject on start, opposed to waiting for Spawn() to be called manually";
+    private const string SpawnCountLabelPrefix = "Spawn Count";
+    private const string SpawnCountTooltip = "How many GameObjects to spawn";
     private const float MinSpawnChance = 0.0f;
     private const float MaxSpawnChance = 1.0f;
+    private const int MinSpawnCount = 1;
+    private const int MaxSpawnCount = 25;
 
     public override void OnInspectorGUI()
     {
@@ -19,6 +25,16 @@ public class SpawnerEditor : Editor
         var spawnChanceGuiContent = new GUIContent(SpawnChanceLabel, SpawnChanceTooltip);
         float spawnChance = EditorGUILayout.Slider(spawnChanceGuiContent, spawner.GetSpawnChance(), MinSpawnChance, MaxSpawnChance);
         spawner.SetSpawnChance(spawnChance);
+        var onStartGuiContent = new GUIContent(SpawnOnStartLabel, SpawnChanceTooltip);
+        bool spawnOnStart = EditorGUILayout.Toggle(onStartGuiContent, spawner.GetSpawnOnStart());
+        spawner.SetSpawnOnStart(spawnOnStart);
+        float minSpawns = spawner.GetMinSpawns();
+        float maxSpawns = spawner.GetMaxSpawns();
+        string spawnCountLabel = SpawnCountLabelPrefix + " [" + minSpawns + "," + maxSpawns + "]";
+        var spawnCountGuiContent = new GUIContent(spawnCountLabel, SpawnCountTooltip);
+        EditorGUILayout.MinMaxSlider(spawnCountGuiContent, ref minSpawns, ref maxSpawns, MinSpawnCount, MaxSpawnCount);
+        spawner.SetMinSpawns((int)minSpawns);
+        spawner.SetMaxSpawns((int)maxSpawns);
         var spawnables = spawner.GetSpawnables();
         var weights = spawner.GetWeights();
         for (int i = 0; i < spawnables.Count && i < weights.Count; i++)

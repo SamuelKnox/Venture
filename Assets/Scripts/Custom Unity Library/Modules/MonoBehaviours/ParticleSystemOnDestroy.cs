@@ -5,12 +5,11 @@
     /// <summary>
     /// Plays the provided Particle System when the GameObject is destroyed
     /// </summary>
-    [RequireComponent(typeof(Renderer))]
     public class ParticleSystemOnDestroy : MonoBehaviour
     {
         [Tooltip("The particle system which will be trigged when game object is destroyed")]
         [SerializeField]
-        private ParticleSystem ParticleSystem;
+        private ParticleSystem particleSystemPrefab;
 
         private bool applicationClosing;
 
@@ -20,9 +19,10 @@
             {
                 return;
             }
-            if (GetComponent<Renderer>().isVisible)
+            var renderer = GetComponent<Renderer>();
+            if (!renderer || renderer.isVisible)
             {
-                var particleSystem = Instantiate(ParticleSystem, transform.position, Quaternion.identity) as ParticleSystem;
+                var particleSystem = Instantiate(particleSystemPrefab, transform.position, Quaternion.identity) as ParticleSystem;
                 GameObjectUtility.ChildCloneToContainer(particleSystem.gameObject);
                 Destroy(particleSystem.gameObject, particleSystem.duration);
             }

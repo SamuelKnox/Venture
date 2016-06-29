@@ -1,5 +1,5 @@
 ﻿///Uncomment the line below if you are using Creative Spore's Super Tilemap Editor
-//#define USING_SUPER_TILEMAP_EDITOR
+#define USING_SUPER_TILEMAP_EDITOR
 
 namespace LevelGenerator2D
 {
@@ -55,6 +55,10 @@ namespace LevelGenerator2D
         [Range(1, MaxHeight)]
         private int height = 1;
 
+        [Tooltip("Whether or not to lock children within the Room")]
+        [SerializeField]
+        private bool lockChildren = true;
+
         [Tooltip("Link between Rooms.  The Doors rotate clockwise around the Room starting at the bottom left corner.")]
         [SerializeField]
         private Door[] doors = new Door[1];
@@ -93,7 +97,7 @@ namespace LevelGenerator2D
         void Update()
         {
             UpdatePosition();
-            if (!Application.isPlaying)
+            if (!Application.isPlaying && GetChildlock())
             {
                 EncompassChildren();
             }
@@ -145,6 +149,28 @@ namespace LevelGenerator2D
                 }
             }
             return doorList.ToArray();
+        }
+
+        /// <summary>
+        /// Gets whether or not the children are to be locked within the room
+        /// </summary>
+        /// <returns>If children are locked</returns>
+        public bool GetChildlock()
+        {
+            return lockChildren;
+        }
+
+        /// <summary>
+        /// Sets whether or not the children will be locked within the room
+        /// </summary>
+        /// <param name="childlock">Whether or not to lock the children</param>
+        public void SetChildlock(bool childlock)
+        {
+            lockChildren = childlock;
+            if (!Application.isPlaying && lockChildren)
+            {
+                EncompassChildren();
+            }
         }
 
         /// <summary>

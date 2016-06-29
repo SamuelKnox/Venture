@@ -15,6 +15,8 @@
         private const string GlobalPointTooltip = "This is Room's world point in grid space.";
         private const string SizeLabel = "Size";
         private const string SizeTooltip = "These are the dimensions of the Room in grid space.";
+        private const string ChildlockLabel = "Lock Children";
+        private const string ChildlockTooltip = "Whether or not to force Room's children to stay within the room.";
         private const string DoorCountLabel = "Door Count";
         private const string DoorCountTooltip = "This is how many doors are on this room.";
         private const string DoorLabelPrefix = "Door #";
@@ -32,6 +34,7 @@
             var room = (Room)target;
             MaintainGlobalPoint(room);
             MaintainSize(room);
+            MaintainChildlock(room);
             MaintainWeight(room);
             MaintainDoors(room);
             UpdateGUI(room);
@@ -61,6 +64,17 @@
             room.SetWidth(width);
             var height = Mathf.Clamp(Mathf.RoundToInt(vectorSize.y), 1, Room.MaxHeight);
             room.SetHeight(height);
+        }
+
+        /// <summary>
+        /// Draws the UI in the inspector for the room's option to encapsulate children
+        /// </summary>
+        /// <param name="room">The room to draw the UI for</param>
+        private void MaintainChildlock(Room room)
+        {
+            var guiContent = new GUIContent(ChildlockLabel, ChildlockTooltip);
+            bool childLock = EditorGUILayout.Toggle(guiContent, room.GetChildlock());
+            room.SetChildlock(childLock);
         }
 
         /// <summary>

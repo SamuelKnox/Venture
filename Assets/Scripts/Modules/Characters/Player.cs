@@ -15,6 +15,14 @@ public class Player : Character
     [SerializeField]
     private Transform runeContainer;
 
+    [Tooltip("Container for player's armor")]
+    [SerializeField]
+    private Transform armorContainer;
+
+    [Tooltip("Miscellaneous collectables container")]
+    [SerializeField]
+    private Transform miscellaneousContainer;
+
     private Inventory inventory;
     private Weapon activeWeapon;
 
@@ -33,37 +41,49 @@ public class Player : Character
     /// Adds an item to the player's inventory
     /// </summary>
     /// <param name="item">Item to add</param>
-    public void CollectItem(Collectable collectable)
+    public void Collect(Collectable collectable)
     {
         if (!collectable)
         {
             return;
         }
-        var item = collectable.GetComponent<Item>();
-        if (!item)
+        var itemContainer = miscellaneousContainer;
+        if (collectable.GetComponent<Weapon>())
         {
-            Debug.Log("Cannot move Collectable into inventory, because it is not an Item!", collectable.gameObject);
+            itemContainer = weaponContainer;
+        }
+        else if (collectable.GetComponent<Rune>())
+        {
+            itemContainer = runeContainer;
+        }
+        else if (collectable.GetComponent<Armor>())
+        {
+            throw new NotImplementedException("Armor is not collectable yet.");
+        }
+        collectable.transform.SetParent(itemContainer);
+        collectable.transform.position = itemContainer.position;
+        collectable.transform.right *= Mathf.Sign(transform.localScale.x);
+        var item = collectable.GetComponent<Item>();
+        if (item)
+        {
+            if (!inventory.Contains(item))
+            {
+                inventory.Add(item);
+            }
+            else
+            {
+                Debug.LogWarning(name + " is attempting to collect " + item.name + ", but it already exists in " + inventory.name + ".", item.gameObject);
+            }
             return;
         }
-        if (!inventory.Contains(item))
+        var stat = collectable.GetComponent<ResourcePool>();
+        if (stat)
         {
-            Transform itemContainer = null;
-            if (item.GetComponent<Weapon>())
+            var experience = stat.GetComponent<Experience>();
+            if (experience)
             {
-                itemContainer = weaponContainer;
+                ApplyExperience(experience);
             }
-            else if (item.GetComponent<Rune>())
-            {
-                itemContainer = runeContainer;
-            }
-            item.transform.SetParent(itemContainer);
-            item.transform.position = weaponContainer.transform.position;
-            item.transform.right *= Mathf.Sign(transform.localScale.x);
-            inventory.Add(item);
-        }
-        else
-        {
-            Debug.LogWarning(name + " is attempting to collect " + item.name + ", but it already exists in " + inventory.name + ".", item.gameObject);
         }
     }
 
@@ -236,6 +256,27 @@ public class Player : Character
     }
 
     /// <summary>
+    /// Player dies
+    /// </summary>
+    protected override void Die()
+    {
+        throw new NotImplementedException("Played death not yet implemented.");
+    }
+
+    /// <summary>
+    /// Adds experience to the equipped runes
+    /// </summary>
+    /// <param name="experience">Experience to be added</param>
+    private void ApplyExperience(Experience experience)
+    {
+        var equippedRunes = inventory.GetItems(ItemType.Rune).Where(r => r.IsEquipped()).Select(r => r.GetComponent<Rune>());
+        foreach (var rune in equippedRunes)
+        {
+            rune.SetExperience(rune.GetExperience() + experience.GetAmount() / equippedRunes.Count());
+        }
+    }
+
+    /// <summary>
     /// Sets the initially active weapon
     /// </summary>
     private void SetStartingActiveWeapon()
@@ -252,14 +293,5 @@ public class Player : Character
         {
             Debug.LogWarning("There is no active weapon.", gameObject);
         }
-    }
-
-    /// <summary>
-    /// Player dies
-    /// </summary>
-    protected override void Die()
-    {
-        Debug.Log("Player died.");
-        throw new NotImplementedException();
     }
 }

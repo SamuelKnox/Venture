@@ -2,6 +2,14 @@
 {
     public static class Enemy
     {
+        public static class Bools
+        {
+            /// <summary>
+            /// Animation name for when enemy dies
+            /// </summary>
+            public const string Death = "Dead";
+        }
+
         public static class Floats
         {
             /// <summary>
@@ -21,10 +29,6 @@
             /// Animation name for enemy's primary attack
             /// </summary>
             public const string Attack = "Attack";
-            /// <summary>
-            /// Animation name for when enemy dies
-            /// </summary>
-            public const string Die = "Die";
 
             /// <summary>
             /// Animation name for when enemy is hurt
@@ -35,6 +39,27 @@
 
     public static class Player
     {
+        public static class Bools
+        {
+            /// <summary>
+            /// Animation name for whether or not the player is climbing
+            /// </summary>
+            public const string Climbing = "Climbing";
+        }
+
+        public static class Floats
+        {
+            /// <summary>
+            /// Animation name for player's horizontal speed
+            /// </summary>
+            public const string HorizontalSpeed = "Horizontal Speed";
+
+            /// <summary>
+            /// Animation name for player's vertical speed
+            /// </summary>
+            public const string VerticalSpeed = "Vertical Speed";
+        }
+
         public static class Triggers
         {
             /// <summary>
@@ -56,19 +81,8 @@
             /// Animation name for player collecting an item
             /// </summary>
             public const string CollectItem = "Collect Item";
-        }
 
-        public static class Floats
-        {
-            /// <summary>
-            /// Animation name for player's horizontal speed
-            /// </summary>
-            public const string HorizontalSpeed = "Horizontal Speed";
-
-            /// <summary>
-            /// Animation name for player's vertical speed
-            /// </summary>
-            public const string VerticalSpeed = "Vertical Speed";
+            public const string CollectSpecialItem = "Collect Special Item";
         }
     }
 }

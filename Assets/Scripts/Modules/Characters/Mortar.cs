@@ -2,7 +2,6 @@
 using UnityEngine;
 
 [RequireComponent(typeof(RangedWeapon))]
-[RequireComponent(typeof(Animator))]
 public class Mortar : Enemy
 {
     [Tooltip("Maximum time in seconds that the mortar will wait before attempting to fire a shot")]
@@ -47,21 +46,8 @@ public class Mortar : Enemy
             if (!firing && rangedWeapon.IsValidShot(player.transform))
             {
                 firing = true;
-                animator.SetTrigger(AnimationNames.Enemy.Triggers.Attack);
+                enemyView.Attack();
             }
-        }
-    }
-
-    /// <summary>
-    /// Causes mortar to die
-    /// </summary>
-    protected override void Die()
-    {
-        animator.SetTrigger(AnimationNames.Enemy.Triggers.Die);
-        var damage = GetComponent<Damage>();
-        if (damage)
-        {
-            Destroy(damage);
         }
     }
 }
