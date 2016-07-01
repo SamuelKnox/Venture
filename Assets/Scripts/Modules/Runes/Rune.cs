@@ -4,26 +4,17 @@ using UnityEngine;
 [Serializable]
 public abstract class Rune : Item
 {
-    private const float ExperiencePerLevel = 100.0f;
+    private const int MinLevel = 1;
+    private const int Maxlevel = 10;
 
     [Tooltip("Type of rune")]
     [SerializeField]
     private RuneType runeType;
 
-    [Tooltip("Experience on this rune, which affects the level")]
-    [SerializeField]
-    [Range(0.0f, 1000.0f)]
-    private float experience = 0.0f;
-
     [Tooltip("Rune level")]
     [SerializeField]
     [Range(1, 10)]
     protected int level = 1;
-
-    void OnValidate()
-    {
-        UpdateLevel();
-    }
 
     /// <summary>
     /// Attaches a rune to equipment
@@ -47,28 +38,26 @@ public abstract class Rune : Item
     }
 
     /// <summary>
-    /// Gets the experience for this rune
+    /// Gets the rune's level
     /// </summary>
-    /// <returns>Experience</returns>
-    public float GetExperience()
+    /// <returns>Rune level</returns>
+    public int GetLevel()
     {
-        return experience;
+        return level;
     }
 
     /// <summary>
-    /// Sets the experience for this rune
+    /// Sets the rune's level
     /// </summary>
-    /// <param name="experience">Experience to set</param>
-    public void SetExperience(float experience)
+    /// <param name="level">Level to set</param>
+    /// <returns>Whether or not the rune's level was successfully set</returns>
+    public bool SetLevel(int level)
     {
-        this.experience = experience;
-    }
-
-    /// <summary>
-    /// Updates the level to match the experience
-    /// </summary>
-    private void UpdateLevel()
-    {
-        level = (int)(experience / ExperiencePerLevel);
+        if (level < MinLevel || level > Maxlevel)
+        {
+            return false;
+        }
+        this.level = level;
+        return true;
     }
 }

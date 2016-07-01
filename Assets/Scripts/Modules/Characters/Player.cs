@@ -76,15 +76,20 @@ public class Player : Character
             }
             return;
         }
-        var stat = collectable.GetComponent<ResourcePool>();
-        if (stat)
+        var resource = collectable.GetComponent<ResourcePool>();
+        if (resource)
         {
-            var experience = stat.GetComponent<Experience>();
-            if (experience)
+            var gold = resource.GetComponent<Gold>();
+            if (gold)
             {
-                ApplyExperience(experience);
+                AddGold(gold);
             }
         }
+    }
+
+    private void AddGold(Gold gold)
+    {
+        Debug.Log("Collecting gold!");
     }
 
     /// <summary>
@@ -261,19 +266,6 @@ public class Player : Character
     protected override void Die()
     {
         throw new NotImplementedException("Played death not yet implemented.");
-    }
-
-    /// <summary>
-    /// Adds experience to the equipped runes
-    /// </summary>
-    /// <param name="experience">Experience to be added</param>
-    private void ApplyExperience(Experience experience)
-    {
-        var equippedRunes = inventory.GetItems(ItemType.Rune).Where(r => r.IsEquipped()).Select(r => r.GetComponent<Rune>());
-        foreach (var rune in equippedRunes)
-        {
-            rune.SetExperience(rune.GetExperience() + experience.GetAmount() / equippedRunes.Count());
-        }
     }
 
     /// <summary>

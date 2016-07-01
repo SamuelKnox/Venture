@@ -44,7 +44,27 @@ public static class InputNames
     public const string TabRight = "Tab to Right";
 
     /// <summary>
-    /// Input name to edit the roons for the currently selected item
+    /// Input name to edit the runes for the currently selected item
     /// </summary>
     public const string EditRunes = "Edit Runes";
+
+    /// <summary>
+    /// Input name to equip equipment
+    /// </summary>
+    public const string EquipEquipment = "Equip Equipment";
+
+    /// <summary>
+    /// Input name used to remove runes from equipment
+    /// </summary>
+    public const string ClearRunes = "Clear Runes";
+
+    /// <summary>
+    /// Input name to equip a rune
+    /// </summary>
+    public const string EquipRune = "Equip Rune";
+
+    /// <summary>
+    /// Input name for leveling up a rune
+    /// </summary>
+    public const string LevelUpRune = "Level Up Rune";
 }

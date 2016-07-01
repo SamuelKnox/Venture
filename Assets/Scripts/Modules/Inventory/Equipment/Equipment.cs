@@ -32,6 +32,17 @@ public abstract class Equipment : Item
     }
 
     /// <summary>
+    /// Detaches all runes from this equipment
+    /// </summary>
+    public void DetachAllRunes()
+    {
+        foreach (var runeSocket in runeSockets)
+        {
+            runeSocket.SetRune(null);
+        }
+    }
+
+    /// <summary>
     /// Sets the rune for this item's respective rune socket
     /// </summary>
     /// <param name="rune"></param>
@@ -59,6 +70,12 @@ public abstract class Equipment : Item
     public float GetDamageOverTime()
     {
         return damageOverTime;
+    }
+
+    public void DetachRune(Rune rune)
+    {
+        var runeSocket = runeSockets.Where(s => s.GetRuneType() == rune.GetRuneType()).FirstOrDefault();
+        runeSocket.SetRune(null);
     }
 
     /// <summary>
@@ -142,7 +159,10 @@ public abstract class Equipment : Item
                 this.rune.SetEquipped(false);
             }
             this.rune = rune;
-            this.rune.SetEquipped(true);
+            if (this.rune)
+            {
+                this.rune.SetEquipped(true);
+            }
         }
     }
 }

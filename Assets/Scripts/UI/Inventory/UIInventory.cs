@@ -1,6 +1,4 @@
-﻿using CustomUnityLibrary;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,10 +7,8 @@ using UnityEngine.UI;
 
 public class UIInventory : MonoBehaviour
 {
+    private const float LongPressDuration = 1.0f;
     private const float HorizontalTabSpacing = 10.0f;
-    private const string EquippedItemSuffix = " is currently equipped.";
-    private const string RuneSocketedElsewhereAffix = " currently has ";
-    private const string RuneSocketedElsewhereSuffix = " socketed.";
 
     [Tooltip("Panel which stores all of the category tabs")]
     [SerializeField]
@@ -43,32 +39,15 @@ public class UIInventory : MonoBehaviour
     [SerializeField]
     private Vector2 itemSpacing = Vector2.one;
 
-    [Tooltip("Image used to show the item which is currently equipped")]
-    [SerializeField]
-    private Image equippedItemImage;
-
-    [Tooltip("Text used to show the description for the currently equipped item")]
-    [SerializeField]
-    private Text equippedItemDescription;
-
-    [Tooltip("Image used to show the item which is being browsed")]
-    [SerializeField]
-    private Image browserItemImage;
-
-    [Tooltip("Text used to show the description for the item currently being browsed")]
-    [SerializeField]
-    private Text browserItemDescription;
-
-    [Tooltip("Text used to display whether or not an item is already equipped for the browser description")]
-    [SerializeField]
-    private Text browserEquipmentStatus;
-
     private int currentIndex = 0;
     private Player player;
     private GameObject currentSelectedGameObject;
     private InventoryMode inventoryMode;
     private List<Tab> tabs;
     private Equipment activeEquipmentForRunes;
+    private float longPressTimer;
+    private InventoryButtonsView buttonsView;
+    private InventoryDescriptionView descriptionView;
 
     void Awake()
     {
@@ -86,6 +65,18 @@ public class UIInventory : MonoBehaviour
         if (runeTabs.Length == 0)
         {
             Debug.LogError("There must be at least one rune tab!", gameObject);
+            return;
+        }
+        buttonsView = FindObjectOfType<InventoryButtonsView>();
+        if (!buttonsView)
+        {
+            Debug.LogError(gameObject + " could not find InventoryButtonsView!", gameObject);
+            return;
+        }
+        descriptionView = FindObjectOfType<InventoryDescriptionView>();
+        if (!descriptionView)
+        {
+            Debug.LogError(gameObject + " could not find InventoryDescriptionView!", gameObject);
             return;
         }
     }
@@ -109,32 +100,144 @@ public class UIInventory : MonoBehaviour
         if (EventSystem.current.currentSelectedGameObject != currentSelectedGameObject)
         {
             currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
-            UpdateItemDescriptions();
+            descriptionView.UpdateItemDescriptions(currentSelectedGameObject, activeEquipmentForRunes);
         }
-        if (Input.GetButtonDown(InputNames.Inventory))
+        switch (inventoryMode)
         {
-            Time.timeScale = 1.0f;
-            SceneManager.UnloadScene(SceneNames.Inventory);
-        }
-        if (Input.GetButtonDown(InputNames.EditRunes))
-        {
-            switch (inventoryMode)
-            {
-                case InventoryMode.EquipmentBrowser:
+            case InventoryMode.EquipmentBrowser:
+                if (Input.GetButtonDown(InputNames.Inventory))
+                {
+                    buttonsView.PressButton(InputNames.Inventory);
+                    Time.timeScale = 1.0f;
+                    SceneManager.UnloadScene(SceneNames.Inventory);
+                }
+                if (Input.GetButtonDown(InputNames.EditRunes))
+                {
+                    buttonsView.PressButton(InputNames.EditRunes);
                     if (currentSelectedGameObject)
                     {
                         inventoryMode = InventoryMode.RuneEditor;
                         CreateTabs();
                     }
-                    break;
-                case InventoryMode.RuneEditor:
+                }
+                if (!currentSelectedGameObject)
+                {
+                    return;
+                }
+                var equipmentItemButton = currentSelectedGameObject.GetComponent<ItemButton>();
+                if (!equipmentItemButton)
+                {
+                    return;
+                }
+                var equipmentItem = equipmentItemButton.GetItem();
+                if (!equipmentItem)
+                {
+                    Debug.LogError(equipmentItemButton + " does not have an item!", equipmentItemButton.gameObject);
+                    return;
+                }
+                var equipment = equipmentItem.GetComponent<Equipment>();
+                if (!equipment)
+                {
+                    Debug.LogError("Expecting equipment, but received " + equipmentItem + "!", equipmentItem.gameObject);
+                    return;
+                }
+                if (Input.GetButtonDown(InputNames.EquipEquipment))
+                {
+                    buttonsView.PressButton(InputNames.EquipEquipment);
+                    Equip(equipment);
+                }
+                if (Input.GetButtonDown(InputNames.ClearRunes))
+                {
+                    buttonsView.PressButton(InputNames.ClearRunes);
+                    ClearRunes(equipment);
+                }
+                if (Input.GetButtonDown(InputNames.ClearRunes))
+                {
+                    longPressTimer = 0.0f;
+                }
+                if (Input.GetButton(InputNames.ClearRunes))
+                {
+                    longPressTimer += Time.unscaledDeltaTime;
+                    if (longPressTimer > 0.0f)
+                    {
+                        buttonsView.HoldButton(InputNames.ClearRunes, longPressTimer / LongPressDuration);
+                    }
+                    if (longPressTimer >= LongPressDuration)
+                    {
+                        ClearAllRunes(equipment);
+                        longPressTimer = -Mathf.Infinity;
+                        buttonsView.HoldButton(InputNames.ClearRunes, 1.0f);
+                    }
+                }
+                if (Input.GetButtonUp(InputNames.ClearRunes))
+                {
+                    buttonsView.HoldButton(InputNames.ClearRunes, 1.0f);
+                }
+                break;
+            case InventoryMode.RuneEditor:
+                if (Input.GetButtonDown(InputNames.Inventory))
+                {
+                    buttonsView.PressButton(InputNames.Inventory);
                     inventoryMode = InventoryMode.EquipmentBrowser;
                     CreateTabs();
-                    break;
-                default:
-                    Debug.LogError("An invalid InventoryMode (" + inventoryMode + ") is being used!", gameObject);
+                }
+                if (!currentSelectedGameObject)
+                {
                     return;
-            }
+                }
+                var runeItemButton = currentSelectedGameObject.GetComponent<ItemButton>();
+                if (!runeItemButton)
+                {
+                    return;
+                }
+                var runeItem = runeItemButton.GetItem();
+                if (!runeItem)
+                {
+                    Debug.LogError(runeItemButton + " does not have an item!", runeItemButton.gameObject);
+                    return;
+                }
+                var rune = runeItem.GetComponent<Rune>();
+                if (!rune)
+                {
+                    Debug.LogError("Expecting rune, but received " + runeItem + "!", runeItem.gameObject);
+                    return;
+                }
+                if (Input.GetButtonDown(InputNames.EquipRune))
+                {
+                    buttonsView.PressButton(InputNames.EquipRune);
+                    AttachRune(rune);
+                }
+                if (Input.GetButtonDown(InputNames.ClearRunes))
+                {
+                    buttonsView.PressButton(InputNames.ClearRunes);
+                    DetachRune(rune);
+                }
+                if (Input.GetButtonDown(InputNames.LevelUpRune))
+                {
+                    longPressTimer = 0.0f;
+                }
+                if (Input.GetButton(InputNames.LevelUpRune))
+                {
+                    longPressTimer += Time.unscaledDeltaTime;
+                    if (longPressTimer > 0.0f)
+                    {
+                        buttonsView.HoldButton(InputNames.LevelUpRune, longPressTimer / LongPressDuration);
+                    }
+                    if (longPressTimer >= LongPressDuration)
+                    {
+                        LevelUpRune(rune);
+                        longPressTimer = -Mathf.Infinity;
+                        buttonsView.HoldButton(InputNames.LevelUpRune, 1.0f);
+                    }
+                }
+                if (Input.GetButtonUp(InputNames.LevelUpRune))
+                {
+                    buttonsView.HoldButton(InputNames.LevelUpRune, 1.0f);
+                }
+                break;
+            default:
+                Debug.LogError("Invalid inventory mode!", gameObject);
+                return;
         }
     }
 
@@ -261,7 +364,7 @@ public class UIInventory : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
         currentSelectedGameObject = null;
         PopulateContentPanel();
-        UpdateItemDescriptions();
+        descriptionView.UpdateItemDescriptions(currentSelectedGameObject, activeEquipmentForRunes);
     }
 
     /// <summary>
@@ -273,12 +376,12 @@ public class UIInventory : MonoBehaviour
         {
             case InventoryMode.EquipmentBrowser:
                 var equipment = player.GetInventory().GetItems(equipmentTabs[currentIndex].GetItemType());
-                PopulateItemBrowser(equipment, Equip);
+                PopulateItemBrowser(equipment);
                 break;
             case InventoryMode.RuneEditor:
                 var allRunes = player.GetInventory().GetItems(ItemType.Rune).Select(r => r.GetComponent<Rune>());
                 var runes = allRunes.Where(r => r.GetRuneType() == runeTabs[currentIndex].GetRuneType()).ToArray();
-                PopulateItemBrowser(runes, AttachRune);
+                PopulateItemBrowser(runes);
                 break;
             default:
                 Debug.LogError("An invalid InventoryMode (" + inventoryMode.ToString() + ") was used!", gameObject);
@@ -289,7 +392,7 @@ public class UIInventory : MonoBehaviour
     /// <summary>
     /// Fills the content panel with the items of the currently selected category type
     /// </summary>
-    private void PopulateItemBrowser(Item[] items, Action<Item> actionToTakeWithItems)
+    private void PopulateItemBrowser(Item[] items)
     {
         foreach (Transform child in itemsContentPanel)
         {
@@ -362,121 +465,16 @@ public class UIInventory : MonoBehaviour
                 }
             }
             var item = itemButtonInstance.GetItem();
-            button.onClick.AddListener(() => actionToTakeWithItems(item));
         }
     }
 
     /// <summary>
-    /// Updates the description for the currently selected item
+    /// Levels up the rune
     /// </summary>
-    private void UpdateItemDescriptions()
+    /// <param name="rune">Rune to level up</param>
+    private void LevelUpRune(Rune rune)
     {
-        if (!currentSelectedGameObject)
-        {
-            browserItemImage.enabled = false;
-            browserItemDescription.enabled = false;
-            equippedItemImage.enabled = false;
-            equippedItemDescription.enabled = false;
-            return;
-        }
-        else
-        {
-            browserItemImage.enabled = true;
-            browserItemDescription.enabled = true;
-        }
-        var itemButton = currentSelectedGameObject.GetComponent<ItemButton>();
-        if (!itemButton)
-        {
-            Debug.LogError("Item Button is missing from the currently selected game object!", currentSelectedGameObject);
-            return;
-        }
-        var item = itemButton.GetItem();
-        if (!item)
-        {
-            Debug.LogError("The Item represented by the Item Button is null!", itemButton.gameObject);
-            return;
-        }
-        var browserIcon = item.GetIcon();
-        if (!browserIcon)
-        {
-            Debug.LogError(item.name + " does not have an icon.", item.gameObject);
-            return;
-        }
-        var browserDescription = item.GetDescription();
-        if (item.IsEquipped())
-        {
-            browserEquipmentStatus.enabled = true;
-            var rune = item.GetComponent<Rune>();
-            if (rune)
-            {
-                if (activeEquipmentForRunes.GetRune(rune.GetRuneType()) != rune)
-                {
-                    var allEquipment = player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
-                    var runeOwner = allEquipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
-                    if (!runeOwner)
-                    {
-                        Debug.LogError("Failed to find owner of Rune!", rune.gameObject);
-                    }
-                    browserEquipmentStatus.text = runeOwner.name + RuneSocketedElsewhereAffix + rune.name + RuneSocketedElsewhereSuffix;
-                }
-                else
-                {
-                    browserEquipmentStatus.text = rune.name + EquippedItemSuffix;
-                }
-            }
-            else
-            {
-                browserEquipmentStatus.text = item.name + EquippedItemSuffix;
-            }
-        }
-        else
-        {
-            browserEquipmentStatus.enabled = false;
-        }
-        if (string.IsNullOrEmpty(browserDescription))
-        {
-            Debug.LogError(item.name + " does not have a description!", item.gameObject);
-            return;
-        }
-        browserItemImage.sprite = browserIcon;
-        browserItemDescription.text = browserDescription;
-        var equippedItem = player.GetInventory().GetItems(item.GetItemType()).Where(i => i.IsEquipped()).FirstOrDefault();
-        if (equippedItem)
-        {
-            var rune = equippedItem.GetComponent<Rune>();
-            if (rune)
-            {
-                equippedItem = activeEquipmentForRunes.GetRune(rune.GetRuneType());
-                if (!equippedItem)
-                {
-                    equippedItemImage.enabled = false;
-                    equippedItemDescription.enabled = false;
-                    return;
-                }
-            }
-            equippedItemImage.enabled = true;
-            equippedItemDescription.enabled = true;
-            var equippedIcon = equippedItem.GetIcon();
-            if (!equippedIcon)
-            {
-                Debug.LogError(equippedIcon.name + " does not have an icon!", item.gameObject);
-                return;
-            }
-            var equippedDescription = equippedItem.GetDescription();
-            if (string.IsNullOrEmpty(equippedDescription))
-            {
-                Debug.LogError(equippedIcon.name + " does not have a description!", item.gameObject);
-                return;
-            }
-            equippedItemImage.sprite = equippedIcon;
-            equippedItemDescription.text = equippedDescription;
-        }
-        else
-        {
-            equippedItemImage.enabled = false;
-            equippedItemDescription.enabled = false;
-            return;
-        }
+        rune.SetLevel(rune.GetLevel() + 1);
     }
 
     /// <summary>
@@ -501,29 +499,23 @@ public class UIInventory : MonoBehaviour
             return;
         }
         player.Equip(equipment);
-        UpdateItemDescriptions();
+        descriptionView.UpdateItemDescriptions(currentSelectedGameObject, activeEquipmentForRunes);
         PopulateContentPanel();
     }
 
     /// <summary>
-    /// Attaches a rune to the currently selected item
+    /// Attaches a rune to the currently selected equipment
     /// </summary>
-    /// <param name="item">Rune to attach</param>
-    private void AttachRune(Item item)
+    /// <param name="rune">Rune to attach</param>
+    private void AttachRune(Rune rune)
     {
-        if (!item)
-        {
-            Debug.LogError("Cannot attach a null item!", gameObject);
-            return;
-        }
-        if (item.IsEquipped())
-        {
-            return;
-        }
-        var rune = item.GetComponent<Rune>();
         if (!rune)
         {
-            Debug.LogError("Expecting a Rune, but received " + item + "!", item.gameObject);
+            Debug.LogError("Cannot attach a null rune!", gameObject);
+            return;
+        }
+        if (rune.IsEquipped())
+        {
             return;
         }
         var equipment = activeEquipmentForRunes.GetComponent<Equipment>();
@@ -533,6 +525,46 @@ public class UIInventory : MonoBehaviour
             return;
         }
         equipment.SetRune(rune);
+        PopulateContentPanel();
+    }
+
+    /// <summary>
+    /// Detaches a rune from the currently selected equipment
+    /// </summary>
+    /// <param name="rune">Rune to detach</param>
+    private void DetachRune(Rune rune)
+    {
+        var equipment = activeEquipmentForRunes.GetComponent<Equipment>();
+        if (!equipment)
+        {
+            Debug.LogError(activeEquipmentForRunes + " must be an Equipment to have Runes!", activeEquipmentForRunes.gameObject);
+            return;
+        }
+        equipment.DetachRune(rune);
+        PopulateContentPanel();
+    }
+
+    /// <summary>
+    /// Detaches all runes from specified equipment
+    /// </summary>
+    /// <param name="equipment">Equipment to detach runes from</param>
+    private void ClearRunes(Equipment equipment)
+    {
+        equipment.DetachAllRunes();
+        PopulateContentPanel();
+    }
+
+    /// <summary>
+    /// Detaches all runes from equipment of the specified type
+    /// </summary>
+    /// <param name="equipment">Piece of equipment of the type that all runes will be detached from</param>
+    private void ClearAllRunes(Equipment equipment)
+    {
+        var allEquipment = player.GetInventory().GetItems(equipment.GetItemType()).Select(e => e.GetComponent<Equipment>());
+        foreach (var equipmentPiece in allEquipment)
+        {
+            equipmentPiece.DetachAllRunes();
+        }
         PopulateContentPanel();
     }
 
