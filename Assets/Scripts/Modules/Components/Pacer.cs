@@ -1,5 +1,4 @@
-﻿using CustomUnityLibrary;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -24,7 +23,7 @@ public class Pacer : MonoBehaviour
     [Tooltip("Speed at which the Pacer moves")]
     [SerializeField]
     [Range(0.0f, 10.0f)]
-    private float speed = 5.0f;
+    private float speed = 4.0f;
 
     private Vector2 extents;
     private Rigidbody2D body2D;

@@ -1,12 +1,11 @@
-﻿using System;
-using CreativeSpore.SmartColliders;
+﻿using CreativeSpore.SmartColliders;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(Player
-    
+
     ))]
 public class PlayerController : MonoBehaviour
 {

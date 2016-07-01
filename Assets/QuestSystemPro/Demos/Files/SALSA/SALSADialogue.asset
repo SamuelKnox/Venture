@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd1b04f7aa160c3428767bf8c847bd2b, type: 3}
+  m_Name: SALSADialogue
+  m_EditorClassIdentifier: 
+  _serializedJsonString: '{"name":null,"description":null,"helpUrl":null,"_nodes":[{"_index":0,"ownerType":1,"useAutoFocus":true,"_edges":[{"toNodeIndex":3,"conditions":[]}],"message":null,"audioClip":{"audioClip":null,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":null,"_editorPosition":{"x":0.0,"y":0.0},"$type":"Devdog.QuestSystemPro.Dialogue.EntryNode"},{"_index":1,"ownerType":1,"useAutoFocus":true,"_edges":[{"toNodeIndex":2,"conditions":[]}],"message":"Hey
+    there","audioClip":{"audioClip":0,"volume":1.0,"pitch":1.0,"loop":false,"$id":"6"},"animationClip":1,"_editorPosition":{"x":-126.0,"y":452.0},"$type":"Devdog.QuestSystemPro.Dialogue.Node"},{"_index":2,"ownerType":0,"useAutoFocus":true,"_edges":[],"message":"Cool!","audioClip":{"$ref":"6"},"animationClip":null,"_editorPosition":{"x":-126.0,"y":662.0},"$type":"Devdog.QuestSystemPro.Dialogue.Node"},{"_playerDecisions":[{"option":"Speak
+    to me"},{"option":"Hi..."}],"_index":3,"ownerType":1,"useAutoFocus":true,"_edges":[{"toNodeIndex":1,"conditions":[]},{"toNodeIndex":4,"conditions":[]}],"message":null,"audioClip":{"audioClip":2,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":1,"_editorPosition":{"x":1.0,"y":111.0},"$type":"Devdog.QuestSystemPro.Dialogue.PlayerDecisionNode"},{"_index":4,"ownerType":1,"useAutoFocus":true,"_edges":[{"toNodeIndex":5,"conditions":[]}],"message":"Hi
+    to you","audioClip":{"audioClip":null,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":null,"_editorPosition":{"x":136.0,"y":450.0},"$type":"Devdog.QuestSystemPro.Dialogue.Node"},{"_index":5,"ownerType":0,"useAutoFocus":true,"_edges":[],"message":"I''m
+    gonna go now...","audioClip":{"$ref":"6"},"animationClip":null,"_editorPosition":{"x":141.0,"y":659.0},"$type":"Devdog.QuestSystemPro.Dialogue.Node"}],"conditions":[],"variables":{"variables":[]}}'
+  _objectReferences:
+  - {fileID: 8300000, guid: 11d7033156a09c843bf5c9aedff5c9a7, type: 3}
+  - {fileID: 7400000, guid: 8fb04a2e247396a45ac30f027e7d30ac, type: 2}
+  - {fileID: 8300000, guid: 7e5bffd8ef771dc4f913b2ce9d34bf35, type: 3}
+  name: 
+  description: 
+  helpUrl: 

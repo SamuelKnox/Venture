@@ -16,7 +16,7 @@ public class Health : MonoBehaviour
     [Tooltip("Current hit points")]
     [SerializeField]
     [Range(0.0f, 1000.0f)]
-    private float hitPoints = 100.0f;
+    private float currentHitPoints = 100.0f;
 
     [Tooltip("Max hit points")]
     [SerializeField]
@@ -53,7 +53,7 @@ public class Health : MonoBehaviour
 
     void OnValidate()
     {
-        hitPoints = Mathf.Min(hitPoints, maxHitPoints);
+        currentHitPoints = Mathf.Min(currentHitPoints, maxHitPoints);
     }
 
     /// <summary>
@@ -62,7 +62,16 @@ public class Health : MonoBehaviour
     /// <returns>Whether or not dead</returns>
     public bool IsDead()
     {
-        return hitPoints <= 0;
+        return currentHitPoints <= 0;
+    }
+
+    /// <summary>
+    /// Gets the current hit points
+    /// </summary>
+    /// <returns>Current hit points</returns>
+    public float GetCurrentHitPoints()
+    {
+        return currentHitPoints;
     }
 
     /// <summary>
@@ -101,7 +110,7 @@ public class Health : MonoBehaviour
         {
             return;
         }
-        hitPoints -= damage.GetBaseDamage();
+        currentHitPoints -= damage.GetBaseDamage();
         damageOverTime += damage.GetDamageOverTime();
         invincibilityCooldown = totalInvincibilityCooldown;
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
@@ -140,7 +149,7 @@ public class Health : MonoBehaviour
         {
             float damage = Mathf.Min(Time.deltaTime * damageOverTimeRate, damageOverTime);
             damageOverTime -= damage;
-            hitPoints -= damage;
+            currentHitPoints -= damage;
         }
     }
 }

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd1b04f7aa160c3428767bf8c847bd2b, type: 3}
+  m_Name: NPC3
+  m_EditorClassIdentifier: 
+  _serializedJsonString: '{"name":null,"description":null,"helpUrl":null,"_nodes":[{"_index":0,"ownerType":0,"useAutoFocus":true,"_edges":[{"toNodeIndex":1,"conditions":[]}],"message":null,"audioClip":{"audioClip":null,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":null,"_editorPosition":{"x":3.0,"y":-14.0},"$type":"Devdog.QuestSystemPro.Dialogue.EntryNode"},{"_index":1,"ownerType":1,"useAutoFocus":true,"_edges":[{"toNodeIndex":2,"conditions":[]}],"message":"Oh
+    heey there!! I have something amazing to tell you!","audioClip":{"audioClip":null,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":null,"_editorPosition":{"x":1.0,"y":106.0},"$type":"Devdog.QuestSystemPro.Dialogue.Node"},{"_index":2,"ownerType":1,"useAutoFocus":true,"_edges":[{"toNodeIndex":3,"conditions":[]}],"message":"It''s
+    this great new thing that...","audioClip":{"audioClip":null,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":null,"_editorPosition":{"x":2.0,"y":290.0},"$type":"Devdog.QuestSystemPro.Dialogue.Node"},{"_index":3,"ownerType":1,"useAutoFocus":true,"_edges":[{"toNodeIndex":4,"conditions":[]}],"message":"Blah
+    blah blah...","audioClip":{"audioClip":null,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":null,"_editorPosition":{"x":3.0,"y":474.0},"$type":"Devdog.QuestSystemPro.Dialogue.Node"},{"type":1,"quest":0,"questTask":"Main","amount":1.0,"_index":4,"ownerType":1,"useAutoFocus":true,"_edges":[],"message":null,"audioClip":{"audioClip":null,"volume":1.0,"pitch":1.0,"loop":false},"animationClip":null,"_editorPosition":{"x":4.0,"y":653.0},"$type":"Devdog.QuestSystemPro.Dialogue.SetQuestProgressNode"}],"conditions":[],"variables":{"variables":[]}}'
+  _objectReferences:
+  - {fileID: 11400000, guid: a1bc93f02fd0c94419e0deec62e401a9, type: 2}
+  name: 
+  description: 
+  helpUrl: 
