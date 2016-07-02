@@ -67,4 +67,9 @@ public static class InputNames
     /// Input name for leveling up a rune
     /// </summary>
     public const string LevelUpRune = "Level Up Rune";
+
+    /// <summary>
+    /// Input name for interacting with an interactable
+    /// </summary>
+    public const string Interact = "Interact";
 }

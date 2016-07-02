@@ -4,11 +4,11 @@ using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Player))]
-[RequireComponent(typeof(Player
-
-    ))]
+[RequireComponent(typeof(PlayerView))]
 public class PlayerController : MonoBehaviour
 {
+    private const float AxisJumpingThreshold = 0.5f;
+
     [Tooltip("Whether or not to use input to determine speed, or snap speed to a constant")]
     [SerializeField]
     public bool UseAxisAsSpeedFactor = true;
@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private Player player;
     private PlatformCharacterController platformCharacterController;
     private PlayerView playerView;
-    private Vector2 speedModifier = Vector2.one;
+    private Interactable nearbyInteractable;
 
     void Awake()
     {
@@ -32,35 +32,50 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
+        var directionalInput = GetDirectionalInput();
+        Move(directionalInput);
+        Jump(directionalInput.y);
+        if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid())
         {
-            var directionalInput = GetDirectionalInput();
-            Move(directionalInput);
-            Jump(directionalInput.y);
-            if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid())
+            Attack();
+        }
+        if (Input.GetButtonDown(InputNames.ToggleWeapon))
+        {
+            player.ToggleWeapon();
+        }
+        if (Input.GetButtonDown(InputNames.Inventory) && !SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
+        {
+            Time.timeScale = 0.0f;
+            SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
+            enabled = false;
+        }
+        if (Input.GetButtonDown(InputNames.Interact) && nearbyInteractable && !nearbyInteractable.IsActImmediately())
+        {
+            nearbyInteractable.Interact();
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collider2D)
+    {
+        var interactable = collider2D.GetComponent<Interactable>();
+        if (interactable && !nearbyInteractable)
+        {
+            nearbyInteractable = interactable;
+            if (nearbyInteractable.IsActImmediately())
             {
-                Attack();
-            }
-            if (Input.GetButtonDown(InputNames.ToggleWeapon))
-            {
-                player.ToggleWeapon();
-            }
-            if (Input.GetButtonDown(InputNames.Inventory) && !SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
-            {
-                Time.timeScale = 0.0f;
-                SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
+                nearbyInteractable.Interact();
             }
         }
     }
 
-    public Vector2 GetSpeedModifier()
+    void OnTriggerExit2D(Collider2D collider2D)
     {
-        return speedModifier;
-    }
-
-    public void SetSpeedModifier(Vector2 speedModifier)
-    {
-        this.speedModifier = speedModifier;
+        var interactable = collider2D.GetComponent<Interactable>();
+        if (interactable && interactable == nearbyInteractable)
+        {
+            nearbyInteractable = null;
+            interactable.EndInteraction();
+        }
     }
 
     void OnCollectorStay(Collider2D collider2D)
@@ -112,8 +127,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Jump(float verticalInput)
     {
-        bool jumping = Input.GetButton(InputNames.Jump) && verticalInput > -AxisMovingThreshold;
-        bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -AxisMovingThreshold;
+        bool jumping = Input.GetButton(InputNames.Jump) && verticalInput > -AxisJumpingThreshold;
+        bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -AxisJumpingThreshold;
         platformCharacterController.SetActionState(eControllerActions.Jump, jumping);
         platformCharacterController.SetActionState(eControllerActions.PlatformDropDown, droppingDown);
         platformCharacterController.HorizontalSpeedScale = 1.0f;

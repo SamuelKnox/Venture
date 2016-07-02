@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -23,6 +24,18 @@ public class Player : Character
     [SerializeField]
     private Transform miscellaneousContainer;
 
+    [Tooltip("Container for all of the player's quests")]
+    [SerializeField]
+    private Transform questContainer;
+
+    [Tooltip("Player's currently active quests")]
+    [SerializeField]
+    private List<Quest> activeQuests = new List<Quest>();
+
+    [Tooltip("Player's completed quests")]
+    [SerializeField]
+    private List<Quest> completedQuests = new List<Quest>();
+
     private Inventory inventory;
     private Weapon activeWeapon;
 
@@ -35,6 +48,35 @@ public class Player : Character
     void Start()
     {
         SetStartingActiveWeapon();
+    }
+
+    /// <summary>
+    /// Adds a quest to the player's active quests
+    /// </summary>
+    /// <param name="quest">Quest to add</param>
+    public bool AddQuest(Quest quest)
+    {
+        if (activeQuests.Contains(quest))
+        {
+            return false;
+        }
+        activeQuests.Add(quest);
+        quest.SetActiveQuest(true);
+        quest.transform.SetParent(questContainer);
+        quest.transform.position = transform.position;
+        quest.OnQuestComplete += OnQuestComplete;
+        return true;
+    }
+
+    /// <summary>
+    /// Called when quest is complete
+    /// </summary>
+    /// <param name="quest">Quest which was completed</param>
+    private void OnQuestComplete(Quest quest)
+    {
+        activeQuests.Remove(quest);
+        completedQuests.Add(quest);        
+        quest.OnQuestComplete -= OnQuestComplete;
     }
 
     /// <summary>

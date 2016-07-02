@@ -109,6 +109,13 @@ public class UIInventory : MonoBehaviour
                 {
                     buttonsView.PressButton(InputNames.Inventory);
                     Time.timeScale = 1.0f;
+                    var playerController = player.GetComponent<PlayerController>();
+                    if (!playerController)
+                    {
+                        Debug.LogError("Could not find PlayerController on Player!", gameObject);
+                        return;
+                    }
+                    playerController.enabled = true;
                     SceneManager.UnloadScene(SceneNames.Inventory);
                 }
                 if (Input.GetButtonDown(InputNames.EditRunes))
