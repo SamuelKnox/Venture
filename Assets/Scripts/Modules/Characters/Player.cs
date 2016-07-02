@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomUnityLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,7 +7,24 @@ using UnityEngine;
 [RequireComponent(typeof(Inventory))]
 public class Player : Character
 {
+    private const int PrestigePerLevel = 1;
+    private const int GoldPerLevel = 100;
     private static readonly ItemType[] WeaponTypes = new ItemType[] { ItemType.MeleeWeapon, ItemType.RangedWeapon };
+
+    [Tooltip("How many prestige points the player has")]
+    [SerializeField]
+    [Range(0, 1000)]
+    private int prestige = 0;
+
+    [Tooltip("How much gold the player has")]
+    [SerializeField]
+    [Range(0, 100000)]
+    private int gold = 0;
+
+    [Tooltip("The player's level, which is based on prestige")]
+    [SerializeField]
+    [Range(1, 1000)]
+    private float level = 1;
 
     [Tooltip("Container for player's weapons")]
     [SerializeField]
@@ -75,8 +93,75 @@ public class Player : Character
     private void OnQuestComplete(Quest quest)
     {
         activeQuests.Remove(quest);
-        completedQuests.Add(quest);        
+        completedQuests.Add(quest);
+        prestige += quest.GetPrestige();
         quest.OnQuestComplete -= OnQuestComplete;
+    }
+
+    /// <summary>
+    /// Gets the amount of prestige the player has
+    /// </summary>
+    /// <returns>Prestige amount</returns>
+    public int GetPrestige()
+    {
+        return prestige;
+    }
+
+    /// <summary>
+    /// Adds prestige to player's resources, and increases level
+    /// </summary>
+    /// <param name="prestige">Prestige to add</param>
+    public void AddPrestige(int prestige)
+    {
+        this.prestige += prestige;
+        level += (float)prestige / PrestigePerLevel;
+    }
+
+    /// <summary>
+    /// Spends prestige if the player has enough
+    /// </summary>
+    /// <param name="prestige">Whether or not the player had enough prestige</param>
+    public void SpendPrestige(int prestige)
+    {
+        if (this.prestige < prestige)
+        {
+            Debug.LogError("Attempting to spend more prestige than the player has!", gameObject);
+            return;
+        }
+        this.prestige -= prestige;
+    }
+
+    /// <summary>
+    /// Gets the amount of gold the player has
+    /// </summary>
+    /// <returns>Gold amount</returns>
+    public int GetGold()
+    {
+        return gold;
+    }
+
+    /// <summary>
+    /// Adds gold to player's resources, and increases level
+    /// </summary>
+    /// <param name="gold">Gold to add</param>
+    public void AddGold(int gold)
+    {
+        this.gold += gold;
+        level += (float)gold / GoldPerLevel;
+    }
+
+    /// <summary>
+    /// Spends gold if the player has enough
+    /// </summary>
+    /// <param name="gold">Whether or not the player had enough gold</param>
+    public void SpendGold(int gold)
+    {
+        if (this.gold < gold)
+        {
+            Debug.LogError("Attempting to spend more gold than the player has!", gameObject);
+            return;
+        }
+        this.gold -= gold;
     }
 
     /// <summary>
@@ -121,17 +206,19 @@ public class Player : Character
         var resource = collectable.GetComponent<ResourcePool>();
         if (resource)
         {
-            var gold = resource.GetComponent<Gold>();
-            if (gold)
+            switch (resource.GetResourceType())
             {
-                AddGold(gold);
+                case ResourceType.Gold:
+                    AddGold(resource.GetAmount());
+                    break;
+                case ResourceType.Prestige:
+                    AddPrestige(resource.GetAmount());
+                    break;
+                default:
+                    Debug.LogError("An invalid resource type was provided!", gameObject);
+                    return;
             }
         }
-    }
-
-    private void AddGold(Gold gold)
-    {
-        Debug.Log("Collecting gold!");
     }
 
     /// <summary>
@@ -156,7 +243,6 @@ public class Player : Character
         var meleeWeapon = activeWeapon.GetComponent<MeleeWeapon>();
         if (!meleeWeapon)
         {
-            Debug.Log("Attempting to finish melee attack, but a Melee Weapon is not the active weapon!", gameObject);
             return;
         }
         meleeWeapon.FinishSwing();

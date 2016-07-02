@@ -4,6 +4,7 @@ using UnityEngine;
 [Serializable]
 public abstract class Rune : Item
 {
+    private const int PrestigeCostToLevelUp = 1;
     private const int MinLevel = 1;
     private const int Maxlevel = 10;
 
@@ -27,6 +28,15 @@ public abstract class Rune : Item
     /// </summary>
     /// <param name="equipment">Equipment rune is being detached from</param>
     public abstract void DetachRune(Equipment equipment);
+
+    /// <summary>
+    /// Get cost in prestige to level up this rune
+    /// </summary>
+    /// <returns>Prestige cost</returns>
+    public int GetPrestigeCostToLevelUp()
+    {
+        return PrestigeCostToLevelUp;
+    }
 
     /// <summary>
     /// Gets the type of this rune

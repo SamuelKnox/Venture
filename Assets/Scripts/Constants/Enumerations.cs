@@ -40,3 +40,12 @@ public enum RuneType
     Poison,
     Speed
 }
+
+/// <summary>
+/// Type of player resource
+/// </summary>
+public enum ResourceType
+{
+    Gold,
+    Prestige
+}

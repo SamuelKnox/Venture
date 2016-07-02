@@ -17,6 +17,11 @@ public abstract class Quest : MonoBehaviour
     /// </summary>
     public event QuestComplete OnQuestComplete;
 
+    [Tooltip("How many prestige this quest is worth")]
+    [SerializeField]
+    [Range(0, 10)]
+    private int prestige = 1;
+
     [Tooltip("Difficulty of this quest")]
     [SerializeField]
     [Range(1, 100)]
@@ -48,6 +53,15 @@ public abstract class Quest : MonoBehaviour
             Debug.LogError(this + " does not have a description!", gameObject);
             return;
         }
+    }
+
+    /// <summary>
+    /// Gets how many prestige it is worth to complete this quest
+    /// </summary>
+    /// <returns>How many prestige it's worth</returns>
+    public int GetPrestige()
+    {
+        return prestige;
     }
 
     /// <summary>
@@ -125,7 +139,6 @@ public abstract class Quest : MonoBehaviour
     private void SetUpSpawners()
     {
         spawners = GetComponents<Spawner>();
-        Debug.Log(spawners.Length);
         foreach (var spawner in spawners)
         {
             spawner.SetSpawnOnStart(false);

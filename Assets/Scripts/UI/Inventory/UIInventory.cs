@@ -471,7 +471,6 @@ public class UIInventory : MonoBehaviour
                     EventSystem.current.SetSelectedGameObject(itemButtonInstance.gameObject);
                 }
             }
-            var item = itemButtonInstance.GetItem();
         }
     }
 
@@ -481,6 +480,11 @@ public class UIInventory : MonoBehaviour
     /// <param name="rune">Rune to level up</param>
     private void LevelUpRune(Rune rune)
     {
+        if (player.GetPrestige() < rune.GetPrestigeCostToLevelUp())
+        {
+            return;
+        }
+        player.SpendPrestige(rune.GetPrestigeCostToLevelUp());
         rune.SetLevel(rune.GetLevel() + 1);
     }
 

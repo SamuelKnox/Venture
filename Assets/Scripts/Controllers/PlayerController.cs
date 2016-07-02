@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private PlatformCharacterController platformCharacterController;
     private PlayerView playerView;
     private Interactable nearbyInteractable;
+    private bool interacting = false;
 
     void Awake()
     {
@@ -32,6 +33,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetButtonDown(InputNames.Interact) && nearbyInteractable && !nearbyInteractable.IsActImmediately() && !interacting)
+        {
+            interacting = true;
+            nearbyInteractable.Interact();
+        }
+        if (interacting)
+        {
+            if (Input.GetButtonUp(InputNames.Interact))
+            {
+                interacting = false;
+            }
+            return;
+        }
         var directionalInput = GetDirectionalInput();
         Move(directionalInput);
         Jump(directionalInput.y);
@@ -48,10 +62,6 @@ public class PlayerController : MonoBehaviour
             Time.timeScale = 0.0f;
             SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
             enabled = false;
-        }
-        if (Input.GetButtonDown(InputNames.Interact) && nearbyInteractable && !nearbyInteractable.IsActImmediately())
-        {
-            nearbyInteractable.Interact();
         }
     }
 
