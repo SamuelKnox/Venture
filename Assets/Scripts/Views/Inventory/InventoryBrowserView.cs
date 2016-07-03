@@ -5,22 +5,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class UIInventory : MonoBehaviour
+public class InventoryBrowserView : MonoBehaviour
 {
     private const float LongPressDuration = 1.0f;
-    private const float HorizontalTabSpacing = 10.0f;
-
-    [Tooltip("Panel which stores all of the category tabs")]
-    [SerializeField]
-    private RectTransform categoryTabPanel;
-
-    [Tooltip("All of the item tabs which may be used")]
-    [SerializeField]
-    private EquipmentTab[] equipmentTabs;
-
-    [Tooltip("All of the rune tabs which may be used")]
-    [SerializeField]
-    private RuneTab[] runeTabs;
 
     [Tooltip("Content panel which stores the items for the current category")]
     [SerializeField]
@@ -39,15 +26,14 @@ public class UIInventory : MonoBehaviour
     [SerializeField]
     private Vector2 itemSpacing = Vector2.one;
 
-    private int currentIndex = 0;
     private Player player;
+    private InventoryDescriptionView descriptionView;
     private GameObject currentSelectedGameObject;
-    private InventoryMode inventoryMode;
-    private List<Tab> tabs;
     private Equipment activeEquipmentForRunes;
+    private InventoryMode inventoryMode;
     private float longPressTimer;
     private InventoryButtonsView buttonsView;
-    private InventoryDescriptionView descriptionView;
+    private InventoryCategoriesView categoriesView;
 
     void Awake()
     {
@@ -57,20 +43,28 @@ public class UIInventory : MonoBehaviour
             Debug.LogError("Player was not found!", gameObject);
             return;
         }
-        if (equipmentTabs.Length == 0)
-        {
-            Debug.LogError("There must be at least one item tab!", gameObject);
-            return;
-        }
-        if (runeTabs.Length == 0)
-        {
-            Debug.LogError("There must be at least one rune tab!", gameObject);
-            return;
-        }
         buttonsView = FindObjectOfType<InventoryButtonsView>();
         if (!buttonsView)
         {
             Debug.LogError(gameObject + " could not find InventoryButtonsView!", gameObject);
+            return;
+        }
+        categoriesView = FindObjectOfType<InventoryCategoriesView>();
+        if (!categoriesView)
+        {
+            Debug.LogError(gameObject + " could not find InventoryCategoriesView!", gameObject);
+            return;
+        }
+        categoriesView = FindObjectOfType<InventoryCategoriesView>();
+        if (!categoriesView)
+        {
+            Debug.LogError(gameObject + " could not find InventoryCategoriesView!", gameObject);
+            return;
+        }
+        player = FindObjectOfType<Player>();
+        if (!player)
+        {
+            Debug.LogError(gameObject + " could not find Player!", gameObject);
             return;
         }
         descriptionView = FindObjectOfType<InventoryDescriptionView>();
@@ -84,19 +78,11 @@ public class UIInventory : MonoBehaviour
     void Start()
     {
         inventoryMode = InventoryMode.EquipmentBrowser;
-        CreateTabs();
+        categoriesView.CreateTabs(inventoryMode);
     }
 
     void Update()
     {
-        if (Input.GetButtonDown(InputNames.TabLeft))
-        {
-            MoveTab(-1);
-        }
-        if (Input.GetButtonDown(InputNames.TabRight))
-        {
-            MoveTab(1);
-        }
         if (EventSystem.current.currentSelectedGameObject != currentSelectedGameObject)
         {
             currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
@@ -124,7 +110,7 @@ public class UIInventory : MonoBehaviour
                     if (currentSelectedGameObject)
                     {
                         inventoryMode = InventoryMode.RuneEditor;
-                        CreateTabs();
+                        categoriesView.CreateTabs(inventoryMode);
                     }
                 }
                 if (!currentSelectedGameObject)
@@ -186,7 +172,7 @@ public class UIInventory : MonoBehaviour
                 {
                     buttonsView.PressButton(InputNames.Inventory);
                     inventoryMode = InventoryMode.EquipmentBrowser;
-                    CreateTabs();
+                    categoriesView.CreateTabs(inventoryMode);
                 }
                 if (!currentSelectedGameObject)
                 {
@@ -249,145 +235,39 @@ public class UIInventory : MonoBehaviour
     }
 
     /// <summary>
-    /// Creates the tabs for the respective inventory mode
+    /// Gets the active equipment being used for runes
     /// </summary>
-    private void CreateTabs()
+    /// <returns>Active equipment</returns>
+    public Equipment GetActiveEquipmentForRunes()
     {
-        currentIndex = 0;
-        foreach (Transform child in categoryTabPanel)
-        {
-            Destroy(child.gameObject);
-        }
-        switch (inventoryMode)
-        {
-            case InventoryMode.EquipmentBrowser:
-                CreateEquipmentTabs();
-                break;
-            case InventoryMode.RuneEditor:
-                bool success = CreateRuneTabs();
-                if (!success)
-                {
-                    inventoryMode = InventoryMode.EquipmentBrowser;
-                    CreateTabs();
-                }
-                break;
-            default:
-                Debug.LogError("An invalid InventoryMode (" + inventoryMode.ToString() + ") was used!", gameObject);
-                return;
-        }
-        MoveTab(0);
+        return activeEquipmentForRunes;
     }
 
     /// <summary>
-    /// Creates the tabs for equipment browsing
+    /// Sets the active equipment which is used for runes
     /// </summary>
-    private void CreateEquipmentTabs()
+    /// <param name="equipment">Active equipment</param>
+    public void SetActiveEquipmentForRunes(Equipment equipment)
     {
-        tabs = new List<Tab>();
-        for (int i = 0; i < equipmentTabs.Length; i++)
-        {
-            var equipmentTabInstance = Instantiate(equipmentTabs[i]);
-            var equipmentTabTransform = equipmentTabInstance.GetComponent<RectTransform>();
-            if (!equipmentTabTransform)
-            {
-                Debug.LogError(equipmentTabInstance.name + " is missing a RectTransform!", equipmentTabInstance.gameObject);
-                return;
-            }
-            equipmentTabTransform.SetParent(categoryTabPanel);
-            float xPosition = i * (equipmentTabTransform.sizeDelta.x + HorizontalTabSpacing) + HorizontalTabSpacing;
-            float yPosition = 0.0f;
-            equipmentTabTransform.anchoredPosition = new Vector2(xPosition, yPosition);
-            tabs.Add(equipmentTabInstance);
-        }
-    }
-
-    /// <summary>
-    /// Creates the tabs for rune browsing
-    /// </summary>
-    /// <returns>Whether or not the tabs were successfully created</returns>
-    private bool CreateRuneTabs()
-    {
-        if (!currentSelectedGameObject)
-        {
-            return false;
-        }
-        var itemButton = currentSelectedGameObject.GetComponent<ItemButton>();
-        tabs = new List<Tab>();
-        if (!itemButton)
-        {
-            Debug.LogError("Item Button is missing from the currently selected game object!", currentSelectedGameObject);
-            return false;
-        }
-        var activeItem = itemButton.GetItem();
-        if (!activeItem)
-        {
-            Debug.LogError("The Item represented by the Item Button is null!", itemButton.gameObject);
-            return false;
-        }
-        activeEquipmentForRunes = activeItem.GetComponent<Equipment>();
-        if (!activeEquipmentForRunes)
-        {
-            Debug.LogError(activeEquipmentForRunes + " is not Equipment, and it needs to be to access Runes!", activeEquipmentForRunes.gameObject);
-            return false;
-        }
-        var runeTypes = activeEquipmentForRunes.GetRuneTypes();
-        int skippedRunes = 0;
-        for (int i = 0; i < runeTabs.Length; i++)
-        {
-            if (!runeTypes.Contains(runeTabs[i].GetRuneType()))
-            {
-                skippedRunes++;
-                continue;
-            }
-            var runeTabInstance = Instantiate(runeTabs[i]);
-            var runeTabTransform = runeTabInstance.GetComponent<RectTransform>();
-            if (!runeTabTransform)
-            {
-                Debug.LogError(runeTabInstance.name + " is missing a RectTransform!", runeTabInstance.gameObject);
-                return false;
-            }
-            runeTabTransform.SetParent(categoryTabPanel);
-            float xPosition = (i - skippedRunes) * (runeTabTransform.sizeDelta.x + HorizontalTabSpacing) + HorizontalTabSpacing;
-            float yPosition = 0.0f;
-            runeTabTransform.anchoredPosition = new Vector2(xPosition, yPosition);
-            tabs.Add(runeTabInstance);
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// Moves the tab left or right by the specified number
-    /// </summary>
-    /// <param name="movement">Number of tabs to move</param>
-    private void MoveTab(int movement)
-    {
-        tabs[currentIndex].GetImage().color = Color.white;
-        currentIndex = (currentIndex + movement) % tabs.Count;
-        if (currentIndex < 0)
-        {
-            currentIndex = tabs.Count - 1;
-        }
-        tabs[currentIndex].GetImage().color = Color.red;
-        EventSystem.current.SetSelectedGameObject(null);
-        currentSelectedGameObject = null;
-        PopulateContentPanel();
-        descriptionView.UpdateItemDescriptions(currentSelectedGameObject, activeEquipmentForRunes);
+        activeEquipmentForRunes = equipment;
     }
 
     /// <summary>
     /// Fills the content panel with item buttons based on the category
     /// </summary>
-    private void PopulateContentPanel()
+    public void PopulateContentPanel()
     {
         switch (inventoryMode)
         {
             case InventoryMode.EquipmentBrowser:
-                var equipment = player.GetInventory().GetItems(equipmentTabs[currentIndex].GetItemType());
+                var equipmentType = categoriesView.GetEquipmentType();
+                var equipment = player.GetInventory().GetItems(equipmentType);
                 PopulateItemBrowser(equipment);
                 break;
             case InventoryMode.RuneEditor:
                 var allRunes = player.GetInventory().GetItems(ItemType.Rune).Select(r => r.GetComponent<Rune>());
-                var runes = allRunes.Where(r => r.GetRuneType() == runeTabs[currentIndex].GetRuneType()).ToArray();
+                var runeType = categoriesView.GetRuneType();
+                var runes = allRunes.Where(r => r.GetRuneType() == runeType).ToArray();
                 PopulateItemBrowser(runes);
                 break;
             default:
@@ -472,6 +352,7 @@ public class UIInventory : MonoBehaviour
                 }
             }
         }
+        descriptionView.UpdateItemDescriptions(EventSystem.current.currentSelectedGameObject, activeEquipmentForRunes);
     }
 
     /// <summary>
@@ -577,14 +458,5 @@ public class UIInventory : MonoBehaviour
             equipmentPiece.DetachAllRunes();
         }
         PopulateContentPanel();
-    }
-
-    /// <summary>
-    /// Modes for inventory UI
-    /// </summary>
-    private enum InventoryMode
-    {
-        EquipmentBrowser,
-        RuneEditor
     }
 }

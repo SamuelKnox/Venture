@@ -49,3 +49,12 @@ public enum ResourceType
     Gold,
     Prestige
 }
+
+/// <summary>
+/// Modes for inventory UI
+/// </summary>
+public enum InventoryMode
+{
+    EquipmentBrowser,
+    RuneEditor
+}

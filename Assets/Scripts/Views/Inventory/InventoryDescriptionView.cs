@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Linq;
+using TMPro;
 
 public class InventoryDescriptionView : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class InventoryDescriptionView : MonoBehaviour
 
     [Tooltip("Text used to show the description for the currently equipped item")]
     [SerializeField]
-    private Text equippedItemDescription;
+    private TextMeshProUGUI equippedItemDescription;
 
     [Tooltip("Image used to show the item which is being browsed")]
     [SerializeField]
@@ -23,11 +24,11 @@ public class InventoryDescriptionView : MonoBehaviour
 
     [Tooltip("Text used to show the description for the item currently being browsed")]
     [SerializeField]
-    private Text browserItemDescription;
+    private TextMeshProUGUI browserItemDescription;
 
     [Tooltip("Text used to display whether or not an item is already equipped for the browser description")]
     [SerializeField]
-    private Text browserEquipmentStatus;
+    private TextMeshProUGUI browserEquipmentStatus;
 
     private Player player;
 
