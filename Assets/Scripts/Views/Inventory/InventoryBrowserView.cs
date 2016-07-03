@@ -28,12 +28,12 @@ public class InventoryBrowserView : MonoBehaviour
 
     private Player player;
     private InventoryDescriptionView descriptionView;
-    private GameObject currentSelectedGameObject;
     private Equipment activeEquipmentForRunes;
     private InventoryMode inventoryMode;
     private float longPressTimer;
     private InventoryButtonsView buttonsView;
     private InventoryCategoriesView categoriesView;
+    private GameObject previousSelectedGameObject;
 
     void Awake()
     {
@@ -83,10 +83,11 @@ public class InventoryBrowserView : MonoBehaviour
 
     void Update()
     {
-        if (EventSystem.current.currentSelectedGameObject != currentSelectedGameObject)
+        var currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
+        if (currentSelectedGameObject != previousSelectedGameObject)
         {
-            currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
-            descriptionView.UpdateItemDescriptions(currentSelectedGameObject, activeEquipmentForRunes);
+            previousSelectedGameObject = currentSelectedGameObject;
+            descriptionView.UpdateItemDescriptions(activeEquipmentForRunes);
         }
         switch (inventoryMode)
         {
@@ -352,7 +353,7 @@ public class InventoryBrowserView : MonoBehaviour
                 }
             }
         }
-        descriptionView.UpdateItemDescriptions(EventSystem.current.currentSelectedGameObject, activeEquipmentForRunes);
+        descriptionView.UpdateItemDescriptions(activeEquipmentForRunes);
     }
 
     /// <summary>
@@ -391,7 +392,7 @@ public class InventoryBrowserView : MonoBehaviour
             return;
         }
         player.Equip(equipment);
-        descriptionView.UpdateItemDescriptions(currentSelectedGameObject, activeEquipmentForRunes);
+        descriptionView.UpdateItemDescriptions(activeEquipmentForRunes);
         PopulateContentPanel();
     }
 

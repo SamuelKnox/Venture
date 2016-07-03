@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class InventoryDescriptionView : MonoBehaviour
 {
@@ -45,8 +46,9 @@ public class InventoryDescriptionView : MonoBehaviour
     /// <summary>
     /// Updates the description for the currently selected item
     /// </summary>
-    public void UpdateItemDescriptions(GameObject currentSelectedGameObject, Equipment activeEquipment)
+    public void UpdateItemDescriptions(Equipment activeEquipment)
     {
+        var currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
         if (!currentSelectedGameObject)
         {
             browserItemImage.enabled = false;
