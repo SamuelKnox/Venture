@@ -774,7 +774,7 @@ namespace LevelGenerator2D
                 if (doorIndex < doors.Length && i == doors[doorIndex].GetIndex())
                 {
                     doorIndex++;
-                    Gizmos.DrawIcon(position, FilePaths.DoorGizmo);
+                    Gizmos.DrawIcon(position, FilePaths.DoorGizmo, false);
                 }
                 else
                 {
