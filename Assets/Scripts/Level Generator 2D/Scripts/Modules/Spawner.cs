@@ -1,8 +1,9 @@
-﻿using CustomUnityLibrary;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 [Serializable]
@@ -249,7 +250,9 @@ public class Spawner : MonoBehaviour
             }
         }
         maxSpawnableSize = maxSize;
+#if UNITY_EDITOR
         SceneView.RepaintAll();
+#endif
     }
 
     /// <summary>

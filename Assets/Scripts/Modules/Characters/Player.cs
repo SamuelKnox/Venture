@@ -256,7 +256,6 @@ public class Player : Character
         var bow = activeWeapon.GetComponent<Bow>();
         if (!bow)
         {
-            Debug.LogError("Attempting to fire a Bow, but it is not the active weapon!", gameObject);
             return;
         }
         bow.Fire(transform.root.right);
@@ -270,7 +269,6 @@ public class Player : Character
         var wand = activeWeapon.GetComponent<Wand>();
         if (!wand)
         {
-            Debug.LogError("Attempting to use a Wand, but it is not the active weapon!", gameObject);
             return;
         }
         wand.CastSpell();
@@ -380,6 +378,11 @@ public class Player : Character
                 {
                     Debug.LogError("The item of type " + ItemType.RangedWeapon.ToString() + " does not have a Ranged Weapon Component!", activeWeapon.gameObject);
                     return false;
+                }
+                bool ready = rangedWeapon.IsReady();
+                if (!ready)
+                {
+                    Debug.LogWarning(rangedWeapon + "'s animation is done, and it is trying to attack, but it is still on cooldown.", rangedWeapon.gameObject);
                 }
                 return rangedWeapon.IsReady();
             default:

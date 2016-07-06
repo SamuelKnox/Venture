@@ -8,9 +8,19 @@ using UnityEngine;
 [RequireComponent(typeof(Damage))]
 public class Projectile : MonoBehaviour
 {
+    [Tooltip("How long until the projectile is automatically destroyed, where 0 means it will never be automatically destroyed")]
+    [SerializeField]
+    [Range(0.0f, 10.0f)]
+    private float lifeSpan = 5.0f;
+
+    [Tooltip("Whether or not to have the projectile be allowed to be destroyed while visible")]
+    [SerializeField]
+    private bool destroyedWhileVisible = false;
+
     private Rigidbody2D body2D;
     private Collider2D areaOfEffect;
     private Damage damage;
+    bool visible;
 
     void Awake()
     {
@@ -29,11 +39,21 @@ public class Projectile : MonoBehaviour
         {
             transform.RotateTowardsVelocity();
         }
+        lifeSpan -= Time.deltaTime;
+        if (lifeSpan <= 0.0f && (!visible || destroyedWhileVisible))
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    void OnBecameVisible()
+    {
+        visible = true;
     }
 
     void OnBecameInvisible()
     {
-        Destroy(gameObject);
+        visible = false;
     }
 
     void OnEnable()

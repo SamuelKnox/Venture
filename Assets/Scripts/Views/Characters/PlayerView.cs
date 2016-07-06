@@ -17,6 +17,7 @@ public class PlayerView : MonoBehaviour
     private Animator animator;
     private Player player;
     private bool climbing;
+    private bool attacking;
     private Collectable collectable;
 
     void Awake()
@@ -35,10 +36,24 @@ public class PlayerView : MonoBehaviour
     }
 
     /// <summary>
+    /// Whether or not an attack animation is being played
+    /// </summary>
+    /// <returns>Is attacking</returns>
+    public bool IsAttacking()
+    {
+        return attacking;
+    }
+
+    /// <summary>
     /// Initiates a melee attack
     /// </summary>
     public void MeleeWeaponAttack()
     {
+        if (attacking)
+        {
+            return;
+        }
+        attacking = true;
         animator.SetTrigger(AnimationNames.Player.Triggers.MeleeWeaponAttack);
     }
 
@@ -47,6 +62,11 @@ public class PlayerView : MonoBehaviour
     /// </summary>
     public void BowAttack()
     {
+        if (attacking)
+        {
+            return;
+        }
+        attacking = true;
         animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);
     }
 
@@ -55,6 +75,11 @@ public class PlayerView : MonoBehaviour
     /// </summary>
     public void WantAttack()
     {
+        if (attacking)
+        {
+            return;
+        }
+        attacking = true;
         animator.SetTrigger(AnimationNames.Player.Triggers.WandAttack);
     }
 
@@ -88,6 +113,14 @@ public class PlayerView : MonoBehaviour
         var equippedWeapon = player.GetActiveWeapon();
         equippedWeapon.gameObject.SetActive(true);
         Destroy(collectable);
+    }
+
+    /// <summary>
+    /// Finished attack animation
+    /// </summary>
+    public void FinishAttacking()
+    {
+        attacking = false;
     }
 
     /// <summary>

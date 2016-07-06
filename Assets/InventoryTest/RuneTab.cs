@@ -1,16 +1,15 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
-public class RuneTab : Tab
+public class RuneTab : MonoBehaviour
 {
-    [Tooltip("Type of rune this tab contains")]
+    [Tooltip("Type of rune this tab represents")]
     [SerializeField]
     private RuneType runeType;
 
     /// <summary>
-    /// Gets the rune type for this category
+    /// Gets the type of rune represented by this tab
     /// </summary>
-    /// <returns>Rune type</returns>
+    /// <returns>Type of rune</returns>
     public RuneType GetRuneType()
     {
         return runeType;

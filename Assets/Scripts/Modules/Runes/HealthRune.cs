@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class HealthRune : Rune
+public class HealthRune : RedRune
 {
     [Tooltip("Hit points by which this rune increases max hit points")]
     [SerializeField]

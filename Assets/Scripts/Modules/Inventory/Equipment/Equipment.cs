@@ -101,7 +101,7 @@ public abstract class Equipment : Item
     /// Gets the types of runes this item can hold, as determined by its rune sockets
     /// </summary>
     /// <returns>Types of runes this item can hold</returns>
-    public RuneType[] GetRuneTypes()
+    public RuneType[] GetRuneSocketTypes()
     {
         return runeSockets.Select(s => s.GetRuneType()).ToArray();
     }

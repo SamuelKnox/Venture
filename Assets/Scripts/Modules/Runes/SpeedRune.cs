@@ -1,7 +1,7 @@
 ﻿using CreativeSpore.SmartColliders;
 using UnityEngine;
 
-public class SpeedRune : Rune
+public class SpeedRune : YellowRune
 {
     [Tooltip("Scalar speed by which the player increases horizontally per level")]
     [SerializeField]

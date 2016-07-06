@@ -8,6 +8,7 @@ using UnityEngine;
 public class RangedWeapon : MonoBehaviour
 {
     private const string SpawnPositionGizmoName = "gizmo_ranged_weapon_spawn_position.png";
+    private static readonly Color RangeColor = Color.red;
 
     [Tooltip("Projectile shot by this Ranged Weapon")]
     [SerializeField]
@@ -29,8 +30,8 @@ public class RangedWeapon : MonoBehaviour
 
     [Tooltip("How far this Ranged Weapon can fire, assuming it does not have unlimited range.  It will not fire if its target is beyond this distance.")]
     [SerializeField]
-    [Range(1.0f, 1000.0f)]
-    private float range = 100.0f;
+    [Range(1.0f, 100.0f)]
+    private float range = 25.0f;
 
     [Tooltip("Arch to be used when firing.  An arch of 0 or 1 will fire at the full force.")]
     [SerializeField]
@@ -68,6 +69,8 @@ public class RangedWeapon : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.DrawIcon(transform.position + projectileSpawnOffset, SpawnPositionGizmoName);
+        Gizmos.color = RangeColor;
+        Gizmos.DrawWireSphere(transform.position + projectileSpawnOffset, range);
     }
 
     /// <summary>

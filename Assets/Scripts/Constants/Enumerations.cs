@@ -36,9 +36,12 @@ public enum ItemType
 /// </summary>
 public enum RuneType
 {
-    Health,
-    Poison,
-    Speed
+    Red,
+    Blue,
+    Yellow,
+    Purple,
+    Green,
+    Orange
 }
 
 /// <summary>

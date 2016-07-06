@@ -8,10 +8,6 @@ public abstract class Rune : Item
     private const int MinLevel = 1;
     private const int Maxlevel = 10;
 
-    [Tooltip("Type of rune")]
-    [SerializeField]
-    private RuneType runeType;
-
     [Tooltip("Rune level")]
     [SerializeField]
     [Range(1, 10)]
@@ -30,21 +26,18 @@ public abstract class Rune : Item
     public abstract void DetachRune(Equipment equipment);
 
     /// <summary>
+    /// Gets the type of this rune
+    /// </summary>
+    /// <returns>Rune Type</returns>
+    public abstract RuneType GetRuneType();
+
+    /// <summary>
     /// Get cost in prestige to level up this rune
     /// </summary>
     /// <returns>Prestige cost</returns>
     public int GetPrestigeCostToLevelUp()
     {
         return PrestigeCostToLevelUp;
-    }
-
-    /// <summary>
-    /// Gets the type of this rune
-    /// </summary>
-    /// <returns>Rune Type</returns>
-    public RuneType GetRuneType()
-    {
-        return runeType;
     }
 
     /// <summary>

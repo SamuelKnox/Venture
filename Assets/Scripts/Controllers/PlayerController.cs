@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
         var directionalInput = GetDirectionalInput();
         Move(directionalInput);
         Jump(directionalInput.y);
-        if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid())
+        if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid() && !playerView.IsAttacking())
         {
             Attack();
         }

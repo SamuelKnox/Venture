@@ -1,7 +1,9 @@
 ﻿namespace CustomUnityLibrary
 {
     using System.IO;
+#if UNITY_EDITOR
     using UnityEditor;
+#endif
     using UnityEngine;
 
     /// <summary>
@@ -12,6 +14,7 @@
         private const string AssetsFolderName = "Assets";
         private const string AssetSuffix = ".asset";
 
+#if UNITY_EDITOR
         /// <summary>
         /// Create, name, and place unique new ScriptableObject asset files, optionally passing in the path where the Scriptable Object is to be created.
         /// </summary>
@@ -42,5 +45,6 @@
             Selection.activeObject = asset;
             return asset;
         }
+#endif
     }
 }

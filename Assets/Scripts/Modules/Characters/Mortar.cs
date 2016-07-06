@@ -31,6 +31,13 @@ public class Mortar : Enemy
     public void FireAtPlayer()
     {
         rangedWeapon.Fire(player.transform);
+    }
+
+    /// <summary>
+    /// Lets mortar know that the firing animation is complete
+    /// </summary>
+    public void FinishedFiring()
+    {
         firing = false;
     }
 

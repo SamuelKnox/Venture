@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PoisonRune : Rune
+public class PoisonRune : GreenRune
 {
     [Tooltip("Amount of poison to apply")]
     [SerializeField]
