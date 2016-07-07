@@ -73,7 +73,7 @@ public class InventoryEquipmentView : MonoBehaviour
             button.transform.SetParent(equipmentContainer);
             button.SetItemType(itemType);
             button.SetItem(equipmentPiece);
-            if (!EventSystem.current.currentSelectedGameObject)
+            if (!EventSystem.current.currentSelectedGameObject || equipmentPiece.IsEquipped())
             {
                 EventSystem.current.SetSelectedGameObject(button.gameObject);
             }

@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Inventory))]
+[RequireComponent(typeof(PlayerView))]
 public class Player : Character
 {
     private const int PrestigePerLevel = 1;
@@ -55,12 +56,14 @@ public class Player : Character
     private List<Quest> completedQuests = new List<Quest>();
 
     private Inventory inventory;
+    private PlayerView playerView;
     private Weapon activeWeapon;
 
     protected override void Awake()
     {
         base.Awake();
         inventory = GetComponent<Inventory>();
+        playerView = GetComponent<PlayerView>();
     }
 
     void Start()
@@ -396,7 +399,7 @@ public class Player : Character
     /// </summary>
     protected override void Die()
     {
-        throw new NotImplementedException("Played death not yet implemented.");
+        playerView.Die();
     }
 
     /// <summary>

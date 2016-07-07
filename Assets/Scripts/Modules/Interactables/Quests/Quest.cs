@@ -40,10 +40,17 @@ public abstract class Quest : MonoBehaviour
     private bool completedQuest = false;
 
     private Spawner[] spawners;
+    private PlayerController playerController;
 
     protected virtual void Awake()
     {
         SetUpSpawners();
+        playerController = FindObjectOfType<PlayerController>();
+        if (!playerController)
+        {
+            Debug.LogError("Could not find player controller!", gameObject);
+            return;
+        }
     }
 
     void Start()
@@ -160,8 +167,13 @@ public abstract class Quest : MonoBehaviour
                 if (body2D)
                 {
                     body2D.AddForce(new Vector2(Random.Range(-RewardForce.x, RewardForce.x), Random.Range(0.0f, RewardForce.y)));
+                    GameObjectUtility.ChildCloneToContainer(reward);
                 }
-                GameObjectUtility.ChildCloneToContainer(reward);
+                else
+                {
+                    var collectable = reward.GetOrAddComponent<Collectable>();
+                    playerController.Collect(collectable);
+                }
             }
         }
     }

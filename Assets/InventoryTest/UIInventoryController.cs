@@ -1,10 +1,25 @@
-﻿using System.Linq;
+﻿using CustomUnityLibrary;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class UIInventoryController : MonoBehaviour
 {
+    private const string characterAButton = "Select Equipment";
+    private const string characterBButton = "Exit";
+    private const string characterXButton = "Change Runes";
+    private const string characterYButton = "Remove Runes";
+    private const string equipmentAButton = "Equip";
+    private const string equipmentBButton = "Back";
+    private const string equipmentXButton = null;
+    private const string equipmentYButton = null;
+    private const string runesAButton = "Attach";
+    private const string runesBButton = "Back";
+    private const string runesXButton = null;
+    private const string runesYButton = null;
+
     [Tooltip("View used to display the title of the current inventory panel")]
     [SerializeField]
     private InventoryTitleView titleView;
@@ -40,6 +55,9 @@ public class UIInventoryController : MonoBehaviour
     private InventoryMode inventoryMode = InventoryMode.Character;
     private GameObject previousSelectedGameObject;
     private Player player;
+    private ItemButton runeableEquipmentItemButton;
+    private bool dirty;
+    private Dictionary<GamePadInputs, string> gamePadInstructions = new Dictionary<GamePadInputs, string>();
 
     void Awake()
     {
@@ -53,34 +71,36 @@ public class UIInventoryController : MonoBehaviour
 
     void Start()
     {
+        UpdateInstructions();
         ChangeMode(InventoryMode.Character, initialSelection);
     }
 
     void Update()
     {
         var currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
+        if (!currentSelectedGameObject)
+        {
+            EventSystem.current.SetSelectedGameObject(runeableEquipmentItemButton.gameObject);
+            currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
+        }
+        dirty = dirty || currentSelectedGameObject != previousSelectedGameObject;
+        previousSelectedGameObject = currentSelectedGameObject;
         var itemButton = currentSelectedGameObject.GetComponent<ItemButton>();
         if (!itemButton)
         {
             Debug.Log(currentSelectedGameObject + " could not find ItemButton!", currentSelectedGameObject);
             return;
         }
-        bool changedSelectedGameObject = currentSelectedGameObject != previousSelectedGameObject;
-        if (changedSelectedGameObject)
-        {
-            previousSelectedGameObject = currentSelectedGameObject;
-            changedSelectedGameObject = true;
-        }
         switch (inventoryMode)
         {
             case InventoryMode.Character:
-                UpdateForCharacterMode(changedSelectedGameObject, itemButton);
+                UpdateForCharacterMode(itemButton);
                 break;
             case InventoryMode.Equipment:
-                UpdateForEquipmentMode(changedSelectedGameObject, itemButton);
+                UpdateForEquipmentMode(itemButton);
                 break;
             case InventoryMode.Runes:
-                UpdateForRunesMode(changedSelectedGameObject, itemButton);
+                UpdateForRunesMode(itemButton);
                 break;
             default:
                 Debug.LogError("A valid InventoryMode could not be found!", gameObject);
@@ -88,12 +108,18 @@ public class UIInventoryController : MonoBehaviour
         }
     }
 
-    private void UpdateForCharacterMode(bool changedSelectedGameObject, ItemButton itemButton)
+    /// <summary>
+    /// Update loop for character screen
+    /// </summary>
+    /// <param name="changedSelectedGameObject">If the selected character equipment has changed since last frame</param>
+    /// <param name="itemButton">Currently selected character equipment</param>
+    private void UpdateForCharacterMode(ItemButton itemButton)
     {
         var item = itemButton.GetItem();
         var equipment = item ? item.GetComponent<Equipment>() : null;
-        if (changedSelectedGameObject)
+        if (dirty)
         {
+            dirty = false;
             characterView.UpdateDescription(equipment);
             equipmentDescriptionView.UpdateDescription(equipment);
         }
@@ -123,7 +149,12 @@ public class UIInventoryController : MonoBehaviour
         }
     }
 
-    private void UpdateForEquipmentMode(bool changedSelectedGameObject, ItemButton itemButton)
+    /// <summary>
+    /// Update loop for when selecting equipment
+    /// </summary>
+    /// <param name="changedSelectedGameObject">Whether or not the selected equipment has chanegd since last frame</param>
+    /// <param name="itemButton">Currently selected item button</param>
+    private void UpdateForEquipmentMode(ItemButton itemButton)
     {
         var item = itemButton.GetItem();
         if (!item)
@@ -137,8 +168,9 @@ public class UIInventoryController : MonoBehaviour
             Debug.LogError("Expecting equipment, but there wasn't any!", gameObject);
             return;
         }
-        if (changedSelectedGameObject)
+        if (dirty)
         {
+            dirty = false;
             equipmentView.UpdateDescription(equipment);
         }
         if (Input.GetButtonDown(InputNames.EquipEquipment))
@@ -161,27 +193,74 @@ public class UIInventoryController : MonoBehaviour
         }
     }
 
-    private void UpdateForRunesMode(bool changedSelectedGameObject, ItemButton itemButton)
+    /// <summary>
+    /// Update loop for when in rune selection
+    /// </summary>
+    /// <param name="changedSelectedGameObject">Whether or not the currently selected rune has been changed</param>
+    /// <param name="itemButton">Currently selected item button</param>
+    private void UpdateForRunesMode(ItemButton itemButton)
     {
+        var item = itemButton.GetItem();
+        if (!item)
+        {
+            Debug.LogError("Expecting item in ItemButton!", itemButton.gameObject);
+            return;
+        }
+        var rune = item.GetComponent<Rune>();
+        if (dirty)
+        {
+            dirty = false;
+            runesView.UpdateDescription(rune);
+            runeDescriptionView.SetDescription(rune);
+        }
         if (Input.GetButtonDown(InputNames.Inventory))
         {
-            ChangeMode(InventoryMode.Character, itemButton);
+            var equipmentItemButton = characterView.GetItemButton(runeableEquipmentItemButton.GetItemType());
+            ChangeMode(InventoryMode.Character, equipmentItemButton);
         }
         if (Input.GetButtonDown(InputNames.TabRight))
         {
             runesView.MoveTab(1);
         }
-        if (Input.GetButtonDown(InputNames.TabLeft)){
+        if (Input.GetButtonDown(InputNames.TabLeft))
+        {
             runesView.MoveTab(-1);
+        }
+        if (Input.GetButtonDown(InputNames.EquipRune))
+        {
+            if (rune && !rune.IsEquipped())
+            {
+                var equipmentItem = runeableEquipmentItemButton.GetItem();
+                if (!equipmentItem)
+                {
+                    Debug.LogError("Could not find equipment!", gameObject);
+                    return;
+                }
+                var equipment = equipmentItem.GetComponent<Equipment>();
+                if (!equipment)
+                {
+                    Debug.LogError("Could not find equipment!", gameObject);
+                    return;
+                }
+                equipment.SetRune(rune);
+            }
         }
     }
 
+    /// <summary>
+    /// Changes the inventory mode
+    /// </summary>
+    /// <param name="inventoryMode">New inventory mode</param>
+    /// <param name="itemButton">Item button selected when inventory mode is changing</param>
     private void ChangeMode(InventoryMode inventoryMode, ItemButton itemButton)
     {
+        dirty = true;
         this.inventoryMode = inventoryMode;
+        UpdateInstructions();
         var itemType = itemButton.GetItemType();
         var item = itemButton.GetItem();
         var equipment = item ? item.GetComponent<Equipment>() : null;
+        runeableEquipmentItemButton = null;
         switch (this.inventoryMode)
         {
             case InventoryMode.Character:
@@ -218,16 +297,45 @@ public class UIInventoryController : MonoBehaviour
                 equipmentDescriptionView.gameObject.SetActive(false);
                 runesView.gameObject.SetActive(true);
                 runeDescriptionView.gameObject.SetActive(true);
-                bool runesButtonSuccess = runesView.CreateButtons(equipment);
-                if (!runesButtonSuccess)
-                {
-                    ChangeMode(InventoryMode.Character, itemButton);
-                }
+                runeableEquipmentItemButton = itemButton;
+                runesView.CreateButtons(equipment);
                 break;
             default:
                 Debug.LogError("Invalid InventoryMode used!", gameObject);
                 return;
         }
+    }
+
+    /// <summary>
+    /// Adds all the keys for the gamepad input instruction dictionary, and updates the display on screen
+    /// </summary>
+    private void UpdateInstructions()
+    {
+        switch (inventoryMode)
+        {
+            case InventoryMode.Character:
+                gamePadInstructions[GamePadInputs.A] = characterAButton;
+                gamePadInstructions[GamePadInputs.B] = characterBButton;
+                gamePadInstructions[GamePadInputs.X] = characterXButton;
+                gamePadInstructions[GamePadInputs.Y] = characterYButton;
+                break;
+            case InventoryMode.Equipment:
+                gamePadInstructions[GamePadInputs.A] = equipmentAButton;
+                gamePadInstructions[GamePadInputs.B] = equipmentBButton;
+                gamePadInstructions[GamePadInputs.X] = equipmentXButton;
+                gamePadInstructions[GamePadInputs.Y] = equipmentYButton;
+                break;
+            case InventoryMode.Runes:
+                gamePadInstructions[GamePadInputs.A] = runesAButton;
+                gamePadInstructions[GamePadInputs.B] = runesBButton;
+                gamePadInstructions[GamePadInputs.X] = runesXButton;
+                gamePadInstructions[GamePadInputs.Y] = runesYButton;
+                break;
+            default:
+                Debug.LogError("Invalid InventoryMode supplied!", gameObject);
+                return;
+        }
+        instructionsView.UpdateInstructions(gamePadInstructions);
     }
 
     /// <summary>

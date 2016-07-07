@@ -23,16 +23,35 @@ public class PlayerController : MonoBehaviour
     private PlayerView playerView;
     private Interactable nearbyInteractable;
     private bool interacting = false;
+    private Health health;
 
     void Awake()
     {
         player = GetComponent<Player>();
         platformCharacterController = GetComponent<PlatformCharacterController>();
         playerView = GetComponent<PlayerView>();
+        health = GetComponentInChildren<Health>();
+        if (!health)
+        {
+            Debug.LogError("Could not find player health!", gameObject);
+            return;
+        }
     }
 
     void Update()
     {
+        if (health.IsDead())
+        {
+            if (player.GetPrestige() > 0)
+            {
+                SceneManager.LoadScene(SceneNames.LevelUp);
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneNames.Venture);
+            }
+            return;
+        }
         if (Input.GetButtonDown(InputNames.Interact) && nearbyInteractable && !nearbyInteractable.IsActImmediately() && !interacting)
         {
             interacting = true;
@@ -93,7 +112,7 @@ public class PlayerController : MonoBehaviour
         var collectable = collider2D.GetComponent<Collectable>();
         if (collectable)
         {
-            CollectItem(collectable);
+            Collect(collectable);
         }
     }
 
@@ -107,6 +126,16 @@ public class PlayerController : MonoBehaviour
         float verticalInput = Input.GetAxis(InputNames.Vertical);
         var input = new Vector2(horizontalInput, verticalInput);
         return input;
+    }
+
+    /// <summary>
+    /// Collect an item
+    /// </summary>
+    /// <param name="item">Item to collect</param>
+    public void Collect(Collectable collectable)
+    {
+        player.Collect(collectable);
+        playerView.Collect(collectable);
     }
 
     /// <summary>
@@ -143,16 +172,6 @@ public class PlayerController : MonoBehaviour
         platformCharacterController.SetActionState(eControllerActions.PlatformDropDown, droppingDown);
         platformCharacterController.HorizontalSpeedScale = 1.0f;
         platformCharacterController.VerticalSpeedScale = 1.0f;
-    }
-
-    /// <summary>
-    /// Collect an item
-    /// </summary>
-    /// <param name="item">Item to collect</param>
-    private void CollectItem(Collectable collectable)
-    {
-        player.Collect(collectable);
-        playerView.Collect(collectable);
     }
 
     /// <summary>

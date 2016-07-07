@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System;
 
 public class InventoryCharacterView : MonoBehaviour
 {
@@ -87,5 +88,16 @@ public class InventoryCharacterView : MonoBehaviour
         }
         var equippedItemSelection = itemButtons.Where(b => b.GetItemType() == itemType).First();
         EventSystem.current.SetSelectedGameObject(equippedItemSelection.gameObject);
+    }
+
+    /// <summary>
+    /// Gets the Item Button for the specified type
+    /// </summary>
+    /// <param name="itemType">Type of item to get button for</param>
+    /// <returns>The item button</returns>
+    public ItemButton GetItemButton(ItemType itemType)
+    {
+        var itemButtons = characterEquipmentContainer.GetComponentsInChildren<ItemButton>();
+        return itemButtons.Where(b => b.GetItemType() == itemType).FirstOrDefault();
     }
 }

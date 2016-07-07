@@ -9,4 +9,9 @@
     /// Scene name for inventory menu
     /// </summary>
     public const string Inventory = "Inventory";
+
+    /// <summary>
+    /// Scene name for player to level up runes
+    /// </summary>
+    public const string LevelUp = "Level Up";
 }

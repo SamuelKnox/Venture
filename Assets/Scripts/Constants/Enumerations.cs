@@ -61,3 +61,14 @@ public enum InventoryMode
     EquipmentBrowser,
     RuneEditor
 }
+
+/// <summary>
+/// Input options for gamepad
+/// </summary>
+public enum GamePadInputs
+{
+    A,
+    B,
+    X,
+    Y
+}

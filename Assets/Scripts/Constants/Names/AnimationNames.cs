@@ -45,6 +45,11 @@
             /// Animation name for whether or not the player is climbing
             /// </summary>
             public const string Climbing = "Climbing";
+
+            /// <summary>
+            /// Animation name for when the player is dead
+            /// </summary>
+            public const string Dead = "Dead";
         }
 
         public static class Floats

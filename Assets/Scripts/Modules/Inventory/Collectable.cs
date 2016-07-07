@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class Collectable : MonoBehaviour
 {
     [Tooltip("Whether or not to emphasize this item and play a player-locking animation when picking this up")]

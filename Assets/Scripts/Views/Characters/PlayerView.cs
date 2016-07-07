@@ -84,6 +84,15 @@ public class PlayerView : MonoBehaviour
     }
 
     /// <summary>
+    /// Plays player death animation
+    /// </summary>
+    public void Die()
+    {
+        Debug.Log("ded animation");
+        animator.SetBool(AnimationNames.Player.Bools.Dead, true);
+    }
+
+    /// <summary>
     /// Collects an item
     /// </summary>
     public void Collect(Collectable collectable)

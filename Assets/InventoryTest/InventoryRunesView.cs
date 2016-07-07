@@ -4,10 +4,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using CustomUnityLibrary;
 using TMPro;
-using System;
 
 public class InventoryRunesView : MonoBehaviour
 {
+    private const string EquippedDescriptionPrefix = "Equipped: ";
+    private const string NoEquippedDescriptionSuffix = "None";
+
     [Tooltip("Rune tab prefabs to move between different types of runes")]
     [SerializeField]
     private RuneTab[] runeTabs;
@@ -32,8 +34,13 @@ public class InventoryRunesView : MonoBehaviour
     [SerializeField]
     private string noRunesDescriptionText;
 
+    [Tooltip("Short description for currently selected rune")]
+    [SerializeField]
+    private TextMeshProUGUI description;
+
     private Inventory inventory;
     private int tabIndex = 0;
+    private bool dirty = false;
 
     void Awake()
     {
@@ -51,7 +58,16 @@ public class InventoryRunesView : MonoBehaviour
 
     void Start()
     {
-        SetUpNoDescriptionText();
+        UpdateDescription(null);
+    }
+
+    void Update()
+    {
+        if (dirty)
+        {
+            dirty = false;
+            MoveTab(0);
+        }
     }
 
     /// <summary>
@@ -59,11 +75,11 @@ public class InventoryRunesView : MonoBehaviour
     /// </summary>
     /// <param name="equipment">Equipment whose runes can be changed</param>
     /// <returns>Whether or not any of that equipment type was found to create buttons for</returns>
-    public bool CreateButtons(Equipment equipment)
+    public void CreateButtons(Equipment equipment)
     {
-        foreach (var button in categoryContainer.GetComponentsInChildren<RuneTab>())
+        foreach (var runeTab in categoryContainer.GetComponentsInChildren<RuneTab>())
         {
-            Destroy(button.gameObject);
+            Destroy(runeTab.gameObject);
         }
         foreach (var button in runesContainer.GetComponentsInChildren<ItemButton>())
         {
@@ -73,7 +89,7 @@ public class InventoryRunesView : MonoBehaviour
         if (runeSocketTypes.Length == 0)
         {
             Debug.LogError(equipment + " does not have any rune sockets!", equipment.gameObject);
-            return false;
+            return;
         }
         foreach (var runeSocketType in runeSocketTypes)
         {
@@ -81,7 +97,7 @@ public class InventoryRunesView : MonoBehaviour
             if (!runeTabPrefab)
             {
                 Debug.LogError("Missing a rune tab for " + runeSocketType + "!", gameObject);
-                return false;
+                return;
             }
             var tab = Instantiate(runeTabPrefab);
             tab.transform.SetParent(categoryContainer);
@@ -89,26 +105,11 @@ public class InventoryRunesView : MonoBehaviour
             if (!button)
             {
                 Debug.LogError(tab + " could not find button component!", tab.gameObject);
-                return false;
+                return;
             }
             button.SetNavigation(Navigation.Mode.None);
         }
-        MoveTab(0);
-        return true;
-    }
-
-    /// <summary>
-    /// Sets up the text game object for when there are no runes
-    /// </summary>
-    private void SetUpNoDescriptionText()
-    {
-        var description = noRunesDescription.GetComponent<TextMeshProUGUI>();
-        if (!description)
-        {
-            Debug.LogError("Could not find TextMeshProUGUI!", gameObject);
-            return;
-        }
-        description.text = noRunesDescriptionText;
+        dirty = true;
     }
 
     /// <summary>
@@ -117,27 +118,33 @@ public class InventoryRunesView : MonoBehaviour
     /// <param name="movement">Amount to move the tab to the left or right</param>
     public void MoveTab(int movement)
     {
-        tabIndex = (tabIndex + movement) % runeTabs.Length;
+        foreach (var itemButton in runesContainer.GetComponentsInChildren<ItemButton>())
+        {
+            Destroy(itemButton.gameObject);
+        }
+        var runeTabInstances = categoryContainer.GetComponentsInChildren<RuneTab>();
+        tabIndex = (tabIndex + movement) % runeTabInstances.Length;
         if (tabIndex < 0)
         {
-            tabIndex = 0;
+            tabIndex = runeTabInstances.Length - 1;
         }
-        var buttons = categoryContainer.GetComponentsInChildren<RuneTab>().Select(t => t.GetComponent<Button>()).ToArray();
+        var buttons = runeTabInstances.Select(t => t.GetComponent<Button>()).ToArray();
         for (int i = 0; i < buttons.Count(); i++)
         {
             buttons[i].interactable = i == tabIndex;
         }
-        var runes = inventory.GetItems(ItemType.Rune).Select(r => r.GetComponent<Rune>()).Where(r => r.GetRuneType() == runeTabs[tabIndex].GetRuneType());
-        if (runes.Count() > 0)
+        var runes = inventory.GetItems(ItemType.Rune).Select(r => r.GetComponent<Rune>()).Where(r => r.GetRuneType() == runeTabs[tabIndex].GetRuneType()).ToArray();
+        if (runes.Length > 0)
         {
+            runesContainer.gameObject.SetActive(true);
             noRunesDescription.gameObject.SetActive(false);
-            foreach (var rune in runes)
+            for (int i = 0; i < runes.Length; i++)
             {
                 var button = Instantiate(itemButton);
                 button.transform.SetParent(runesContainer);
                 button.SetItemType(ItemType.Rune);
-                button.SetItem(rune);
-                if (!EventSystem.current.currentSelectedGameObject || rune.IsEquipped())
+                button.SetItem(runes[i]);
+                if (i == 0 || runes[i].IsEquipped())
                 {
                     EventSystem.current.SetSelectedGameObject(button.gameObject);
                 }
@@ -145,7 +152,19 @@ public class InventoryRunesView : MonoBehaviour
         }
         else
         {
+            runesContainer.gameObject.SetActive(false);
             noRunesDescription.gameObject.SetActive(true);
         }
+    }
+
+    /// <summary>
+    /// Updates the description for the rune
+    /// </summary>
+    /// <param name="rune">Rune to describe</param>
+    public void UpdateDescription(Rune rune)
+    {
+        var descriptionSuffix = rune ? rune.name : NoEquippedDescriptionSuffix;
+        var descriptionText = EquippedDescriptionPrefix + descriptionSuffix;
+        description.text = descriptionText;
     }
 }
