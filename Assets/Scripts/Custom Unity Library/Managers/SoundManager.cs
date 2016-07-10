@@ -52,6 +52,10 @@
             }
             newAudioSource.clip = clip;
             newAudioSource.loop = loop;
+            if (!newAudioSource.enabled)
+            {
+                newAudioSource.enabled = true;
+            }
             newAudioSource.Play();
         }
 

@@ -7,16 +7,19 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(PlayerView))]
 public class PlayerController : MonoBehaviour
 {
-    private const float AxisJumpingThreshold = 0.5f;
-
     [Tooltip("Whether or not to use input to determine speed, or snap speed to a constant")]
     [SerializeField]
-    public bool UseAxisAsSpeedFactor = true;
+    private bool useAxisAsSpeedFactor = true;
 
     [Tooltip("Minimum axis value to start moving")]
     [SerializeField]
     [Range(0.0f, 1.0f)]
-    public float AxisMovingThreshold = 0.2f;
+    private float axisMovingThreshold = 0.2f;
+
+    [Tooltip("Minimum axis value to jump or drop down")]
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    private float axisJumpingThreshold = 0.5f;
 
     private Player player;
     private PlatformCharacterController platformCharacterController;
@@ -24,6 +27,7 @@ public class PlayerController : MonoBehaviour
     private Interactable nearbyInteractable;
     private bool interacting = false;
     private Health health;
+    private QuestsView questsView;
 
     void Awake()
     {
@@ -36,20 +40,24 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("Could not find player health!", gameObject);
             return;
         }
+        questsView = FindObjectOfType<QuestsView>();
+        if (!questsView)
+        {
+            Debug.LogError("Could not find quests view!", gameObject);
+            return;
+        }
+    }
+
+    void Start()
+    {
+        player.Load();
     }
 
     void Update()
     {
         if (health.IsDead())
         {
-            if (player.GetPrestige() > 0)
-            {
-                SceneManager.LoadScene(SceneNames.LevelUp);
-            }
-            else
-            {
-                SceneManager.LoadScene(SceneNames.Venture);
-            }
+            GameOver();
             return;
         }
         if (Input.GetButtonDown(InputNames.Interact) && nearbyInteractable && !nearbyInteractable.IsActImmediately() && !interacting)
@@ -75,6 +83,14 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown(InputNames.ToggleWeapon))
         {
             player.ToggleWeapon();
+        }
+        if (Input.GetButtonDown(InputNames.QuestLeft))
+        {
+            questsView.SwitchQuest(-1);
+        }
+        if (Input.GetButtonDown(InputNames.QuestRight))
+        {
+            questsView.SwitchQuest(1);
         }
         if (Input.GetButtonDown(InputNames.Inventory) && !SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
         {
@@ -135,7 +151,6 @@ public class PlayerController : MonoBehaviour
     public void Collect(Collectable collectable)
     {
         player.Collect(collectable);
-        playerView.Collect(collectable);
     }
 
     /// <summary>
@@ -147,18 +162,18 @@ public class PlayerController : MonoBehaviour
         float absoluteHorizontalMovement = Mathf.Abs(horizontalMovement);
         float verticalMovement = input.y * Mathf.Abs(input.y);
         float absoluteVerticalMovement = Mathf.Abs(verticalMovement);
-        if (absoluteHorizontalMovement >= AxisMovingThreshold)
+        if (absoluteHorizontalMovement >= axisMovingThreshold)
         {
-            platformCharacterController.HorizontalSpeedScale = UseAxisAsSpeedFactor ? absoluteHorizontalMovement : 1.0f;
+            platformCharacterController.HorizontalSpeedScale = useAxisAsSpeedFactor ? absoluteHorizontalMovement : 1.0f;
         }
-        if (absoluteVerticalMovement >= AxisMovingThreshold)
+        if (absoluteVerticalMovement >= axisMovingThreshold)
         {
-            platformCharacterController.VerticalSpeedScale = UseAxisAsSpeedFactor ? absoluteVerticalMovement : 1.0f;
+            platformCharacterController.VerticalSpeedScale = useAxisAsSpeedFactor ? absoluteVerticalMovement : 1.0f;
         }
-        platformCharacterController.SetActionState(eControllerActions.Left, horizontalMovement <= -AxisMovingThreshold);
-        platformCharacterController.SetActionState(eControllerActions.Right, horizontalMovement >= AxisMovingThreshold);
-        platformCharacterController.SetActionState(eControllerActions.Down, verticalMovement <= -AxisMovingThreshold);
-        platformCharacterController.SetActionState(eControllerActions.Up, verticalMovement >= AxisMovingThreshold);
+        platformCharacterController.SetActionState(eControllerActions.Left, horizontalMovement <= -axisMovingThreshold);
+        platformCharacterController.SetActionState(eControllerActions.Right, horizontalMovement >= axisMovingThreshold);
+        platformCharacterController.SetActionState(eControllerActions.Down, verticalMovement <= -axisMovingThreshold);
+        platformCharacterController.SetActionState(eControllerActions.Up, verticalMovement >= axisMovingThreshold);
     }
 
     /// <summary>
@@ -166,12 +181,28 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Jump(float verticalInput)
     {
-        bool jumping = Input.GetButton(InputNames.Jump) && verticalInput > -AxisJumpingThreshold;
-        bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -AxisJumpingThreshold;
+        bool jumping = Input.GetButton(InputNames.Jump) && verticalInput > -axisJumpingThreshold;
+        bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -axisJumpingThreshold;
         platformCharacterController.SetActionState(eControllerActions.Jump, jumping);
         platformCharacterController.SetActionState(eControllerActions.PlatformDropDown, droppingDown);
         platformCharacterController.HorizontalSpeedScale = 1.0f;
         platformCharacterController.VerticalSpeedScale = 1.0f;
+    }
+
+    /// <summary>
+    /// Acts when the player has died
+    /// </summary>
+    private void GameOver()
+    {
+        player.Save();
+        if (player.GetPrestige() > 0)
+        {
+            SceneManager.LoadScene(SceneNames.LevelUp);
+        }
+        else
+        {
+            SceneManager.LoadScene(SceneNames.Venture);
+        }
     }
 
     /// <summary>

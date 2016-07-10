@@ -8,6 +8,9 @@ public abstract class Equipment : Item
     [SerializeField]
     private RuneSocket[] runeSockets;
 
+    [Tooltip("Damage over time applied on contact with this equipment")]
+    [SerializeField]
+    [Range(0.0f, 10.0f)]
     private float damageOverTime = 0.0f;
 
     protected virtual void OnValidate()
@@ -63,19 +66,20 @@ public abstract class Equipment : Item
         rune.AttachRune(this);
     }
 
+    public void DetachRune(Rune rune)
+    {
+        var runeSocket = runeSockets.Where(s => s.GetRuneType() == rune.GetRuneType()).FirstOrDefault();
+        runeSocket.SetRune(null);
+    }
+
     /// <summary>
     /// Gets the damage over time effect from this equipment
     /// </summary>
     /// <returns>Damage Over Time</returns>
     public float GetDamageOverTime()
     {
+        Debug.LogWarning("Damage over time not implemented");
         return damageOverTime;
-    }
-
-    public void DetachRune(Rune rune)
-    {
-        var runeSocket = runeSockets.Where(s => s.GetRuneType() == rune.GetRuneType()).FirstOrDefault();
-        runeSocket.SetRune(null);
     }
 
     /// <summary>
@@ -84,17 +88,7 @@ public abstract class Equipment : Item
     /// <param name="damageOverTime">Damage over Time to set</param>
     public void SetDamageOverTime(float damageOverTime)
     {
-        this.damageOverTime = damageOverTime;
-        var damage = GetComponent<Damage>();
-        if (damage)
-        {
-            damage.SetDamageOverTime(damageOverTime);
-        }
-        var rangedWeapon = GetComponent<RangedWeapon>();
-        if (rangedWeapon)
-        {
-            rangedWeapon.SetDamageOverTime(rangedWeapon.GetDamageOverTime() + damageOverTime);
-        }
+        Debug.LogWarning("Damage over time not implemented");
     }
 
     /// <summary>

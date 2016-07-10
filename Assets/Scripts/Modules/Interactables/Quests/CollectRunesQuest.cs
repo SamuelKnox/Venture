@@ -22,7 +22,7 @@ public class CollectRunesQuest : Quest
 
     void Update()
     {
-        if (!IsActiveQuest() || IsComplete())
+        if (IsComplete())
         {
             return;
         }

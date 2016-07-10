@@ -14,7 +14,13 @@ public class Wand : Weapon
     void Awake()
     {
         rangedWeapon = GetComponent<RangedWeapon>();
-        mana = transform.root.GetComponentInChildren<Mana>();
+        var player = FindObjectOfType<Player>();
+        if (!player)
+        {
+            Debug.LogError("Could not find player!", gameObject);
+            return;
+        }
+        mana = player.GetComponentInChildren<Mana>();
         if (!mana)
         {
             Debug.LogError(gameObject + " could not find Mana!", gameObject);

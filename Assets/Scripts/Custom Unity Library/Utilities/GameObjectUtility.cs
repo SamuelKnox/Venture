@@ -8,7 +8,10 @@
     /// </summary>
     public static class GameObjectUtility
     {
-        private const string CloneSuffix = "(Clone)";
+        /// <summary>
+        /// Suffix added to GameObject name when cloned
+        /// </summary>
+        public const string CloneSuffix = "(Clone)";
 
         /// <summary>
         /// Returns a newly created GameObject at the bottom of a tree, or returns it if it already exists.

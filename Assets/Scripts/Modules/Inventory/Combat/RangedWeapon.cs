@@ -44,7 +44,6 @@ public class RangedWeapon : MonoBehaviour
 
     private float totalCooldown;
     private Vector3 oldRightVector;
-    private float damageOverTime;
 
     void Awake()
     {
@@ -93,7 +92,6 @@ public class RangedWeapon : MonoBehaviour
         var projectileInstance = Instantiate(projectile, transform.position + projectileSpawnOffset, Quaternion.identity) as Projectile;
         GameObjectUtility.ChildCloneToContainer(projectileInstance.gameObject);
         projectileInstance.tag = gameObject.tag;
-        SetProjectileDamageOverTime(projectileInstance);
         var projectileBody = projectileInstance.GetRigidBody2D();
         if (!unlimitedRange && !projectileBody.IsWithinRange(target.position, force, arch))
         {
@@ -139,7 +137,6 @@ public class RangedWeapon : MonoBehaviour
         var projectileInstance = Instantiate(projectile, transform.position + projectileSpawnOffset, Quaternion.identity) as Projectile;
         GameObjectUtility.ChildCloneToContainer(projectileInstance.gameObject);
         projectileInstance.tag = gameObject.tag;
-        SetProjectileDamageOverTime(projectileInstance);
         var projectileBody = projectileInstance.GetRigidBody2D();
         if (ignoreGravity)
         {
@@ -165,24 +162,6 @@ public class RangedWeapon : MonoBehaviour
     public bool IsReady()
     {
         return fireCooldown <= 0;
-    }
-
-    /// <summary>
-    /// Gets the amount of damage dealt over time by the ranged weapon's projectiles
-    /// </summary>
-    /// <returns>Damage over time</returns>
-    public float GetDamageOverTime()
-    {
-        return damageOverTime;
-    }
-
-    /// <summary>
-    /// Sets the damage over time to be dealt by the ranged weapon's projectiles
-    /// </summary>
-    /// <param name="damageOverTime">Damage over time</param>
-    public void SetDamageOverTime(float damageOverTime)
-    {
-        this.damageOverTime = damageOverTime;
     }
 
     /// <summary>
@@ -251,20 +230,5 @@ public class RangedWeapon : MonoBehaviour
     {
         fireCooldown -= Time.deltaTime;
         fireCooldown = Mathf.Max(0, fireCooldown);
-    }
-
-    /// <summary>
-    /// Sets the damage over time for the projectile
-    /// </summary>
-    /// <param name="projectile">Projectile to set damage over time for</param>
-    private void SetProjectileDamageOverTime(Projectile projectile)
-    {
-        var damage = projectile.GetComponent<Damage>();
-        if (!damage)
-        {
-            Debug.LogError(projectile + " is required to have a Damage component!", projectile);
-            return;
-        }
-        damage.SetDamageOverTime(damageOverTime);
     }
 }

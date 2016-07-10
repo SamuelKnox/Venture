@@ -1,5 +1,2 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class Helmet : Armor {
+﻿public class Helmet : Armor {
 }

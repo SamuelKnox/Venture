@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[Serializable]
 [RequireComponent(typeof(Inventory))]
 [RequireComponent(typeof(PlayerView))]
 public class Player : Character
 {
+    string SaveFilePath = FilePaths.SaveFile + FilePaths.SaveTagAffix + FilePaths.PlayerTag;
+    private const string SaveTag = "Player";
     private const int PrestigePerLevel = 1;
     private const int GoldPerLevel = 100;
     private static readonly ItemType[] WeaponTypes = new ItemType[] { ItemType.MeleeWeapon, ItemType.RangedWeapon };
@@ -39,10 +42,6 @@ public class Player : Character
     [SerializeField]
     private Transform armorContainer;
 
-    [Tooltip("Miscellaneous collectables container")]
-    [SerializeField]
-    private Transform miscellaneousContainer;
-
     [Tooltip("Container for all of the player's quests")]
     [SerializeField]
     private Transform questContainer;
@@ -58,17 +57,210 @@ public class Player : Character
     private Inventory inventory;
     private PlayerView playerView;
     private Weapon activeWeapon;
+    private QuestsView questsView;
 
     protected override void Awake()
     {
         base.Awake();
         inventory = GetComponent<Inventory>();
         playerView = GetComponent<PlayerView>();
+        AddItemsToInventory();
+        questsView = FindObjectOfType<QuestsView>();
+        if (!questsView)
+        {
+            Debug.LogError("Could not find quests view!", gameObject);
+            return;
+        }
     }
 
     void Start()
     {
         SetStartingActiveWeapon();
+    }
+
+    /// <summary>
+    /// Saves the player
+    /// </summary>
+    public void Save()
+    {
+        string playerDataJson = PlayerData.ToJson(this);
+        ES2.Save(playerDataJson, SaveFilePath);
+    }
+
+    /// <summary>
+    /// Updates the player to be overritten with the saved data
+    /// </summary>
+    public void Load()
+    {
+        if (!ES2.Exists(SaveFilePath))
+        {
+            return;
+        }
+        string playerDataJson = ES2.Load<string>(SaveFilePath);
+        var playerData = JsonUtility.FromJson<PlayerData>(playerDataJson);
+        playerData.Apply(this);
+    }
+
+    /// <summary>
+    /// Gets all of the player's weapons
+    /// </summary>
+    /// <returns>Weapons in the player's weapon container</returns>
+    public Weapon[] GetWeapons()
+    {
+        return weaponContainer.GetComponentsInChildren<Weapon>(true);
+    }
+
+    /// <summary>
+    /// Gets all of the player's armor
+    /// </summary>
+    /// <returns>Armor in the player's armor container</returns>
+    public Armor[] GetArmor()
+    {
+        return armorContainer.GetComponentsInChildren<Armor>(true);
+    }
+
+    /// <summary>
+    /// Gets all of the player's quests
+    /// </summary>
+    /// <returns>Quests in the player's quest container</returns>
+    public Quest[] GetQuests()
+    {
+        return questContainer.GetComponentsInChildren<Quest>(true);
+    }
+
+    /// <summary>
+    /// Gets all of the player's runes
+    /// </summary>
+    /// <returns>Runes in the player's rune container</returns>
+    public Rune[] GetRunes()
+    {
+        return runeContainer.GetComponentsInChildren<Rune>(true);
+    }
+
+    /// <summary>
+    /// Loads and equipps the appropriate weapons
+    /// </summary>
+    /// <param name="weaponNames">Names of weapons the player has collected</param>
+    /// <param name="weaponsEquipped">Whether or not each weapon is equipped</param>
+    public void InitializeWeapons(string[] weaponNames, bool[] weaponsEquipped)
+    {
+        if (weaponNames.Length != weaponsEquipped.Length)
+        {
+            Debug.LogError("Every weapon must either be equipped or unequipped!", gameObject);
+            return;
+        }
+        for (int i = 0; i < weaponNames.Length && i < weaponsEquipped.Length; i++)
+        {
+            var weaponPrefab = Resources.Load<Weapon>(FilePaths.Weapons + weaponNames[i]);
+            var weaponInstance = Instantiate(weaponPrefab, weaponContainer.transform.position, Quaternion.identity) as Weapon;
+            weaponInstance.transform.SetParent(weaponContainer);
+            weaponInstance.gameObject.SetActive(true);
+            weaponInstance.name = weaponInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
+            if (inventory.Find(weaponInstance.name))
+            {
+                Destroy(weaponInstance.gameObject);
+            }
+            else
+            {
+                Collect(weaponInstance.GetComponent<Collectable>());
+                if (weaponsEquipped[i])
+                {
+                    Equip(weaponInstance);
+                }
+            }
+        }
+        SetStartingActiveWeapon();
+    }
+
+    /// <summary>
+    /// Sets up the player's armor
+    /// </summary>
+    /// <param name="armorNames">Armor player has collected</param>
+    /// <param name="armorEquipped">Whether or not each piece of armor is equipped</param>
+    public void InitializeArmor(string[] armorNames, bool[] armorEquipped)
+    {
+        if (armorNames.Length != armorEquipped.Length)
+        {
+            Debug.LogError("Every armor must either be equipped or unequipped!", gameObject);
+            return;
+        }
+        for (int i = 0; i < armorNames.Length && i < armorEquipped.Length; i++)
+        {
+            var armorPrefab = Resources.Load<Armor>(FilePaths.Armor + armorNames[i]);
+            var armorInstance = Instantiate(armorPrefab, armorContainer.transform.position, Quaternion.identity) as Armor;
+            armorInstance.transform.SetParent(armorContainer);
+            armorInstance.gameObject.SetActive(true);
+            armorInstance.name = armorInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
+            if (inventory.Find(armorInstance.name))
+            {
+                Destroy(armorInstance.gameObject);
+            }
+            else
+            {
+                Collect(armorInstance.GetComponent<Collectable>());
+                if (armorEquipped[i])
+                {
+                    Equip(armorInstance);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sets up the player's runes
+    /// </summary>
+    /// <param name="runeNames">Runes player has collected</param>
+    /// <param name="runeEquipmentNames">Equipment, if any, the runes are attached to</param>
+    /// <param name="runeLevels">The levels of the runes</param>
+    public void InitializeRunes(string[] runeNames, string[] runeEquipmentNames, int[] runeLevels)
+    {
+        if (runeNames.Length != runeEquipmentNames.Length || runeNames.Length != runeLevels.Length || runeEquipmentNames.Length != runeLevels.Length)
+        {
+            Debug.LogError("Every rune must say which, if any, piece of equipment it is attached to!", gameObject);
+            return;
+        }
+        for (int i = 0; i < runeNames.Length && i < runeEquipmentNames.Length && i < runeLevels.Length; i++)
+        {
+            var runePrefab = Resources.Load<Rune>(FilePaths.Runes + runeNames[i]);
+            var runeInstance = Instantiate(runePrefab, runeContainer.transform.position, Quaternion.identity) as Rune;
+            runeInstance.transform.SetParent(runeContainer);
+            runeInstance.gameObject.SetActive(true);
+            runeInstance.name = runeInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
+            Collect(runeInstance.GetComponent<Collectable>());
+            if (!string.IsNullOrEmpty(runeEquipmentNames[i]))
+            {
+                var playerEquipment = GetComponentsInChildren<Equipment>(true);
+                var runeEquipment = playerEquipment.Where(e => e.name == runeEquipmentNames[i]).First();
+                runeEquipment.SetRune(runeInstance);
+            }
+            runeInstance.SetLevel(runeLevels[i]);
+        }
+    }
+
+    /// <summary>
+    /// Sets up the player's quests
+    /// </summary>
+    /// <param name="questNames">Quests player has undertaken</param>
+    /// <param name="questsComplete">Whether or not those quests are complete</param>
+    public void InitializeQuests(string[] questNames, bool[] questsComplete)
+    {
+        if (questNames.Length != questsComplete.Length)
+        {
+            Debug.LogError("Every quest must either be complete or not!", gameObject);
+            return;
+        }
+        for (int i = 0; i < questNames.Length && i < questsComplete.Length; i++)
+        {
+            var questPrefab = Resources.Load<Quest>(FilePaths.Quests + questNames[i]);
+            var questInstance = Instantiate(questPrefab, questContainer.transform.position, Quaternion.identity) as Quest;
+            questInstance.transform.SetParent(questContainer);
+            questInstance.name = questInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
+            if (questsComplete[i])
+            {
+                questInstance.SetComplete(true);
+            }
+        }
+        questsView.UpdateQuests();
     }
 
     /// <summary>
@@ -82,10 +274,10 @@ public class Player : Character
             return false;
         }
         activeQuests.Add(quest);
-        quest.SetActiveQuest(true);
         quest.transform.SetParent(questContainer);
         quest.transform.position = transform.position;
         quest.OnQuestComplete += OnQuestComplete;
+        questsView.UpdateQuests();
         return true;
     }
 
@@ -99,6 +291,25 @@ public class Player : Character
         completedQuests.Add(quest);
         prestige += quest.GetPrestige();
         quest.OnQuestComplete -= OnQuestComplete;
+        questsView.UpdateQuests();
+    }
+
+    /// <summary>
+    /// Gets the player's current level
+    /// </summary>
+    /// <returns>Player level</returns>
+    public float GetLevel()
+    {
+        return level;
+    }
+
+    /// <summary>
+    /// Overwrites the player's level
+    /// </summary>
+    /// <param name="level">Level to use</param>
+    public void SetLevel(float level)
+    {
+        this.level = level;
     }
 
     /// <summary>
@@ -108,6 +319,15 @@ public class Player : Character
     public int GetPrestige()
     {
         return prestige;
+    }
+
+    /// <summary>
+    /// Overwrites the player's prestige.  If adding prestige, player.AddPrestige(int) should be used instead.
+    /// </summary>
+    /// <param name="prestige">Prestige to set</param>
+    public void SetPrestige(int prestige)
+    {
+        this.prestige = prestige;
     }
 
     /// <summary>
@@ -144,6 +364,15 @@ public class Player : Character
     }
 
     /// <summary>
+    /// Overwrites the player's gold.  If adding gold, player.AddGold(int) should be used instead.
+    /// </summary>
+    /// <param name="gold">Gold to set</param>
+    public void SetGold(int gold)
+    {
+        this.gold = gold;
+    }
+
+    /// <summary>
     /// Adds gold to player's resources, and increases level
     /// </summary>
     /// <param name="gold">Gold to add</param>
@@ -177,7 +406,7 @@ public class Player : Character
         {
             return;
         }
-        var itemContainer = miscellaneousContainer;
+        Transform itemContainer = null;
         if (collectable.GetComponent<Weapon>())
         {
             itemContainer = weaponContainer;
@@ -191,8 +420,11 @@ public class Player : Character
             throw new NotImplementedException("Armor is not collectable yet.");
         }
         collectable.transform.SetParent(itemContainer);
-        collectable.transform.position = itemContainer.position;
-        collectable.transform.right *= Mathf.Sign(transform.localScale.x);
+        if (itemContainer)
+        {
+            collectable.transform.position = itemContainer.position;
+            collectable.transform.right *= Mathf.Sign(transform.localScale.x);
+        }
         var item = collectable.GetComponent<Item>();
         if (item)
         {
@@ -204,7 +436,6 @@ public class Player : Character
             {
                 Debug.LogWarning(name + " is attempting to collect " + item.name + ", but it already exists in " + inventory.name + ".", item.gameObject);
             }
-            return;
         }
         var resource = collectable.GetComponent<ResourcePool>();
         if (resource)
@@ -221,6 +452,11 @@ public class Player : Character
                     Debug.LogError("An invalid resource type was provided!", gameObject);
                     return;
             }
+        }
+        playerView.Collect(collectable);
+        if (resource)
+        {
+            Destroy(resource.gameObject);
         }
     }
 
@@ -298,6 +534,15 @@ public class Player : Character
         if (weapon)
         {
             SetActiveWeapon(weapon.GetItemType());
+        }
+        var armor = equipment.GetComponent<Armor>();
+        if (armor)
+        {
+            var armorOfType = inventory.GetItems(armor.GetItemType()).Select(a => a.GetComponent<Armor>());
+            foreach (var armorPiece in armorOfType)
+            {
+                armorPiece.gameObject.SetActive(armorPiece == armor);
+            }
         }
     }
 
@@ -407,17 +652,47 @@ public class Player : Character
     /// </summary>
     private void SetStartingActiveWeapon()
     {
+        foreach (var weapon in weaponContainer.GetComponentsInChildren<Weapon>())
+        {
+            weapon.gameObject.SetActive(false);
+        }
         foreach (var weaponType in WeaponTypes)
         {
-            if (activeWeapon)
+            if (!activeWeapon)
             {
-                break;
+                SetActiveWeapon(weaponType);
             }
-            SetActiveWeapon(weaponType);
         }
         if (!activeWeapon)
         {
             Debug.LogWarning("There is no active weapon.", gameObject);
+        }
+        for (int i = 0; i < WeaponTypes.Length; i++)
+        {
+            ToggleWeapon();
+        }
+    }
+
+    /// <summary>
+    /// Add pre-existing items to player inventory
+    /// </summary>
+    private void AddItemsToInventory()
+    {
+        foreach (var item in weaponContainer.GetComponentsInChildren<Item>(true))
+        {
+            inventory.Add(item);
+        }
+        foreach (var item in runeContainer.GetComponentsInChildren<Item>(true))
+        {
+            inventory.Add(item);
+        }
+        foreach (var item in armorContainer.GetComponentsInChildren<Item>(true))
+        {
+            inventory.Add(item);
+        }
+        foreach (var item in questContainer.GetComponentsInChildren<Item>(true))
+        {
+            inventory.Add(item);
         }
     }
 }

@@ -121,6 +121,24 @@ public class Inventory : MonoBehaviour
     }
 
     /// <summary>
+    /// Finds an item by the specified name
+    /// </summary>
+    /// <param name="name">Name of item</param>
+    /// <returns>Item, or null if there is none</returns>
+    public Item Find(string name)
+    {
+        var items = GetItems();
+        foreach (var item in items)
+        {
+            if (item.name == name)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Gets the item container for the specified item type
     /// </summary>
     /// <param name="itemType">Type of container to get</param>

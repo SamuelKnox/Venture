@@ -98,6 +98,10 @@ public class CameraController : MonoBehaviour
 
     private void FollowPosition()
     {
+        if (!target)
+        {
+            return;
+        }
         float x = followXPosition ? target.position.x - positionOffset.x : transform.position.x;
         float y = followYPosition ? target.position.y - positionOffset.y : transform.position.y;
         float z = followZPosition ? target.position.z - positionOffset.z : transform.position.z;
@@ -107,6 +111,10 @@ public class CameraController : MonoBehaviour
 
     private void FollowRotation()
     {
+        if (!target)
+        {
+            return;
+        }
         float x = followXRotation ? target.eulerAngles.x - rotationOffset.x : transform.eulerAngles.x;
         float y = followYRotation ? target.eulerAngles.y - rotationOffset.y : transform.eulerAngles.y;
         float z = followZRotation ? target.eulerAngles.z - rotationOffset.z : transform.eulerAngles.z;

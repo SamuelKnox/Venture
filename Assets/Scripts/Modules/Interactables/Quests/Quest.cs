@@ -31,10 +31,6 @@ public abstract class Quest : MonoBehaviour
     [SerializeField]
     private string description;
 
-    [Tooltip("Whether or not the quest is active")]
-    [SerializeField]
-    private bool activeQuest = false;
-
     [Tooltip("Whether or not the quest has been completed")]
     [SerializeField]
     private bool completedQuest = false;
@@ -90,21 +86,12 @@ public abstract class Quest : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks whether or not this is an active quest
+    /// Sets whether or not the quest is complete.  If this is the first time it is complete, and a reward is expected, use quest.Complete() instead.
     /// </summary>
-    /// <returns>If quest is active</returns>
-    public bool IsActiveQuest()
+    /// <param name="complete">Whether to set the quest as complete</param>
+    public void SetComplete(bool complete)
     {
-        return activeQuest;
-    }
-
-    /// <summary>
-    /// Sets whether or not this quest is active
-    /// </summary>
-    /// <param name="active">If quest is active</param>
-    public void SetActiveQuest(bool active)
-    {
-        activeQuest = active;
+        completedQuest = complete;
     }
 
     /// <summary>

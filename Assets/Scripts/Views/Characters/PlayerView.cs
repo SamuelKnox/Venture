@@ -88,7 +88,6 @@ public class PlayerView : MonoBehaviour
     /// </summary>
     public void Die()
     {
-        Debug.Log("ded animation");
         animator.SetBool(AnimationNames.Player.Bools.Dead, true);
     }
 
@@ -102,7 +101,10 @@ public class PlayerView : MonoBehaviour
         {
             this.collectable = collectable;
             var equippedWeapon = player.GetActiveWeapon();
-            equippedWeapon.gameObject.SetActive(false);
+            if (equippedWeapon)
+            {
+                equippedWeapon.gameObject.SetActive(false);
+            }
             animator.SetTrigger(AnimationNames.Player.Triggers.CollectSpecialItem);
         }
         else
