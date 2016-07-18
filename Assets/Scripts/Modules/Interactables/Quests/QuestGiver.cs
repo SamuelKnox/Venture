@@ -20,6 +20,7 @@ public class QuestGiver : Interactable
     [Tooltip("Quests that can be given")]
     [SerializeField]
     private List<Quest> quests = new List<Quest>();
+
     private Player player;
 
     void Awake()
@@ -34,7 +35,7 @@ public class QuestGiver : Interactable
 
     void Start()
     {
-        SortQuests();
+        SetUpQuests();
     }
 
     /// <summary>
@@ -70,6 +71,7 @@ public class QuestGiver : Interactable
             questText.text = notQualifiedDialog;
             return;
         }
+        activeQuest.enabled = true;
         if (activeQuest.IsComplete())
         {
             Debug.LogError("Attempting to active quest " + activeQuest + ", but this quest has already been completed!", activeQuest.gameObject);
@@ -91,10 +93,14 @@ public class QuestGiver : Interactable
     }
 
     /// <summary>
-    /// Sorts the quests as desired
+    /// Sorts the quests as desired and disables them
     /// </summary>
-    private void SortQuests()
+    private void SetUpQuests()
     {
-        quests = quests.OrderBy(q => q.GetDifficulty()).ThenBy(q => UnityEngine.Random.Range(0.0f, 1.0f)).ToList();
+        quests = quests.OrderBy(q => q.GetDifficulty()).ThenBy(q => Random.Range(0.0f, 1.0f)).ToList();
+        foreach(var quest in quests)
+        {
+            quest.enabled = false;
+        }
     }
 }

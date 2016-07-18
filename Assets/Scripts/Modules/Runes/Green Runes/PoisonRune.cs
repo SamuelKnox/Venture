@@ -11,7 +11,7 @@ public class PoisonRune : GreenRune
     /// Applies poison to the equipment
     /// </summary>
     /// <param name="equipment">Equipment to apply poison to</param>
-    public override void AttachRune(Equipment equipment)
+    public override void Activate(Equipment equipment)
     {
         ChangePoison(equipment, poison);
     }
@@ -20,7 +20,7 @@ public class PoisonRune : GreenRune
     /// Removes poison from the equipment
     /// </summary>
     /// <param name="equipment">Equipment to remove poison from</param>
-    public override void DetachRune(Equipment equipment)
+    public override void Deactivate(Equipment equipment)
     {
         ChangePoison(equipment, -poison);
     }

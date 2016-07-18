@@ -73,7 +73,7 @@ public class PlayerView : MonoBehaviour
     /// <summary>
     /// Initiates a wand attack
     /// </summary>
-    public void WantAttack()
+    public void WandAttack()
     {
         if (attacking)
         {
@@ -89,6 +89,7 @@ public class PlayerView : MonoBehaviour
     public void Die()
     {
         animator.SetBool(AnimationNames.Player.Bools.Dead, true);
+        FinishAttacking();
     }
 
     /// <summary>
@@ -112,6 +113,7 @@ public class PlayerView : MonoBehaviour
             animator.SetTrigger(AnimationNames.Player.Triggers.CollectItem);
             collectable.gameObject.SetActive(false);
             Destroy(collectable);
+            FinishAttacking();
         }
     }
 
@@ -124,6 +126,7 @@ public class PlayerView : MonoBehaviour
         var equippedWeapon = player.GetActiveWeapon();
         equippedWeapon.gameObject.SetActive(true);
         Destroy(collectable);
+        FinishAttacking();
     }
 
     /// <summary>

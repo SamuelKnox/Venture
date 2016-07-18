@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -35,6 +36,24 @@ public abstract class Equipment : Item
     }
 
     /// <summary>
+    /// Gets all runes in this equipment
+    /// </summary>
+    /// <returns>All runes</returns>
+    public Rune[] GetRunes()
+    {
+        var runes = new List<Rune>();
+        foreach (var runeSocket in runeSockets)
+        {
+            var rune = runeSocket.GetRune();
+            if (rune)
+            {
+                runes.Add(rune);
+            }
+        }
+        return runes.ToArray();
+    }
+
+    /// <summary>
     /// Detaches all runes from this equipment
     /// </summary>
     public void DetachAllRunes()
@@ -54,7 +73,7 @@ public abstract class Equipment : Item
         var oldRune = GetRune(rune.GetRuneType());
         if (oldRune)
         {
-            oldRune.DetachRune(this);
+            oldRune.Deactivate(this);
         }
         var runeSocket = runeSockets.Where(s => s.GetRuneType() == rune.GetRuneType()).FirstOrDefault();
         if (runeSocket == null)
@@ -63,13 +82,27 @@ public abstract class Equipment : Item
             return;
         }
         runeSocket.SetRune(rune);
-        rune.AttachRune(this);
     }
 
+    /// <summary>
+    /// Removes the rune from its socket
+    /// </summary>
+    /// <param name="rune">Rune to remove</param>
     public void DetachRune(Rune rune)
     {
         var runeSocket = runeSockets.Where(s => s.GetRuneType() == rune.GetRuneType()).FirstOrDefault();
         runeSocket.SetRune(null);
+    }
+
+    /// <summary>
+    /// Activates all of the runes on this equipment
+    /// </summary>
+    public void ActivateRunes()
+    {
+        foreach (var rune in GetRunes())
+        {
+            rune.Activate(this);
+        }
     }
 
     /// <summary>

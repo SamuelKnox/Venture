@@ -11,7 +11,7 @@ public class HealthRune : RedRune
     /// Increases the player's max hit points
     /// </summary>
     /// <param name="equipment">Equipment with rune attached</param>
-    public override void AttachRune(Equipment equipment)
+    public override void Activate(Equipment equipment)
     {
         AdjustPlayerHitPoints(maxHitPointIncrease);
     }
@@ -20,7 +20,7 @@ public class HealthRune : RedRune
     /// Decreases the player's max hit points
     /// </summary>
     /// <param name="equipment">Equipment with rune attached</param>
-    public override void DetachRune(Equipment equipment)
+    public override void Deactivate(Equipment equipment)
     {
         AdjustPlayerHitPoints(-maxHitPointIncrease);
     }

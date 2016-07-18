@@ -54,19 +54,17 @@ public class QuestsView : MonoBehaviour
     public void SwitchQuest(int movement)
     {
         UpdateQuests();
+        if (activeQuests.Length == 0)
+        {
+            UpdateQuestDescription(null);
+            return;
+        }
         questIndex = (questIndex + movement) % activeQuests.Length;
         if (questIndex < 0)
         {
             questIndex = activeQuests.Length - 1;
         }
-        if (activeQuests.Length > 0)
-        {
-            UpdateQuestDescription(activeQuests[questIndex]);
-        }
-        else
-        {
-            UpdateQuestDescription(null);
-        }
+        UpdateQuestDescription(activeQuests[questIndex]);
     }
 
     /// <summary>

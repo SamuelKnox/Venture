@@ -121,6 +121,27 @@ public class Inventory : MonoBehaviour
     }
 
     /// <summary>
+    /// Removes an item from the inventory
+    /// </summary>
+    /// <param name="item">Item to remove</param>
+    /// <param name="destroy">Whether or not to destroy the item's gameobject on removal</param>
+    /// <returns>Whether or not the removal was successful</returns>
+    public bool Remove(Item item, bool destroy = false)
+    {
+        if (!Contains(item))
+        {
+            return false;
+        }
+        var itemContainer = GetItemContainer(item.GetItemType());
+        bool success = itemContainer.Remove(item);
+        if (success)
+        {
+            Destroy(item.gameObject);
+        }
+        return success;
+    }
+
+    /// <summary>
     /// Finds an item by the specified name
     /// </summary>
     /// <param name="name">Name of item</param>

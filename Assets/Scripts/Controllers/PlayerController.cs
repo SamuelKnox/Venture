@@ -83,6 +83,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown(InputNames.ToggleWeapon))
         {
             player.ToggleWeapon();
+            playerView.FinishAttacking();
         }
         if (Input.GetButtonDown(InputNames.QuestLeft))
         {
@@ -228,7 +229,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (activeWeapon.GetComponent<Wand>())
                 {
-                    playerView.WantAttack();
+                    playerView.WandAttack();
                 }
                 else
                 {

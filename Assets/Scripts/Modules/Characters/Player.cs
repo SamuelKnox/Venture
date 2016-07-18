@@ -1,4 +1,5 @@
-﻿using CustomUnityLibrary;
+﻿using CreativeSpore.SmartColliders;
+using CustomUnityLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,6 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerView))]
 public class Player : Character
 {
-    string SaveFilePath = FilePaths.SaveFile + FilePaths.SaveTagAffix + FilePaths.PlayerTag;
-    private const string SaveTag = "Player";
     private const int PrestigePerLevel = 1;
     private const int GoldPerLevel = 100;
     private static readonly ItemType[] WeaponTypes = new ItemType[] { ItemType.MeleeWeapon, ItemType.RangedWeapon };
@@ -79,44 +78,36 @@ public class Player : Character
     }
 
     /// <summary>
-    /// Saves the player
-    /// </summary>
-    public void Save()
-    {
-        string playerDataJson = PlayerData.ToJson(this);
-        ES2.Save(playerDataJson, SaveFilePath);
-    }
-
-    /// <summary>
     /// Updates the player to be overritten with the saved data
     /// </summary>
     public void Load()
     {
-        if (!ES2.Exists(SaveFilePath))
-        {
-            return;
-        }
-        string playerDataJson = ES2.Load<string>(SaveFilePath);
-        var playerData = JsonUtility.FromJson<PlayerData>(playerDataJson);
-        playerData.Apply(this);
+        prestige = SaveData.LoadPrestige();
+        gold = SaveData.LoadGold();
+        level = SaveData.LoadLevel();
+        LoadItems();
+        LoadQuests();
     }
 
     /// <summary>
-    /// Gets all of the player's weapons
+    /// Saves the player
     /// </summary>
-    /// <returns>Weapons in the player's weapon container</returns>
-    public Weapon[] GetWeapons()
+    public void Save()
     {
-        return weaponContainer.GetComponentsInChildren<Weapon>(true);
+        SaveData.SavePrestige(prestige);
+        SaveData.SaveGold(gold);
+        SaveData.SaveLevel(level);
+        SaveData.SaveItems(inventory.GetItems());
+        SaveData.SaveQuests(GetComponentsInChildren<Quest>());
     }
 
     /// <summary>
-    /// Gets all of the player's armor
+    /// Gets all of the player's equipment
     /// </summary>
-    /// <returns>Armor in the player's armor container</returns>
-    public Armor[] GetArmor()
+    /// <returns>Equipment on the player</returns>
+    public Equipment[] GetEquipment()
     {
-        return armorContainer.GetComponentsInChildren<Armor>(true);
+        return GetComponentsInChildren<Equipment>(true);
     }
 
     /// <summary>
@@ -135,132 +126,6 @@ public class Player : Character
     public Rune[] GetRunes()
     {
         return runeContainer.GetComponentsInChildren<Rune>(true);
-    }
-
-    /// <summary>
-    /// Loads and equipps the appropriate weapons
-    /// </summary>
-    /// <param name="weaponNames">Names of weapons the player has collected</param>
-    /// <param name="weaponsEquipped">Whether or not each weapon is equipped</param>
-    public void InitializeWeapons(string[] weaponNames, bool[] weaponsEquipped)
-    {
-        if (weaponNames.Length != weaponsEquipped.Length)
-        {
-            Debug.LogError("Every weapon must either be equipped or unequipped!", gameObject);
-            return;
-        }
-        for (int i = 0; i < weaponNames.Length && i < weaponsEquipped.Length; i++)
-        {
-            var weaponPrefab = Resources.Load<Weapon>(FilePaths.Weapons + weaponNames[i]);
-            var weaponInstance = Instantiate(weaponPrefab, weaponContainer.transform.position, Quaternion.identity) as Weapon;
-            weaponInstance.transform.SetParent(weaponContainer);
-            weaponInstance.gameObject.SetActive(true);
-            weaponInstance.name = weaponInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
-            if (inventory.Find(weaponInstance.name))
-            {
-                Destroy(weaponInstance.gameObject);
-            }
-            else
-            {
-                Collect(weaponInstance.GetComponent<Collectable>());
-                if (weaponsEquipped[i])
-                {
-                    Equip(weaponInstance);
-                }
-            }
-        }
-        SetStartingActiveWeapon();
-    }
-
-    /// <summary>
-    /// Sets up the player's armor
-    /// </summary>
-    /// <param name="armorNames">Armor player has collected</param>
-    /// <param name="armorEquipped">Whether or not each piece of armor is equipped</param>
-    public void InitializeArmor(string[] armorNames, bool[] armorEquipped)
-    {
-        if (armorNames.Length != armorEquipped.Length)
-        {
-            Debug.LogError("Every armor must either be equipped or unequipped!", gameObject);
-            return;
-        }
-        for (int i = 0; i < armorNames.Length && i < armorEquipped.Length; i++)
-        {
-            var armorPrefab = Resources.Load<Armor>(FilePaths.Armor + armorNames[i]);
-            var armorInstance = Instantiate(armorPrefab, armorContainer.transform.position, Quaternion.identity) as Armor;
-            armorInstance.transform.SetParent(armorContainer);
-            armorInstance.gameObject.SetActive(true);
-            armorInstance.name = armorInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
-            if (inventory.Find(armorInstance.name))
-            {
-                Destroy(armorInstance.gameObject);
-            }
-            else
-            {
-                Collect(armorInstance.GetComponent<Collectable>());
-                if (armorEquipped[i])
-                {
-                    Equip(armorInstance);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Sets up the player's runes
-    /// </summary>
-    /// <param name="runeNames">Runes player has collected</param>
-    /// <param name="runeEquipmentNames">Equipment, if any, the runes are attached to</param>
-    /// <param name="runeLevels">The levels of the runes</param>
-    public void InitializeRunes(string[] runeNames, string[] runeEquipmentNames, int[] runeLevels)
-    {
-        if (runeNames.Length != runeEquipmentNames.Length || runeNames.Length != runeLevels.Length || runeEquipmentNames.Length != runeLevels.Length)
-        {
-            Debug.LogError("Every rune must say which, if any, piece of equipment it is attached to!", gameObject);
-            return;
-        }
-        for (int i = 0; i < runeNames.Length && i < runeEquipmentNames.Length && i < runeLevels.Length; i++)
-        {
-            var runePrefab = Resources.Load<Rune>(FilePaths.Runes + runeNames[i]);
-            var runeInstance = Instantiate(runePrefab, runeContainer.transform.position, Quaternion.identity) as Rune;
-            runeInstance.transform.SetParent(runeContainer);
-            runeInstance.gameObject.SetActive(true);
-            runeInstance.name = runeInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
-            Collect(runeInstance.GetComponent<Collectable>());
-            if (!string.IsNullOrEmpty(runeEquipmentNames[i]))
-            {
-                var playerEquipment = GetComponentsInChildren<Equipment>(true);
-                var runeEquipment = playerEquipment.Where(e => e.name == runeEquipmentNames[i]).First();
-                runeEquipment.SetRune(runeInstance);
-            }
-            runeInstance.SetLevel(runeLevels[i]);
-        }
-    }
-
-    /// <summary>
-    /// Sets up the player's quests
-    /// </summary>
-    /// <param name="questNames">Quests player has undertaken</param>
-    /// <param name="questsComplete">Whether or not those quests are complete</param>
-    public void InitializeQuests(string[] questNames, bool[] questsComplete)
-    {
-        if (questNames.Length != questsComplete.Length)
-        {
-            Debug.LogError("Every quest must either be complete or not!", gameObject);
-            return;
-        }
-        for (int i = 0; i < questNames.Length && i < questsComplete.Length; i++)
-        {
-            var questPrefab = Resources.Load<Quest>(FilePaths.Quests + questNames[i]);
-            var questInstance = Instantiate(questPrefab, questContainer.transform.position, Quaternion.identity) as Quest;
-            questInstance.transform.SetParent(questContainer);
-            questInstance.name = questInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
-            if (questsComplete[i])
-            {
-                questInstance.SetComplete(true);
-            }
-        }
-        questsView.UpdateQuests();
     }
 
     /// <summary>
@@ -652,6 +517,7 @@ public class Player : Character
     /// </summary>
     private void SetStartingActiveWeapon()
     {
+        activeWeapon = null;
         foreach (var weapon in weaponContainer.GetComponentsInChildren<Weapon>())
         {
             weapon.gameObject.SetActive(false);
@@ -694,5 +560,87 @@ public class Player : Character
         {
             inventory.Add(item);
         }
+    }
+
+    /// <summary>
+    /// Loads and equips the player's items
+    /// </summary>
+    private void LoadItems()
+    {
+        var items = SaveData.LoadItems();
+        foreach (var item in items)
+        {
+            var equipment = item.GetComponent<Equipment>();
+            if (equipment)
+            {
+                var existingEquipment = inventory.Find(equipment.name);
+                if (existingEquipment)
+                {
+                    inventory.Remove(existingEquipment, true);
+                }
+            }
+            Collect(item.GetComponent<Collectable>());
+            if (equipment && equipment.IsEquipped())
+            {
+                Equip(equipment);
+            }
+            Transform container = null;
+            switch (item.GetItemType())
+            {
+                case ItemType.MeleeWeapon:
+                    container = weaponContainer;
+                    break;
+                case ItemType.RangedWeapon:
+                    container = weaponContainer;
+                    break;
+                case ItemType.Boots:
+                    container = armorContainer;
+                    break;
+                case ItemType.Gloves:
+                    container = armorContainer;
+                    break;
+                case ItemType.Helmet:
+                    container = armorContainer;
+                    break;
+                case ItemType.Leggings:
+                    container = armorContainer;
+                    break;
+                case ItemType.Rune:
+                    container = runeContainer;
+                    break;
+                default:
+                    Debug.LogError("Invalid item type provided!", gameObject);
+                    return;
+            }
+            item.transform.SetParent(container);
+        }
+        var equippedEquipment = inventory.GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>()).Where(e => e.IsEquipped());
+        foreach (var equipment in equippedEquipment)
+        {
+            equipment.ActivateRunes();
+        }
+        SetStartingActiveWeapon();
+    }
+
+    /// <summary>
+    /// Loads the player's quests
+    /// </summary>
+    private void LoadQuests()
+    {
+        var quests = SaveData.LoadQuests();
+        foreach (var quest in quests)
+        {
+            if (quest.IsComplete())
+            {
+                completedQuests.Add(quest);
+            }
+            else
+            {
+                activeQuests.Add(quest);
+                quest.OnQuestComplete += OnQuestComplete;
+            }
+            quest.transform.SetParent(questContainer);
+        }
+        questsView.UpdateQuests();
     }
 }

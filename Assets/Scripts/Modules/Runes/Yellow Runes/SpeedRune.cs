@@ -12,7 +12,7 @@ public class SpeedRune : YellowRune
     /// Increases the player's speed by the modifier
     /// </summary>
     /// <param name="equipment">Equipment which rune is attached to</param>
-    public override void AttachRune(Equipment equipment)
+    public override void Activate(Equipment equipment)
     {
         AdjustPlayerHorizontalSpeedModifier(speedIncrease * level);
     }
@@ -21,7 +21,7 @@ public class SpeedRune : YellowRune
     /// Decreases the player's speed by the modifier
     /// </summary>
     /// <param name="equipment">Equipment which rune is attached to</param>
-    public override void DetachRune(Equipment equipment)
+    public override void Deactivate(Equipment equipment)
     {
         AdjustPlayerHorizontalSpeedModifier(-speedIncrease * level);
     }

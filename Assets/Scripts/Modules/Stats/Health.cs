@@ -38,6 +38,10 @@ public class Health : MonoBehaviour
     [Range(0.0f, 10.0f)]
     private float invincibilityCooldown = 1.0f;
 
+    [Tooltip("Optional health view, used to display the health")]
+    [SerializeField]
+    private HealthView healthView;
+
     private float totalInvincibilityCooldown;
 
     void Awake()
@@ -129,6 +133,10 @@ public class Health : MonoBehaviour
         if (OnDamageDealt != null)
         {
             OnDamageDealt(damage);
+        }
+        if (healthView)
+        {
+            healthView.AdjustHealth(currentHitPoints / maxHitPoints);
         }
     }
 
