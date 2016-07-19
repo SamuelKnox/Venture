@@ -1,21 +1,27 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(EnemyView))]
 [RequireComponent(typeof(Spawner))]
 public abstract class Enemy : Character
 {
+    /// <summary>
+    /// Delegate for enemy dying
+    /// </summary>
+    public delegate void Death(Enemy enemy);
+
+    /// <summary>
+    /// Event called when damage is dealt
+    /// </summary>
+    public static event Death OnDeath;
+
     private static readonly Vector2 RewardForce = new Vector2(250.0f, 500.0f);
 
     protected EnemyView enemyView;
-
-    private Spawner spawner;
 
     protected override void Awake()
     {
         base.Awake();
         enemyView = GetComponent<EnemyView>();
-        spawner = GetComponent<Spawner>();
     }
 
     /// <summary>
@@ -40,12 +46,17 @@ public abstract class Enemy : Character
     /// </summary>
     protected override void Die()
     {
-        if (spawner)
+        if (OnDeath != null)
         {
-            var stats = spawner.Spawn();
-            foreach (var stat in stats)
+            OnDeath(this);
+        }
+        var spawners = GetComponentsInChildren<Spawner>();
+        foreach (var spawner in spawners)
+        {
+            var rewards = spawner.Spawn();
+            foreach (var reward in rewards)
             {
-                var body2D = stat.GetComponent<Rigidbody2D>();
+                var body2D = reward.GetComponent<Rigidbody2D>();
                 if (body2D)
                 {
                     body2D.AddForce(new Vector2(UnityEngine.Random.Range(-RewardForce.x, RewardForce.x), UnityEngine.Random.Range(0.0f, RewardForce.y)));

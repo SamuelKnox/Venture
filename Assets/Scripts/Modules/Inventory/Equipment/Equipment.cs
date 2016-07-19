@@ -29,7 +29,7 @@ public abstract class Equipment : Item
         var runeSocket = runeSockets.Where(s => s.GetRuneType() == runeType).FirstOrDefault();
         if (runeSocket == null)
         {
-            Debug.LogError(gameObject + " cannot hold does not have a Rune Socket of type " + runeType + "!", gameObject);
+            Debug.LogError(gameObject + " cannot hold a Rune Socket of type " + runeType + "!", gameObject);
             return null;
         }
         return runeSocket.GetRune();
@@ -102,6 +102,17 @@ public abstract class Equipment : Item
         foreach (var rune in GetRunes())
         {
             rune.Activate(this);
+        }
+    }
+
+    /// <summary>
+    /// Deactivates all runes on this equipment
+    /// </summary>
+    public void DeactivateRunes()
+    {
+        foreach (var rune in GetRunes())
+        {
+            rune.Deactivate(this);
         }
     }
 

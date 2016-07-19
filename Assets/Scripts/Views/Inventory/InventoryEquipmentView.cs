@@ -10,17 +10,25 @@ public class InventoryEquipmentView : MonoBehaviour
     [SerializeField]
     private ItemButton itemButton;
 
-    [Tooltip("Description to give for item when there is no equipment selected")]
-    [SerializeField]
-    private string noEquipmentDescription;
-
     [Tooltip("Container used to store item selection buttons")]
     [SerializeField]
     private RectTransform equipmentContainer;
 
+    [Tooltip("Container for displaying equipment description")]
+    [SerializeField]
+    private Transform descriptionContainer;
+
+    [Tooltip("Container for dispalying description when there is no equipment to describe")]
+    [SerializeField]
+    private Transform noDescriptionContainer;
+
     [Tooltip("Short description for the equipment selected")]
     [SerializeField]
     private TextMeshProUGUI description;
+
+    [Tooltip("Rune sockets used to display equipment runes")]
+    [SerializeField]
+    private RuneSocket[] runeSockets;
 
     private Inventory inventory;
 
@@ -82,30 +90,33 @@ public class InventoryEquipmentView : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates the description for the equippable item
+    /// Updates the long description for the piece of equipment
     /// </summary>
-    /// <param name="item">equipment to describe</param>
+    /// <param name="equipment">Equipment to get description for</param>
     public void UpdateDescription(Equipment equipment)
     {
-        string equipmentDescription;
         if (equipment)
         {
-            equipmentDescription = equipment.GetDescription();
-            if (string.IsNullOrEmpty(equipmentDescription))
+            descriptionContainer.gameObject.SetActive(true);
+            noDescriptionContainer.gameObject.SetActive(false);
+            description.text = equipment.GetDescription();
+            foreach (var runeSocket in runeSockets)
             {
-                Debug.LogError(equipment + " is missing a description!", equipment.gameObject);
-                return;
+                bool containsSocket = Array.IndexOf(equipment.GetRuneSocketTypes(), runeSocket.GetRuneType()) >= 0;
+                if (containsSocket)
+                {
+                    var runeIcon = runeSocket.GetIcon();
+                    var rune = equipment.GetRune(runeSocket.GetRuneType());
+                    runeIcon.sprite = rune ? rune.GetIcon() : null;
+                    runeIcon.enabled = runeIcon.sprite;
+                }
+                runeSocket.gameObject.SetActive(containsSocket);
             }
         }
         else
         {
-            equipmentDescription = noEquipmentDescription;
-            if (string.IsNullOrEmpty(equipmentDescription))
-            {
-                Debug.LogError(this + " is missing a description for when there is no item!", gameObject);
-                return;
-            }
+            descriptionContainer.gameObject.SetActive(false);
+            noDescriptionContainer.gameObject.SetActive(true);
         }
-        description.text = equipmentDescription;
     }
 }

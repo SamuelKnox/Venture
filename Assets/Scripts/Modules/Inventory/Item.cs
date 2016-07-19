@@ -17,6 +17,7 @@ public abstract class Item : MonoBehaviour
 
     [Tooltip("Description of this item")]
     [SerializeField]
+    [TextArea(1, 5)]
     private string description;
 
     /// <summary>

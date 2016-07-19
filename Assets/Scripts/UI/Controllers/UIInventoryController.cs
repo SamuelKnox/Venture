@@ -137,14 +137,17 @@ public class UIInventoryController : MonoBehaviour
         if (Input.GetButtonDown(InputNames.EquipEquipment))
         {
             ChangeMode(InventoryMode.Equipment, itemButton);
+            dirty = true;
         }
         if (Input.GetButtonDown(InputNames.EditRunes))
         {
             ChangeMode(InventoryMode.Runes, itemButton);
+            dirty = true;
         }
         if (Input.GetButtonDown(InputNames.ClearRunes))
         {
             equipment.DetachAllRunes();
+            dirty = true;
         }
     }
 
@@ -185,10 +188,12 @@ public class UIInventoryController : MonoBehaviour
             }
             player.Equip(equipment);
             ChangeMode(InventoryMode.Character, itemButton);
+            dirty = true;
         }
         if (Input.GetButtonDown(InputNames.Inventory))
         {
             ChangeMode(InventoryMode.Character, itemButton);
+            dirty = true;
         }
     }
 
@@ -210,20 +215,29 @@ public class UIInventoryController : MonoBehaviour
         {
             dirty = false;
             runesView.UpdateDescription(rune);
-            runeDescriptionView.SetDescription(rune);
+            Equipment runedEquipment = null;
+            if (rune)
+            {
+                var equipment = player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
+                runedEquipment = equipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
+            }
+            runeDescriptionView.SetDescription(rune, runedEquipment);
         }
         if (Input.GetButtonDown(InputNames.Inventory))
         {
             var equipmentItemButton = characterView.GetItemButton(runeableEquipmentItemButton.GetItemType());
             ChangeMode(InventoryMode.Character, equipmentItemButton);
+            dirty = true;
         }
         if (Input.GetButtonDown(InputNames.TabRight))
         {
             runesView.MoveTab(1);
+            dirty = true;
         }
         if (Input.GetButtonDown(InputNames.TabLeft))
         {
             runesView.MoveTab(-1);
+            dirty = true;
         }
         if (Input.GetButtonDown(InputNames.EquipRune))
         {
@@ -243,6 +257,7 @@ public class UIInventoryController : MonoBehaviour
                 }
                 equipment.SetRune(rune);
             }
+            dirty = true;
         }
     }
 

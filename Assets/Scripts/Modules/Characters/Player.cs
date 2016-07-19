@@ -1,6 +1,4 @@
-﻿using CreativeSpore.SmartColliders;
-using CustomUnityLibrary;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -97,7 +95,7 @@ public class Player : Character
         SaveData.SavePrestige(prestige);
         SaveData.SaveGold(gold);
         SaveData.SaveLevel(level);
-        SaveData.SaveItems(inventory.GetItems());
+        SaveItems();
         SaveData.SaveQuests(GetComponentsInChildren<Quest>());
     }
 
@@ -302,26 +300,15 @@ public class Player : Character
                 Debug.LogWarning(name + " is attempting to collect " + item.name + ", but it already exists in " + inventory.name + ".", item.gameObject);
             }
         }
-        var resource = collectable.GetComponent<ResourcePool>();
-        if (resource)
+        var consumable = collectable.GetComponent<Consumable>();
+        if (consumable)
         {
-            switch (resource.GetResourceType())
-            {
-                case ResourceType.Gold:
-                    AddGold(resource.GetAmount());
-                    break;
-                case ResourceType.Prestige:
-                    AddPrestige(resource.GetAmount());
-                    break;
-                default:
-                    Debug.LogError("An invalid resource type was provided!", gameObject);
-                    return;
-            }
+            consumable.Consume();
         }
         playerView.Collect(collectable);
-        if (resource)
+        if (consumable)
         {
-            Destroy(resource.gameObject);
+            Destroy(consumable.gameObject);
         }
     }
 
@@ -620,6 +607,20 @@ public class Player : Character
             equipment.ActivateRunes();
         }
         SetStartingActiveWeapon();
+    }
+
+    /// <summary>
+    /// Saves the player's items
+    /// </summary>
+    private void SaveItems()
+    {
+        var items = inventory.GetItems();
+        var equipment = items.Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
+        foreach (var equipmentPiece in equipment)
+        {
+            equipmentPiece.DeactivateRunes();
+        }
+        SaveData.SaveItems(inventory.GetItems());
     }
 
     /// <summary>

@@ -45,15 +45,6 @@ public enum RuneType
 }
 
 /// <summary>
-/// Type of player resource
-/// </summary>
-public enum ResourceType
-{
-    Gold,
-    Prestige
-}
-
-/// <summary>
 /// Modes for inventory UI
 /// </summary>
 public enum InventoryMode

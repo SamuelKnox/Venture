@@ -1,25 +1,29 @@
 ﻿using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryEquipmentDescriptionView : MonoBehaviour
 {
-    [Tooltip("Text used to display the detailed equipment description")]
+    [Tooltip("Name of equipment")]
     [SerializeField]
-    private TextMeshProUGUI description;
+    private TextMeshProUGUI equipmentName;
 
-    [Tooltip("Description when there is no item to describe")]
+    [Tooltip("Equipment Icon")]
     [SerializeField]
-    private string noEquipmentDescription;
+    private Image icon;
 
-    void Awake()
-    {
-        if (string.IsNullOrEmpty(noEquipmentDescription))
-        {
-            Debug.LogWarning("There is no equipment description to choose from if no equipment is selected.", gameObject);
-            return;
-        }
-    }
+    [Tooltip("Description of equipment")]
+    [SerializeField]
+    private TextMeshProUGUI generalDescription;
+
+    [Tooltip("Description of equipment's runes")]
+    [SerializeField]
+    private TextMeshProUGUI specificDescription;
+
+    [Tooltip("Rune sockets used to display equipment runes")]
+    [SerializeField]
+    private RuneSocket[] runeSockets;
 
     /// <summary>
     /// Updates the long description for the piece of equipment
@@ -27,7 +31,25 @@ public class InventoryEquipmentDescriptionView : MonoBehaviour
     /// <param name="equipment">Equipment to get description for</param>
     public void UpdateDescription(Equipment equipment)
     {
-        var equipmentDescription = equipment ? equipment.GetDescription() : noEquipmentDescription;
-        description.text = equipmentDescription;
+        equipmentName.text = equipment.name;
+        icon.sprite = equipment.GetIcon();
+        generalDescription.text = equipment.GetDescription();
+        specificDescription.text = "";
+        foreach (var rune in equipment.GetRunes())
+        {
+            specificDescription.text += rune.GetLevelDescription(rune.GetLevel()) + StringUtility.NewLine();
+        }
+        foreach (var runeSocket in runeSockets)
+        {
+            bool containsSocket = Array.IndexOf(equipment.GetRuneSocketTypes(), runeSocket.GetRuneType()) >= 0;
+            if (containsSocket)
+            {
+                var runeIcon = runeSocket.GetIcon();
+                var rune = equipment.GetRune(runeSocket.GetRuneType());
+                runeIcon.sprite = rune ? rune.GetIcon() : null;
+                runeIcon.enabled = runeIcon.sprite;
+            }
+            runeSocket.gameObject.SetActive(containsSocket);
+        }
     }
 }

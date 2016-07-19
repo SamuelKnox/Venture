@@ -9,6 +9,16 @@ using UnityEngine;
 [Serializable]
 public class Spawner : MonoBehaviour
 {
+    /// <summary>
+    /// Delegate for spawner spawning
+    /// </summary>
+    public delegate void Spawning(GameObject[] spawns);
+
+    /// <summary>
+    /// Event called when spawnable spawns
+    /// </summary>
+    public static event Spawning OnSpawn;
+
     private const float DefaultWeight = 1.0f;
     private const float MinSpawnChance = 0.0f;
     private const float MaxSpawnChance = 1.0f;
@@ -25,7 +35,7 @@ public class Spawner : MonoBehaviour
 
     [Tooltip("Spawn on start, opposed to waiting for spawn to be called manually")]
     [SerializeField]
-    private bool spawnOnStart = true;
+    private bool spawnOnStart = false;
 
     [Tooltip("Minimum number of GameObjects this spawner will spawn")]
     [SerializeField]
@@ -35,7 +45,7 @@ public class Spawner : MonoBehaviour
     [Tooltip("Maximum number of GameObjects this spawner will spawn")]
     [SerializeField]
     [Range(1, 25)]
-    private int maxSpawns = 25;
+    private int maxSpawns = 1;
 
     [Tooltip("Particle effect used when spawning")]
     [SerializeField]
@@ -224,6 +234,10 @@ public class Spawner : MonoBehaviour
                     break;
                 }
             }
+        }
+        if(OnSpawn != null)
+        {
+            OnSpawn(spawnedGameObjects.ToArray());
         }
         return spawnedGameObjects.ToArray();
     }

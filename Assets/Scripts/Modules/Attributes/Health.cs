@@ -78,6 +78,11 @@ public class Health : MonoBehaviour
         return currentHitPoints;
     }
 
+    public void SetCurrentHitPoints(float hitPoints)
+    {
+        currentHitPoints = Mathf.Clamp(hitPoints, 0, GetMaxHitPoints());
+    }
+
     /// <summary>
     /// Gets the max hit points
     /// </summary>

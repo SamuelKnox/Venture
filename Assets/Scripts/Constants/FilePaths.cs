@@ -6,16 +6,6 @@
     public const string SaveFile = "save.dat";
 
     /// <summary>
-    /// Affix for creating tagged save paths
-    /// </summary>
-    public const string SaveTagAffix = "?tag=";
-
-    /// <summary>
-    /// Tag for player save
-    /// </summary>
-    public const string PlayerTag = "Player";
-
-    /// <summary>
     /// File path to load quests
     /// </summary>
     public const string Quests = "Quests/";
@@ -28,20 +18,15 @@
     /// <summary>
     /// File path to load equipment
     /// </summary>
-    public const string Equipment = "Equipment";
+    public const string Equipment = "Equipment/";
 
     /// <summary>
-    /// File path to load melee weapons
+    /// File path to load consumables
     /// </summary>
-    public const string MeleeWeapons = "Weapons/Melee Weapons/";
+    public const string Consumable = "Consumables/";
 
     /// <summary>
-    /// File path to load ranged weapons
+    /// File path to load health potion
     /// </summary>
-    public const string RangedWeapons = "Weapons/Ranged Weapons/";
-
-    /// <summary>
-    /// File path to load armor
-    /// </summary>
-    public const string Armor = "Armor/";
+    public const string HealthPotion = Consumable + "Health Potion";
 }

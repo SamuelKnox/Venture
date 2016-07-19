@@ -6,8 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class UILevelUpController : MonoBehaviour
 {
-    private const string SaveFilePath = FilePaths.SaveFile + FilePaths.SaveTagAffix + FilePaths.PlayerTag;
-
     [Tooltip("View used to display the runes")]
     [SerializeField]
     private LevelUpRunesView runesView;
