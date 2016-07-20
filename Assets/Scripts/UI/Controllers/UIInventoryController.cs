@@ -219,7 +219,8 @@ public class UIInventoryController : MonoBehaviour
             if (rune)
             {
                 var equipment = player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
-                runedEquipment = equipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
+                var socketedEquipment = equipment.Where(e => e.GetRuneSocketTypes().Contains(rune.GetRuneType()));
+                runedEquipment = socketedEquipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
             }
             runeDescriptionView.SetDescription(rune, runedEquipment);
         }

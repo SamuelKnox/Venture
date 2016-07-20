@@ -40,6 +40,7 @@ public class InventoryRunesView : MonoBehaviour
 
     private Inventory inventory;
     private int tabIndex = 0;
+    private Equipment equipmentViewed;
     private bool dirty = false;
 
     void Awake()
@@ -77,6 +78,7 @@ public class InventoryRunesView : MonoBehaviour
     /// <returns>Whether or not any of that equipment type was found to create buttons for</returns>
     public void CreateButtons(Equipment equipment)
     {
+        equipmentViewed = equipment;
         foreach (var runeTab in categoryContainer.GetComponentsInChildren<RuneTab>())
         {
             Destroy(runeTab.gameObject);
@@ -133,7 +135,8 @@ public class InventoryRunesView : MonoBehaviour
         {
             buttons[i].interactable = i == tabIndex;
         }
-        var runes = inventory.GetItems(ItemType.Rune).Select(r => r.GetComponent<Rune>()).Where(r => r.GetRuneType() == runeTabs[tabIndex].GetRuneType()).ToArray();
+        var runeType = runeTabInstances[tabIndex].GetRuneType();
+        var runes = inventory.GetItems(ItemType.Rune).Select(r => r.GetComponent<Rune>()).Where(r => r.GetRuneType() == runeType).ToArray();
         if (runes.Length > 0)
         {
             runesContainer.gameObject.SetActive(true);
@@ -144,7 +147,7 @@ public class InventoryRunesView : MonoBehaviour
                 button.transform.SetParent(runesContainer);
                 button.SetItemType(ItemType.Rune);
                 button.SetItem(runes[i]);
-                if (i == 0 || runes[i].IsEquipped())
+                if (i == 0 || equipmentViewed.GetRune(runeType) == runes[i])
                 {
                     EventSystem.current.SetSelectedGameObject(button.gameObject);
                 }

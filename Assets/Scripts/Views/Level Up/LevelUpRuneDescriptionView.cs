@@ -12,9 +12,25 @@ public class LevelUpRuneDescriptionView : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI currentLevelDescription;
 
+    [Tooltip("Icon showing the rune's current level")]
+    [SerializeField]
+    private Image currentLevelIcon;
+
     [Tooltip("Next level description")]
     [SerializeField]
     private TextMeshProUGUI nextLevelDescription;
+
+    [Tooltip("Icon showing the rune's next level")]
+    [SerializeField]
+    private Image nextLevelIcon;
+
+    [Tooltip("Next level prestige cost")]
+    [SerializeField]
+    private TextMeshProUGUI prestigeCost;
+
+    [Tooltip("Selector for icon display for runes by level")]
+    [SerializeField]
+    public RuneLevelIconSelector runeLevelIconSelector;
 
     /// <summary>
     /// Sets the full description for the specified rune
@@ -24,6 +40,9 @@ public class LevelUpRuneDescriptionView : MonoBehaviour
     {
         icon.sprite = rune.GetIcon();
         currentLevelDescription.text = rune.GetLevelDescription(rune.GetLevel());
+        currentLevelIcon.sprite = runeLevelIconSelector.GetIcon(rune.GetLevel());
         nextLevelDescription.text = rune.GetLevelDescription(rune.GetLevel() + 1);
+        nextLevelIcon.sprite = runeLevelIconSelector.GetIcon(rune.GetLevel() + 1);
+        prestigeCost.text = rune.GetPrestigeCostToLevelUp().ToString();
     }
 }

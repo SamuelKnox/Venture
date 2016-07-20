@@ -69,6 +69,24 @@ public abstract class Rune : Item
     public abstract RuneType GetRuneType();
 
     /// <summary>
+    /// Gets the minimum level allowed for this rune
+    /// </summary>
+    /// <returns>Min level</returns>
+    public static int GetMinLevel()
+    {
+        return MinLevel;
+    }
+
+    /// <summary>
+    /// Gets the maximum level allowed for this rune
+    /// </summary>
+    /// <returns>Max level</returns>
+    public static int GetMaxLevel()
+    {
+        return Maxlevel;
+    }
+
+    /// <summary>
     /// Gets the base value for the rune
     /// </summary>
     /// <returns>Base value</returns>
@@ -124,26 +142,26 @@ public abstract class Rune : Item
     /// </summary>
     /// <param name="level">Level to set</param>
     /// <returns>Whether or not the rune's level was successfully set</returns>
-    public bool SetLevel(int level)
+    public void SetLevel(int level)
     {
         if (level < MinLevel || level > Maxlevel)
         {
-            return false;
+            Debug.LogError("Attempting to set " + name + " to an invalid level!", gameObject);
+            return;
         }
         this.level = level;
-        return true;
     }
 
     [Serializable]
     private class RuneLevelAttributes
     {
-        private const string RuneDescriptionNamePrefix = "Level ";
-
 #pragma warning disable 0414
         [HideInInspector]
         [SerializeField]
         private string name;
 #pragma warning restore 0414
+
+        private const string RuneDescriptionNamePrefix = "Level ";
 
         [Tooltip("Description for level")]
         [SerializeField]
@@ -166,16 +184,16 @@ public abstract class Rune : Item
         private int prestigeCost;
 
         /// <summary>
-        /// Sets the name of the rune description
+        /// Sets the default values for the rune, such as name, prestige cost, and effect values
         /// </summary>
-        /// <param name="name">Name to set</param>
+        /// <param name="level">Rune level</param>
         public void Initialize(int level)
         {
             name = RuneDescriptionNamePrefix + level;
             switch (level)
             {
                 case 1:
-                    prestigeCost = 0;
+                    prestigeCost = 1;
                     baseValue = 1.0f;
                     specialValue = 0.0f;
                     break;
@@ -185,12 +203,12 @@ public abstract class Rune : Item
                     specialValue = 0.0f;
                     break;
                 case 3:
-                    prestigeCost = 1;
+                    prestigeCost = 2;
                     baseValue = 3.0f;
                     specialValue = 0.0f;
                     break;
                 case 4:
-                    prestigeCost = 2;
+                    prestigeCost = 1;
                     baseValue = 3.0f;
                     specialValue = 1.0f;
                     break;
@@ -200,12 +218,12 @@ public abstract class Rune : Item
                     specialValue = 1.0f;
                     break;
                 case 6:
-                    prestigeCost = 1;
+                    prestigeCost = 2;
                     baseValue = 5.0f;
                     specialValue = 1.0f;
                     break;
                 case 7:
-                    prestigeCost = 2;
+                    prestigeCost = 1;
                     baseValue = 5.0f;
                     specialValue = 2.0f;
                     break;
@@ -215,12 +233,12 @@ public abstract class Rune : Item
                     specialValue = 2.0f;
                     break;
                 case 9:
-                    prestigeCost = 1;
+                    prestigeCost = 3;
                     baseValue = 7.0f;
                     specialValue = 2.0f;
                     break;
                 case 10:
-                    prestigeCost = 3;
+                    prestigeCost = 0;
                     baseValue = 10.0f;
                     specialValue = 4.0f;
                     break;
@@ -258,7 +276,7 @@ public abstract class Rune : Item
         }
 
         /// <summary>
-        /// Gets the cost in prestige to achieve this level from the previous level
+        /// Gets the cost in prestige to level up this rune to the next level
         /// </summary>
         /// <returns></returns>
         public int GetPrestigeCostToLevel()

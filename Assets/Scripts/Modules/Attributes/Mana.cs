@@ -43,7 +43,7 @@ public class Mana : MonoBehaviour
     /// <param name="mana">Mana points to set</param>
     public void SetCurrentManaPoints(float mana)
     {
-        currentManaPoints = Mathf.Max(0, mana);
+        currentManaPoints = Mathf.Clamp(mana, 0, GetMaxManaPoints());
     }
 
     /// <summary>

@@ -14,6 +14,10 @@ public class UILevelUpController : MonoBehaviour
     [SerializeField]
     private LevelUpRuneDescriptionView runeDescriptionView;
 
+    [Tooltip("View used to display how much prestige is available")]
+    [SerializeField]
+    private LevelUpPrestigeView prestigeView;
+
     [Tooltip("Container to store all of the runes and equipment")]
     [SerializeField]
     private Transform itemContainer;
@@ -29,6 +33,7 @@ public class UILevelUpController : MonoBehaviour
         LoadData();
         runesView.CreateTabs(GetRuneTypes());
         runesView.MoveTab(0, runes);
+        prestigeView.UpdatePrestige(prestige);
         dirty = true;
     }
 
@@ -65,6 +70,7 @@ public class UILevelUpController : MonoBehaviour
         if (Input.GetButtonDown(InputNames.LevelUpRune))
         {
             LevelUpRune(rune);
+            prestigeView.UpdatePrestige(prestige);
         }
         if (Input.GetButtonDown(InputNames.TabRight) && GetRuneTypes().Length > 1)
         {
@@ -92,11 +98,13 @@ public class UILevelUpController : MonoBehaviour
         {
             return;
         }
-        bool success = rune.SetLevel(rune.GetLevel() + 1);
-        if (success)
+        int levelUp = rune.GetLevel() + 1;
+        if (levelUp < Rune.GetMinLevel() || levelUp > Rune.GetMaxLevel())
         {
-            prestige -= rune.GetPrestigeCostToLevelUp();
+            return;
         }
+        prestige -= rune.GetPrestigeCostToLevelUp();
+        rune.SetLevel(levelUp);
         dirty = true;
     }
 
@@ -113,7 +121,7 @@ public class UILevelUpController : MonoBehaviour
             item.transform.SetParent(itemContainer);
         }
         itemContainer.gameObject.SetActive(false);
-        runes = items.Where(i => i.GetComponent<Rune>()).Select(r => r.GetComponent<Rune>()).ToArray(); 
+        runes = items.Where(i => i.GetComponent<Rune>()).Select(r => r.GetComponent<Rune>()).ToArray();
         if (runes.Count() == 0)
         {
             FinishLevelingUpRunes();

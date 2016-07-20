@@ -8,6 +8,10 @@ public class Wand : Weapon
     [Range(0.0f, 10.0f)]
     private float manaCost = 1.0f;
 
+    [Tooltip("Allow for casting when mana is greater than 0, but is not enough to cover the cost")]
+    [SerializeField]
+    private bool allowManaOverflow = true;
+
     private RangedWeapon rangedWeapon;
     private Mana mana;
 
@@ -31,7 +35,9 @@ public class Wand : Weapon
     /// </summary>
     public void CastSpell()
     {
-        if (mana.GetCurrentManaPoints() < manaCost || !rangedWeapon.IsReady())
+        bool canAffordManaCost = mana.GetCurrentManaPoints() >= manaCost || allowManaOverflow && mana.GetCurrentManaPoints() > 0;
+        bool wandIsReady = rangedWeapon.IsReady();
+        if(!canAffordManaCost || !wandIsReady)
         {
             return;
         }

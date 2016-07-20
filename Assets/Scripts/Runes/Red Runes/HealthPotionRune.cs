@@ -21,7 +21,7 @@ public class HealthPotionRune : RedRune
     }
 
     /// <summary>
-    /// Adds a health potino spawner to the enemy
+    /// Adds a health potion spawner to the enemy
     /// </summary>
     /// <param name="enemy">Enemy to add the spawner to</param>
     private void OnEnemyDeath(Enemy enemy)

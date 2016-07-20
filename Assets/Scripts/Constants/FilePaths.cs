@@ -29,4 +29,9 @@
     /// File path to load health potion
     /// </summary>
     public const string HealthPotion = Consumable + "Health Potion";
+
+    /// <summary>
+    /// File path to load mana potion
+    /// </summary>
+    public const string ManaPotion = Consumable + "Mana Potion";
 }
