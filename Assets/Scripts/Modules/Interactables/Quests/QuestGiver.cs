@@ -23,8 +23,9 @@ public class QuestGiver : Interactable
 
     private Player player;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         player = FindObjectOfType<Player>();
         if (!player)
         {
@@ -41,7 +42,7 @@ public class QuestGiver : Interactable
     /// <summary>
     /// Fetches the quest
     /// </summary>
-    public override void Interact()
+    public override void OnInteractionEnter()
     {
         ActivateQuest();
     }
@@ -49,7 +50,7 @@ public class QuestGiver : Interactable
     /// <summary>
     /// Ends the quest fetch
     /// </summary>
-    public override void EndInteraction()
+    public override void OnInteractionExit()
     {
         questText.enabled = false;
     }

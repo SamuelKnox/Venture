@@ -46,7 +46,7 @@ public class Health : MonoBehaviour
 
     void Awake()
     {
-        totalInvincibilityCooldown = invincibilityCooldown;
+        SetInvincibilityTime(invincibilityCooldown);
     }
 
     void Update()
@@ -102,6 +102,25 @@ public class Health : MonoBehaviour
     }
 
     /// <summary>
+    /// Gets the duration of invincibility after taking damage
+    /// </summary>
+    /// <returns>Seconds</returns>
+    public float GetInvincibilityTime()
+    {
+        return invincibilityCooldown;
+    }
+
+    /// <summary>
+    /// Sets the duration of invincibility after taking damage
+    /// </summary>
+    /// <param name="time">Seconds</param>
+    public void SetInvincibilityTime(float time)
+    {
+        invincibilityCooldown = time;
+        totalInvincibilityCooldown = invincibilityCooldown;
+    }
+
+    /// <summary>
     /// Deals damage to this Health
     /// </summary>
     /// <param name="damage">Damage to deal</param>
@@ -121,6 +140,7 @@ public class Health : MonoBehaviour
         }
         currentHitPoints -= damage.GetBaseDamage();
         damageOverTime += damage.GetDamageOverTime();
+        damageOverTimeRate += damage.GetDamageOverTimeRateIncrease();
         invincibilityCooldown = totalInvincibilityCooldown;
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
         var knockBack = knockBackDirection * damage.GetKnockBack();
@@ -163,6 +183,14 @@ public class Health : MonoBehaviour
             float damage = Mathf.Min(Time.deltaTime * damageOverTimeRate, damageOverTime);
             damageOverTime -= damage;
             currentHitPoints -= damage;
+            if (healthView)
+            {
+                healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+            }
+            if(IsDead() && OnDamageDealt != null)
+            {
+                OnDamageDealt(null);
+            }
         }
     }
 }

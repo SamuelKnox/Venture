@@ -97,6 +97,14 @@ public class PlayerView : MonoBehaviour
     /// </summary>
     public void Collect(Collectable collectable)
     {
+        if (this.collectable && collectable.IsHighPriority())
+        {
+            this.collectable.gameObject.SetActive(false);
+            Destroy(this.collectable);
+            collectable.gameObject.SetActive(true);
+            this.collectable = collectable;
+            return;
+        }
         SoundManager.Instance.Play(collectable.GetPickUpSoundEffect());
         if (collectable.IsSpecialItem() && !this.collectable)
         {
@@ -122,6 +130,10 @@ public class PlayerView : MonoBehaviour
     /// </summary>
     private void FinishCollecting()
     {
+        if (!collectable)
+        {
+            return;
+        }
         collectable.gameObject.SetActive(false);
         var equippedWeapon = player.GetActiveWeapon();
         equippedWeapon.gameObject.SetActive(true);

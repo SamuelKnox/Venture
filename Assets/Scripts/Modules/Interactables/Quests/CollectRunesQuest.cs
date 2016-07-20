@@ -2,8 +2,6 @@
 
 public class CollectRunesQuest : Quest
 {
-    private Player player;
-
     [Tooltip("Number of runes needed to complete this quest")]
     [SerializeField]
     [Range(1, 10)]

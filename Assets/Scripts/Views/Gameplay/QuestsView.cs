@@ -22,7 +22,8 @@ public class QuestsView : MonoBehaviour
 
     void Start()
     {
-        UpdateQuestDescription(null);
+        var startingQuest = activeQuests.Length > 0 ? activeQuests[0] : null;
+        UpdateQuestDescription(startingQuest);
     }
 
     /// <summary>

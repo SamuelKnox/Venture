@@ -25,9 +25,9 @@ public class PlayerController : MonoBehaviour
     private PlatformCharacterController platformCharacterController;
     private PlayerView playerView;
     private Interactable nearbyInteractable;
-    private bool interacting = false;
     private Health health;
     private QuestsView questsView;
+    private bool controllable = true;
 
     void Awake()
     {
@@ -60,17 +60,17 @@ public class PlayerController : MonoBehaviour
             GameOver();
             return;
         }
-        if (Input.GetButtonDown(InputNames.Interact) && nearbyInteractable && !nearbyInteractable.IsActImmediately() && !interacting)
+        if (Input.GetButtonDown(InputNames.Interact) && nearbyInteractable)
         {
-            interacting = true;
             nearbyInteractable.Interact();
         }
-        if (interacting)
+        if (Input.GetButtonUp(InputNames.Interact) && nearbyInteractable && nearbyInteractable.IsPlayerControllable())
         {
-            if (Input.GetButtonUp(InputNames.Interact))
-            {
-                interacting = false;
-            }
+            SetPlayerControllable(true);
+            return;
+        }
+        if (!controllable)
+        {
             return;
         }
         var directionalInput = GetDirectionalInput();
@@ -93,12 +93,6 @@ public class PlayerController : MonoBehaviour
         {
             questsView.SwitchQuest(1);
         }
-        if (Input.GetButtonDown(InputNames.Inventory) && !SceneManager.GetSceneByName(SceneNames.Inventory).isLoaded)
-        {
-            Time.timeScale = 0.0f;
-            SceneManager.LoadScene(SceneNames.Inventory, LoadSceneMode.Additive);
-            enabled = false;
-        }
     }
 
     void OnTriggerEnter2D(Collider2D collider2D)
@@ -107,10 +101,6 @@ public class PlayerController : MonoBehaviour
         if (interactable && !nearbyInteractable)
         {
             nearbyInteractable = interactable;
-            if (nearbyInteractable.IsActImmediately())
-            {
-                nearbyInteractable.Interact();
-            }
         }
     }
 
@@ -120,7 +110,6 @@ public class PlayerController : MonoBehaviour
         if (interactable && interactable == nearbyInteractable)
         {
             nearbyInteractable = null;
-            interactable.EndInteraction();
         }
     }
 
@@ -130,6 +119,19 @@ public class PlayerController : MonoBehaviour
         if (collectable)
         {
             Collect(collectable);
+        }
+    }
+
+    /// <summary>
+    /// Sets whether or not the player is controllable
+    /// </summary>
+    /// <param name="controllable">Player can be controlled</param>
+    public void SetPlayerControllable(bool controllable)
+    {
+        this.controllable = controllable;
+        if (!this.controllable)
+        {
+            platformCharacterController.PlatformCharacterPhysics.Velocity = Vector2.zero;
         }
     }
 

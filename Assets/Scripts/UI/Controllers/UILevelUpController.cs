@@ -85,6 +85,7 @@ public class UILevelUpController : MonoBehaviour
             dirty = false;
             runesView.UpdateDescription(rune);
             runeDescriptionView.UpdateDescription(rune);
+            prestigeView.UpdatePrestige(prestige);
         }
     }
 

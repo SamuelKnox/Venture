@@ -2,18 +2,14 @@
 
 public class PoisonRune : GreenRune
 {
-    [Tooltip("Amount of poison to apply")]
-    [SerializeField]
-    [Range(0.0f, 100.0f)]
-    private float poison = 1.0f;
-
     /// <summary>
     /// Applies poison to the equipment
     /// </summary>
     /// <param name="equipment">Equipment to apply poison to</param>
     public override void Activate(Equipment equipment)
     {
-        ChangePoison(equipment, poison);
+        ChangePoisonAmount(equipment, GetBaseValue());
+        ChangePoisonSpeed(equipment, GetSpecialValue());
     }
 
     /// <summary>
@@ -22,7 +18,8 @@ public class PoisonRune : GreenRune
     /// <param name="equipment">Equipment to remove poison from</param>
     public override void Deactivate(Equipment equipment)
     {
-        ChangePoison(equipment, -poison);
+        ChangePoisonAmount(equipment, -GetBaseValue());
+        ChangePoisonSpeed(equipment, -GetSpecialValue());
     }
 
     /// <summary>
@@ -30,8 +27,18 @@ public class PoisonRune : GreenRune
     /// </summary>
     /// <param name="equipment">Equipment whose poison will be changed</param>
     /// <param name="change">Poison to apply</param>
-    public void ChangePoison(Equipment equipment, float change)
+    public void ChangePoisonAmount(Equipment equipment, float change)
     {
         equipment.SetDamageOverTime(equipment.GetDamageOverTime() + change);
+    }
+
+    /// <summary>
+    /// Changes the rate at which poison is applied
+    /// </summary>
+    /// <param name="equipment">Equipment to be changed</param>
+    /// <param name="change">Poison rate change</param>
+    public void ChangePoisonSpeed(Equipment equipment, float change)
+    {
+        equipment.SetDamageOverTimeRateIncrease(equipment.GetDamageOverTimeRateIncrease() + change);
     }
 }

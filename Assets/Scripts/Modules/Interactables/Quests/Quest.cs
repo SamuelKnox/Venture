@@ -4,7 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(Spawner))]
 public abstract class Quest : MonoBehaviour
 {
-    private static readonly Vector2 rewardOffset = new Vector2(0.0f, 5.0f);
+    private const int RewardCollectablePriority = 5;
+    private static readonly Vector2 RewardOffset = new Vector2(0.0f, 5.0f);
     private static readonly Vector2 RewardForce = new Vector2(250.0f, 500.0f);
 
     /// <summary>
@@ -35,16 +36,17 @@ public abstract class Quest : MonoBehaviour
     [SerializeField]
     private bool completedQuest = false;
 
+    protected Player player;
+
     private Spawner[] spawners;
-    private PlayerController playerController;
 
     protected virtual void Awake()
     {
         SetUpSpawners();
-        playerController = FindObjectOfType<PlayerController>();
-        if (!playerController)
+        player = FindObjectOfType<Player>();
+        if (!player)
         {
-            Debug.LogError("Could not find player controller!", gameObject);
+            Debug.LogError("Could not find player!", gameObject);
             return;
         }
     }
@@ -144,7 +146,7 @@ public abstract class Quest : MonoBehaviour
     /// </summary>
     private void SpawnRewards()
     {
-        transform.position += (Vector3)rewardOffset;
+        transform.position += (Vector3)RewardOffset;
         foreach (var spawner in spawners)
         {
             var rewards = spawner.Spawn();
@@ -159,7 +161,8 @@ public abstract class Quest : MonoBehaviour
                 else
                 {
                     var collectable = reward.GetOrAddComponent<Collectable>();
-                    playerController.Collect(collectable);
+                    collectable.SetHighPriority(true);
+                    player.Collect(collectable);
                 }
             }
         }

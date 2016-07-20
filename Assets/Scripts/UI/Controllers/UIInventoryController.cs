@@ -125,13 +125,13 @@ public class UIInventoryController : MonoBehaviour
         if (Input.GetButtonDown(InputNames.Inventory))
         {
             Time.timeScale = 1.0f;
-            var playerController = player.GetComponent<PlayerController>();
-            if (!playerController)
+            var blacksmith = FindObjectOfType<Blacksmith>();
+            if (!blacksmith)
             {
-                Debug.LogError("Could not find PlayerController on Player!", gameObject);
+                Debug.LogError("Could not find Blacksmith!", gameObject);
                 return;
             }
-            playerController.enabled = true;
+            blacksmith.EndInteraction();
             SceneManager.UnloadScene(SceneNames.Inventory);
         }
         if (Input.GetButtonDown(InputNames.EquipEquipment))
@@ -211,18 +211,18 @@ public class UIInventoryController : MonoBehaviour
             return;
         }
         var rune = item.GetComponent<Rune>();
+        Equipment equipmentWithRuneAttached = null;
+        if (rune)
+        {
+            var equipment = player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
+            var socketedEquipment = equipment.Where(e => e.GetRuneSocketTypes().Contains(rune.GetRuneType()));
+            equipmentWithRuneAttached = socketedEquipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
+        }
         if (dirty)
         {
             dirty = false;
             runesView.UpdateDescription(rune);
-            Equipment runedEquipment = null;
-            if (rune)
-            {
-                var equipment = player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
-                var socketedEquipment = equipment.Where(e => e.GetRuneSocketTypes().Contains(rune.GetRuneType()));
-                runedEquipment = socketedEquipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
-            }
-            runeDescriptionView.SetDescription(rune, runedEquipment);
+            runeDescriptionView.SetDescription(rune, equipmentWithRuneAttached);
         }
         if (Input.GetButtonDown(InputNames.Inventory))
         {
@@ -258,6 +258,11 @@ public class UIInventoryController : MonoBehaviour
                 }
                 equipment.SetRune(rune);
             }
+            dirty = true;
+        }
+        if (Input.GetButtonDown(InputNames.ClearRunes) && equipmentWithRuneAttached)
+        {
+            equipmentWithRuneAttached.DetachRune(rune);
             dirty = true;
         }
     }

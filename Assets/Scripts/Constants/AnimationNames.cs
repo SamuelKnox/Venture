@@ -87,6 +87,9 @@
             /// </summary>
             public const string CollectItem = "Collect Item";
 
+            /// <summary>
+            /// Animation name for collecting a special item
+            /// </summary>
             public const string CollectSpecialItem = "Collect Special Item";
         }
     }

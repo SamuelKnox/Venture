@@ -3,18 +3,14 @@ using UnityEngine;
 
 public class SpeedRune : YellowRune
 {
-    [Tooltip("Scalar speed by which the player increases horizontally per level")]
-    [SerializeField]
-    [Range(0.0f, 100.0f)]
-    float speedIncrease = 10.0f;
-
     /// <summary>
-    /// Increases the player's speed by the modifier
+    /// Increases the player's speed by the base modifier, and jump height by the special modifier
     /// </summary>
     /// <param name="equipment">Equipment which rune is attached to</param>
     public override void Activate(Equipment equipment)
     {
-        AdjustPlayerHorizontalSpeedModifier(speedIncrease * level);
+        AdjustPlayerHorizontalSpeedModifier(GetBaseValue());
+        AdjustPlayerJumpHeight(GetSpecialValue());
     }
 
     /// <summary>
@@ -23,7 +19,8 @@ public class SpeedRune : YellowRune
     /// <param name="equipment">Equipment which rune is attached to</param>
     public override void Deactivate(Equipment equipment)
     {
-        AdjustPlayerHorizontalSpeedModifier(-speedIncrease * level);
+        AdjustPlayerHorizontalSpeedModifier(-GetBaseValue());
+        AdjustPlayerJumpHeight(-GetSpecialValue());
     }
 
     /// <summary>
@@ -32,13 +29,26 @@ public class SpeedRune : YellowRune
     /// <param name="change">Change is speed modifier</param>
     private void AdjustPlayerHorizontalSpeedModifier(float change)
     {
-        var platformCharacterController = transform.root.GetComponent<PlatformCharacterController>();
+        var platformCharacterController = GetPlayer().GetComponent<PlatformCharacterController>();
         if (!platformCharacterController)
         {
-            Debug.LogError("A Platform Character Controller was not found in " + name + "'s root!", gameObject);
+            Debug.LogError("A Platform Character Controller was not found!", gameObject);
         }
-        platformCharacterController.WalkingAcc += change;
-        platformCharacterController.AirborneAcc += change;
+        platformCharacterController.WalkingAcc *= 1.0f + change;
+        platformCharacterController.AirborneAcc *= 1.0f + change;
+        Debug.LogWarning("this works?");
+        //platformCharacterController.WalkingAcc += change;
+        //platformCharacterController.AirborneAcc += change;
         platformCharacterController.MaxWalkingSpeed = Mathf.Infinity;
+    }
+
+    private void AdjustPlayerJumpHeight(float change)
+    {
+        var platformCharacterController = GetPlayer().GetComponent<PlatformCharacterController>();
+        if (!platformCharacterController)
+        {
+            Debug.LogError("A Platform Character Controller was not found!", gameObject);
+        }
+        platformCharacterController.JumpingAcc *= 1.0f + change;
     }
 }

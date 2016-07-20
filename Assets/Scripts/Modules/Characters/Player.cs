@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomUnityLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -50,6 +51,10 @@ public class Player : Character
     [Tooltip("Player's completed quests")]
     [SerializeField]
     private List<Quest> completedQuests = new List<Quest>();
+
+    [Tooltip("Damage dealt by player when contact with an enemy is made")]
+    [SerializeField]
+    private Damage defensiveDamage;
 
     private Inventory inventory;
     private PlayerView playerView;
@@ -176,6 +181,15 @@ public class Player : Character
     }
 
     /// <summary>
+    /// Gets the damage dealt by this player when defending against contact with an enemy
+    /// </summary>
+    /// <returns>Player's damage dealer</returns>
+    public Damage GetDefensiveDamage()
+    {
+        return defensiveDamage;
+    }
+
+    /// <summary>
     /// Gets the amount of prestige the player has
     /// </summary>
     /// <returns>Prestige amount</returns>
@@ -260,13 +274,19 @@ public class Player : Character
     }
 
     /// <summary>
-    /// Adds an item to the player's inventory
+    /// Collect an item and add it to the inventory
     /// </summary>
-    /// <param name="item">Item to add</param>
+    /// <param name="collectable">Collectable to add</param>
     public void Collect(Collectable collectable)
     {
         if (!collectable)
         {
+            return;
+        }
+        var equipment = collectable.GetComponent<Equipment>();
+        if (equipment && inventory.Find(equipment.name.TrimEnd(GameObjectUtility.CloneSuffix)))
+        {
+            Destroy(equipment.gameObject);
             return;
         }
         Transform itemContainer = null;
