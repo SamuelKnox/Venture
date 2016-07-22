@@ -28,6 +28,7 @@
         private const float MaxWeight = 1.0f;
         private const string RemoveDoorButtonName = "X";
         private const float RemoveDoorButtonWidth = 25.0f;
+        private const string AddDoorButtonName = "Add Door";
 
         public override void OnInspectorGUI()
         {
@@ -84,7 +85,7 @@
         private void MaintainDoors(Room room)
         {
             var doorCountGUIContent = new GUIContent(DoorCountLabel, DoorCountTooltip);
-            int maxDoors = room.GetWidth() * 2 + room.GetHeight() * 2;
+            int maxDoors = room.GetMaxDoors();
             var doors = room.GetDoors();
             var count = EditorGUILayout.IntSlider(doorCountGUIContent, doors.Length, 1, maxDoors);
             Array.Resize(ref doors, count);
@@ -100,6 +101,11 @@
                     room.RemoveDoor(i);
                 }
                 EditorGUILayout.EndHorizontal();
+            }
+            if (doors.Length < maxDoors && GUILayout.Button(AddDoorButtonName))
+            {
+                Array.Resize(ref doors, doors.Length + 1);
+                room.SetDoors(doors);
             }
         }
 

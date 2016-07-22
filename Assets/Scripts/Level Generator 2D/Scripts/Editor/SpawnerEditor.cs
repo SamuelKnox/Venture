@@ -18,6 +18,8 @@ public class SpawnerEditor : Editor
     private const float MaxSpawnChance = 1.0f;
     private const int MinSpawnCount = 1;
     private const int MaxSpawnCount = 25;
+    private const string RemoveSpawnableButtonName = "X";
+    private const float RemoveSpawnableButtonWidth = 25.0f;
 
     public override void OnInspectorGUI()
     {
@@ -43,7 +45,7 @@ public class SpawnerEditor : Editor
             var existingGuiContent = new GUIContent(spawnables[i].name, GameObjectTooltip);
             weights[i] = EditorGUILayout.FloatField(existingGuiContent, weights[i]);
             var updatedSpawnable = (GameObject)EditorGUILayout.ObjectField(spawnables[i], typeof(GameObject), false);
-            if (!updatedSpawnable)
+            if (GUILayout.Button(RemoveSpawnableButtonName, GUILayout.Width(RemoveSpawnableButtonWidth)) || !updatedSpawnable)
             {
                 spawnables.RemoveAt(i);
                 weights.RemoveAt(i);

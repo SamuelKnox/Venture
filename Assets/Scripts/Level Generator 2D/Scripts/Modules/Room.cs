@@ -152,6 +152,15 @@ namespace LevelGenerator2D
         }
 
         /// <summary>
+        /// Gets the max number of doors that can fit in this room based on its size
+        /// </summary>
+        /// <returns>Max door count</returns>
+        public int GetMaxDoors()
+        {
+            return width * 2 + height * 2;
+        }
+
+        /// <summary>
         /// Gets whether or not the children are to be locked within the room
         /// </summary>
         /// <returns>If children are locked</returns>
@@ -373,7 +382,7 @@ namespace LevelGenerator2D
         /// </summary>
         public void InitializeDoors()
         {
-            int maxDoors = width * 2 + height * 2;
+            int maxDoors = GetMaxDoors();
             if (doors.Length == 0)
             {
                 doors = new Door[1];
