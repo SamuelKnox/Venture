@@ -16,14 +16,6 @@
             }
         }
 
-        void OnLevelWasLoaded()
-        {
-            foreach (var audioSource in gameObject.GetComponents<AudioSource>())
-            {
-                Destroy(audioSource);
-            }
-        }
-
         /// <summary>
         /// Plays the specified audio, and loops it if specified.
         /// If no Game Object is provided, it will play at the position of the AudioManager.
