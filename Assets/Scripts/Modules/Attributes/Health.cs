@@ -1,4 +1,5 @@
-﻿using CustomUnityLibrary;
+﻿using CreativeSpore.SmartColliders;
+using CustomUnityLibrary;
 using UnityEngine;
 
 public class Health : MonoBehaviour
@@ -144,10 +145,10 @@ public class Health : MonoBehaviour
         invincibilityCooldown = totalInvincibilityCooldown;
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
         var knockBack = knockBackDirection * damage.GetKnockBack();
-        var characterPlatformer = GetComponent<CharacterPlatformer>();
-        if (characterPlatformer)
+        var platformCharacterController = GetComponent<PlatformCharacterController>();
+        if (platformCharacterController)
         {
-            characterPlatformer.SetVelocity(knockBack);
+            platformCharacterController.PlatformCharacterPhysics.Velocity = knockBack;
             return;
         }
         var body = GetComponent<Rigidbody2D>();
@@ -187,7 +188,7 @@ public class Health : MonoBehaviour
             {
                 healthView.AdjustHealth(currentHitPoints / maxHitPoints);
             }
-            if(IsDead() && OnDamageDealt != null)
+            if (IsDead() && OnDamageDealt != null)
             {
                 OnDamageDealt(null);
             }

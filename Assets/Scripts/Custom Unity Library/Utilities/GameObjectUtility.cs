@@ -69,7 +69,6 @@
             var parentName = parent ? parent.name : null;
             var container = GetOrAddGameObject(parentName, clone.name.TrimEnd(CloneSuffix));
             clone.transform.SetParent(container.transform);
-            container.tag = Tag.Container.ToString();
             container.GetOrAddComponent<DestroyedWhenEmpty>();
             container.hideFlags = HideFlags.HideInInspector;
         }
