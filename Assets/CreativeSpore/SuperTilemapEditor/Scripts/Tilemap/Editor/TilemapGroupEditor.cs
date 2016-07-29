@@ -109,12 +109,14 @@ namespace CreativeSpore.SuperTilemapEditor
                 Texture2D btnTexture = reordList.elementHeight == 0f ? EditorGUIUtility.FindTexture("winbtn_win_max_h") : EditorGUIUtility.FindTexture("winbtn_win_min_h");
                 if (GUI.Button(new Rect(rect.width - rect.height, rect.y, rect.height, rect.height), btnTexture, EditorStyles.label))
                 {
-                    reordList.elementHeight = reordList.elementHeight == 0f ? EditorGUIUtility.singleLineHeight : 0f;
+                    reordList.elementHeight = reordList.elementHeight == 0f ? 21f : 0f;
                     reordList.draggable = reordList.elementHeight > 0f;
                 }
             };
             reordList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
+                if (reordList.elementHeight == 0)
+                    return;
                 var element = reordList.serializedProperty.GetArrayElementAtIndex(index);               
                 rect.y += 2;
                 Tilemap tilemap = element.objectReferenceValue as Tilemap;

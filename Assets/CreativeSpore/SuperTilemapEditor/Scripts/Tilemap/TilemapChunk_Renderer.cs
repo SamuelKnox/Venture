@@ -265,13 +265,13 @@ namespace CreativeSpore.SuperTilemapEditor
             float u1 = tileUV.xMax - Tileset.AtlasTexture.texelSize.x * InnerPadding;
             float v1 = tileUV.yMax - Tileset.AtlasTexture.texelSize.y * InnerPadding;
 
-            if (flipH)
+            if (flipV)
             {
                 float v = v0;
                 v0 = v1;
                 v1 = v;
             }
-            if (flipV)
+            if (flipH)
             {
                 float u = u0;
                 u0 = u1;

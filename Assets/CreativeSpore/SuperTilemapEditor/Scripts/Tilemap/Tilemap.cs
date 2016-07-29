@@ -73,8 +73,25 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 if (m_material == null)
                 {
-                    m_material = new Material(Shader.Find("Sprites/Default"));
+#if UNITY_EDITOR
+                    // when creating a prefab of a tilemap, the prefab material reference is nulled, so the original tilemap material should be taken
+                    if (DragAndDrop.objectReferences.Length > 0 && DragAndDrop.objectReferences[0] is GameObject && DragAndDrop.objectReferences[0] != gameObject)
+                    {
+                        Tilemap sourceTilemap = (DragAndDrop.objectReferences[0] as GameObject).GetComponent<Tilemap>();
+                        if (sourceTilemap)
+                        {
+                            Material = sourceTilemap.Material;
+                        }
+                    }
+                    else
+#endif
+                    {
+                        m_material = new Material(Shader.Find("Sprites/Default"));
+                        //m_material.name = name + "_" + Time.frameCount;
+                    }
                 }
+                if (Tileset != null)
+                    m_material.mainTexture = Tileset.AtlasTexture;
                 return m_material;
             }
 
@@ -114,7 +131,10 @@ namespace CreativeSpore.SuperTilemapEditor
         /// Sets the isTrigger property of the collider. You need call Refresh to update the colliders after changing it.
         /// </summary>
         public bool IsTrigger { get { return m_isTrigger; } set { m_isTrigger = true; } }
-
+        /// <summary>
+        /// Show the collider normals
+        /// </summary>
+        public bool ShowColliderNormals = true;
         /// <summary>
         /// The size of the cell containing the tiles. You should call Refresh() after changing this value to apply the effect.
         /// </summary>
@@ -581,7 +601,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 EditorApplication.MarkSceneDirty();
 #endif
             }
-#endif
+#endif            
 
             RecalculateMapBounds();
 
@@ -644,10 +664,10 @@ namespace CreativeSpore.SuperTilemapEditor
         }
 
         /// <summary>
-        /// Flip the tilemap horizontally
+        /// Flip the tilemap vertically
         /// </summary>
         /// <param name="changeFlags"></param>
-        public void FlipH(bool changeFlags)
+        public void FlipV(bool changeFlags)
         {
             List<uint> flippedList = new List<uint>(GridWidth * GridHeight);
             for (int gy = MinGridY; gy <= MaxGridY; ++gy)
@@ -671,7 +691,7 @@ namespace CreativeSpore.SuperTilemapEditor
                         && (flippedTileData & Tileset.k_TileDataMask_BrushId) == 0 // don't activate flip flags on brushes
                         )
                     {
-                        flippedTileData ^= Tileset.k_TileFlag_FlipH;
+                        flippedTileData ^= Tileset.k_TileFlag_FlipV;
                     }
                     SetTileData(gx, gy, flippedTileData);
                 }
@@ -679,10 +699,10 @@ namespace CreativeSpore.SuperTilemapEditor
         }
 
         /// <summary>
-        /// Flip the map vertically
+        /// Flip the map horizontally
         /// </summary>
         /// <param name="changeFlags"></param>
-        public void FlipV(bool changeFlags)
+        public void FlipH(bool changeFlags)
         {
             List<uint> flippedList = new List<uint>(GridWidth * GridHeight);
             for (int gx = MinGridX; gx <= MaxGridX; ++gx)
@@ -706,7 +726,7 @@ namespace CreativeSpore.SuperTilemapEditor
                         && (flippedTileData & Tileset.k_TileDataMask_BrushId) == 0 // don't activate flip flags on brushes
                         )
                     {
-                        flippedTileData ^= Tileset.k_TileFlag_FlipV;
+                        flippedTileData ^= Tileset.k_TileFlag_FlipH;
                     }
                     SetTileData(gx, gy, flippedTileData);
                 }

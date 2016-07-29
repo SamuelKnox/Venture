@@ -40,6 +40,7 @@ namespace CreativeSpore.SuperTilemapEditor
         public void Refresh()
         {
             m_tilemaps = new List<Tilemap>( GetComponentsInChildren<Tilemap>() );
+            m_selectedIndex = 0;
             m_selectedIndex = Mathf.Clamp(m_selectedIndex, -1, m_tilemaps.Count);
         }
     }

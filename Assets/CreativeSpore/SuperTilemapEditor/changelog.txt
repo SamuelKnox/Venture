@@ -1,3 +1,21 @@
+--- v1.3.5 ---
+- Added TMX import options
+- Flipping Horizontally and Vertically properly (not in the opposite way)
+- Painting brush now copy the tilemap material instead using always the Sprite\Defult
+- When creating a tilemap prefab, the tilemap material is now linked to the prefab
+- Fixed missing tilemap prefab material when pressing play, making the preview to be pink
+- Fixed creation of a tilemap prefab from brush selection when the scene was not saved in disk
+- Fixed unregister tileset events properly in TilemapEditor when the tilemap is destroyed (causing a BrushBehaviour exception)
+
+--- v1.3.4 ---
+- Added Show Collider Normals in Tilemap Collider section when using 2D colliders
+- Added two new menu options: Create Tilemap From Selection and Create Prefab From Selection
+- Improved the random tile brush to help in the creation
+- Fixed some cases where random brushes where not painting any tile
+- Fixed showing the bottom right part of the tileset when scrollbars are visible
+- Fixed null exception when setting tile collider in the tile properties window
+- Fixed selecting the right tileset when selecting a tilemap from the scene
+
 --- v1.3.3 ---
 - Added warning message when using Polygon collider or activating isTrigger in the tilemap collider section
 - Added Tile Prefab Setting multi editing to change the prefab setting for a selection of tiles at the same time

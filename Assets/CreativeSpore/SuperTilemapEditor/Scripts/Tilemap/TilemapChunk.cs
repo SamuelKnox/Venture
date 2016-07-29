@@ -112,13 +112,13 @@ namespace CreativeSpore.SuperTilemapEditor
                         float u1 = tileUV.xMax - Tileset.AtlasTexture.texelSize.x * InnerPadding;
                         float v1 = tileUV.yMax - Tileset.AtlasTexture.texelSize.y * InnerPadding;
 
-                        if (flipH)
+                        if (flipV)
                         {
                             float v = v0;
                             v0 = v1;
                             v1 = v;
                         }
-                        if (flipV)
+                        if (flipH)
                         {
                             float u = u0;
                             u0 = u1;
@@ -201,6 +201,11 @@ namespace CreativeSpore.SuperTilemapEditor
 
         void OnEnable()
         {
+            if (ParentTilemap == null)
+            {
+                ParentTilemap = GetComponentInParent<Tilemap>();
+            }
+
 #if UNITY_EDITOR
             if (m_meshRenderer != null)
             {
@@ -273,6 +278,14 @@ namespace CreativeSpore.SuperTilemapEditor
                         for (int j = 0; j < (points.Length - 1); ++j)
                         {
                             Gizmos.DrawLine(points[j], points[j + 1]);
+                            //Draw normals
+                            if(ParentTilemap.ShowColliderNormals)
+                            {
+                                Vector2 s0 = points[j];
+                                Vector2 s1 = points[j + 1];
+                                Vector3 normPos = (s0 + s1) / 2f;
+                                Gizmos.DrawLine(normPos, normPos + Vector3.Cross(s1 - s0, -Vector3.forward).normalized * ParentTilemap.CellSize.y * 0.05f);
+                            }
                         }
                     }
                 }

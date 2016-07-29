@@ -14,7 +14,6 @@ namespace CreativeSpore.SuperTilemapEditor
             if (property.propertyType != SerializedPropertyType.Integer)
             {
                 Debug.LogError("SortedLayer property should be an integer ( the layer id )");
-                return;
             }
             else
             {

@@ -27,7 +27,7 @@ namespace CreativeSpore.SuperTilemapEditor
             return new TileColliderData { vertices = clonedVertices, type = type };
         }
 
-        public void FlipV()
+        public void FlipH()
         {
             for(int i = 0; i < vertices.Length; ++i)
             {
@@ -36,7 +36,7 @@ namespace CreativeSpore.SuperTilemapEditor
             Array.Reverse(vertices);
         }
 
-        public void FlipH()
+        public void FlipV()
         {
             for (int i = 0; i < vertices.Length; ++i)
             {
@@ -166,8 +166,8 @@ namespace CreativeSpore.SuperTilemapEditor
         public const uint k_TileDataMask_BrushId = 0x0FFF0000; // up to 4096 - 1 ( id 0 is used for undefined brush )
         public const uint k_TileDataMask_Flags = 0xF0000000; // Flags: (1bit)FlipX, (1bit)FlipY, (1bits)Rot90, (1 bit reserved)
         // Tile Data Flags
-        public const uint k_TileFlag_FlipH = 0x80000000;
-        public const uint k_TileFlag_FlipV = 0x40000000;
+        public const uint k_TileFlag_FlipV = 0x80000000;
+        public const uint k_TileFlag_FlipH = 0x40000000;
         public const uint k_TileFlag_Rot90 = 0x20000000;
         public const uint k_TileFlag_Updated = 0x10000000; // used by brushes to check when a tile should be updated or not
 
@@ -210,8 +210,8 @@ namespace CreativeSpore.SuperTilemapEditor
         public int VisualTilePadding = 1;
         public int TileRowLength = 8;        
 
-        public int Width { get { return m_tilesetWidth; } }
-        public int Height { get { return m_tilesetHeight; } }
+        public int Width { get { return m_tilesetWidth > 0? m_tilesetWidth : Mathf.RoundToInt(AtlasTexture.width / TilePxSize.x); } }
+        public int Height { get { return m_tilesetHeight > 0 ? m_tilesetHeight : Mathf.RoundToInt(AtlasTexture.height / TilePxSize.y); } }
 
         public bool GetGroupAutotiling(int groupA, int groupB) 
         { 
@@ -243,6 +243,8 @@ namespace CreativeSpore.SuperTilemapEditor
         public List<BrushContainer> Brushes { get { return m_brushes; } }
         public IList<Tile> Tiles { get { return m_tiles.AsReadOnly(); } }
         public float PixelsPerUnit { get { return m_pixelsPerUnit; } set { m_pixelsPerUnit = value; } }
+
+        public void SetTiles(List<Tile> tiles) { m_tiles = tiles; }
 
         public Vector2 CalculateTileTexelSize()
         {
@@ -420,7 +422,6 @@ namespace CreativeSpore.SuperTilemapEditor
                     if (m_brushes.Count >= maxId)
                     {
                         Debug.LogError(" Max number of brushes reached! " + maxId);
-                        return;
                     }
                     else
                     {

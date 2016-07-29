@@ -239,8 +239,11 @@ namespace CreativeSpore.SuperTilemapEditor
             if (e.type == EventType.MouseDown)
             {
                 m_isDragging = true;
-                m_savedVertexData = new Vector2[selectedTile.collData.vertices.Length];
-                selectedTile.collData.vertices.CopyTo(m_savedVertexData, 0);
+                if (selectedTile.collData.vertices != null)
+                {
+                    m_savedVertexData = new Vector2[selectedTile.collData.vertices.Length];
+                    selectedTile.collData.vertices.CopyTo(m_savedVertexData, 0);
+                }
             }
             else if (e.type == EventType.MouseUp)
             {

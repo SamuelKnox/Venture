@@ -91,6 +91,11 @@ namespace CreativeSpore.SuperTilemapEditor
                     EditorGUILayout.EndVertical();
                 }
                 EditorGUILayout.Separator();
+                if (GUILayout.Button("Import TMX into the Scene"))
+                {
+                    CreativeSpore.TiledImporter.TmxImporter.ImportTmxIntoTheScene(tileset);
+                }
+                EditorGUILayout.Separator();
                 string[] modeNames = System.Enum.GetNames(typeof(eMode));
                 s_mode = (eMode)GUILayout.Toolbar((int)s_mode, modeNames);
                 switch(s_mode)
@@ -313,8 +318,8 @@ namespace CreativeSpore.SuperTilemapEditor
             int tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
             if (tileId != Tileset.k_TileId_Empty)
             {
-                if ((tileData & Tileset.k_TileFlag_FlipH) != 0) GUIUtility.ScaleAroundPivot(new Vector2(1f, -1f), dstRect.center);
-                if ((tileData & Tileset.k_TileFlag_FlipV) != 0) GUIUtility.ScaleAroundPivot(new Vector2(-1f, 1f), dstRect.center);
+                if ((tileData & Tileset.k_TileFlag_FlipV) != 0) GUIUtility.ScaleAroundPivot(new Vector2(1f, -1f), dstRect.center);
+                if ((tileData & Tileset.k_TileFlag_FlipH) != 0) GUIUtility.ScaleAroundPivot(new Vector2(-1f, 1f), dstRect.center);
                 if ((tileData & Tileset.k_TileFlag_Rot90) != 0) GUIUtility.RotateAroundPivot(90f, dstRect.center);
                 GUI.DrawTextureWithTexCoords(dstRect, tileset.AtlasTexture, customUV == default(Rect) ? tileset.Tiles[tileId].uv : customUV, true);
                 GUI.matrix = Matrix4x4.identity;
