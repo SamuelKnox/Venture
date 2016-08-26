@@ -5,7 +5,7 @@ public class Springer : Enemy
 {
     [Tooltip("Impulse applied to spring when player is in sight.  A negative x value will make the springer run away from the player.")]
     [SerializeField]
-    private Vector2 spring = Vector2.one;
+    private Vector2 spring = new Vector2(1, 2);
 
     private bool visible;
     private Rigidbody2D body;
@@ -18,8 +18,12 @@ public class Springer : Enemy
         player = FindObjectOfType<Player>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
+        if (stunned)
+        {
+            return;
+        }
         if (visible && body.velocity == Vector2.zero)
         {
             var force = spring;

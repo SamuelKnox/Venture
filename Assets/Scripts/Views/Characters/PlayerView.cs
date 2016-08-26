@@ -12,6 +12,10 @@ public class PlayerView : MonoBehaviour
     [SerializeField]
     private bool facingRight = true;
 
+    [Tooltip("Sound effect to play when player is stunned")]
+    [SerializeField]
+    private AudioClip stunSound;
+
     private PlatformCharacterController platformCharacterController;
     private PlayerController playerController;
     private Animator animator;
@@ -123,6 +127,16 @@ public class PlayerView : MonoBehaviour
             Destroy(collectable);
             FinishAttacking();
         }
+    }
+
+    /// <summary>
+    /// Sets whether or not the play the stunned animation
+    /// </summary>
+    /// <param name="stunned">Whether or not is stunned</param>
+    public void SetStun(bool stunned)
+    {
+        animator.SetBool(AnimationNames.Enemy.Bools.Stunned, stunned);
+        SoundManager.Instance.Play(stunSound, false, gameObject);
     }
 
     /// <summary>

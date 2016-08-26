@@ -1,4 +1,5 @@
-﻿using LevelGenerator2D;
+﻿using System;
+using LevelGenerator2D;
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyView))]
@@ -17,12 +18,32 @@ public abstract class Enemy : Character
 
     private static readonly Vector2 RewardForce = new Vector2(250.0f, 500.0f);
 
+    private static float stunTime;
+
     protected EnemyView enemyView;
 
     protected override void Awake()
     {
         base.Awake();
         enemyView = GetComponent<EnemyView>();
+    }
+
+    /// <summary>
+    /// Gets the amount of time the enemy should be stunned for on damage dealt
+    /// </summary>
+    /// <returns>Stun duration in seconds</returns>
+    public static float GetStunTime()
+    {
+        return stunTime;
+    }
+
+    /// <summary>
+    /// Sets the amount of time the enemy should be stunned for on damage dealt
+    /// </summary>
+    /// <param name="stunTime">Stun duration in seconds</param>
+    public static void SetStunTime(float stunTime)
+    {
+        Enemy.stunTime = stunTime;
     }
 
     /// <summary>
@@ -68,5 +89,21 @@ public abstract class Enemy : Character
         {
             monoBehaviour.enabled = false;
         }
+    }
+
+    /// <summary>
+    /// Stuns the enemy
+    /// </summary>
+    protected override void EnableStun()
+    {
+        enemyView.SetStun(true);
+    }
+
+    /// <summary>
+    /// Disables the enemy's stun
+    /// </summary>
+    protected override void DisableStun()
+    {
+        enemyView.SetStun(false);
     }
 }

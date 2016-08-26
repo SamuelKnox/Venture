@@ -34,11 +34,19 @@ public class Ghost : Enemy
 
     void Update()
     {
+        if (stunned)
+        {
+            return;
+        }
         FacePlayer();
     }
 
     void FixedUpdate()
     {
+        if (stunned)
+        {
+            return;
+        }
         MoveTowardsPlayer();
     }
 

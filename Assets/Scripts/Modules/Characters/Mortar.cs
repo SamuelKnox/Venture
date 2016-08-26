@@ -30,6 +30,10 @@ public class Mortar : Enemy
     /// </summary>
     public void FireAtPlayer()
     {
+        if (stunned)
+        {
+            return;
+        }
         rangedWeapon.Fire(player.transform);
     }
 

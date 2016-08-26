@@ -21,6 +21,11 @@ public class PlayerController : MonoBehaviour
     [Range(0.0f, 1.0f)]
     private float axisJumpingThreshold = 0.5f;
 
+    [Tooltip("Number of jumps allowed, where 2 means the player can double jump (Once off of the ground, and once while mid-air)")]
+    [SerializeField]
+    [Range(1, 5)]
+    private int numberJumpsAllowed = 1;
+
     private Player player;
     private PlatformCharacterController platformCharacterController;
     private PlayerView playerView;
@@ -69,7 +74,7 @@ public class PlayerController : MonoBehaviour
             SetPlayerControllable(true);
             return;
         }
-        if (!controllable)
+        if (!controllable || player.IsStunned())
         {
             return;
         }

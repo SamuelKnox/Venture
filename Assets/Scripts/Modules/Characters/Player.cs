@@ -56,6 +56,8 @@ public class Player : Character
     [SerializeField]
     private Damage defensiveDamage;
 
+    private static float stunTime;
+
     private Inventory inventory;
     private PlayerView playerView;
     private Weapon activeWeapon;
@@ -512,11 +514,54 @@ public class Player : Character
     }
 
     /// <summary>
+    /// Checks whether or not the player is stunned
+    /// </summary>
+    /// <returns>Whether or not player is stunned</returns>
+    public bool IsStunned()
+    {
+        return stunned;
+    }
+
+    /// <summary>
+    /// Gets the amount of time the player should be stunned for on damage dealt
+    /// </summary>
+    /// <returns>Stun duration in seconds</returns>
+    public static float GetStunTime()
+    {
+        return stunTime;
+    }
+
+    /// <summary>
+    /// Sets the amount of time the player should be stunned for on damage dealt
+    /// </summary>
+    /// <param name="stunTime">Stun duration in seconds</param>
+    public static void SetStunTime(float stunTime)
+    {
+        Player.stunTime = stunTime;
+    }
+
+    /// <summary>
     /// Player dies
     /// </summary>
     protected override void Die()
     {
         playerView.Die();
+    }
+
+    /// <summary>
+    /// Stuns the player
+    /// </summary>
+    protected override void EnableStun()
+    {
+        playerView.SetStun(true);
+    }
+
+    /// <summary>
+    /// Finishes player stun
+    /// </summary>
+    protected override void DisableStun()
+    {
+        playerView.SetStun(false);
     }
 
     /// <summary>

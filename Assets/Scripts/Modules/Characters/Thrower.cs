@@ -34,14 +34,18 @@ public class Thrower : Enemy
 
     void Start()
     {
-        if(rewardFrequencyHalflife > 0.0f)
+        if (rewardFrequencyHalflife > 0.0f)
         {
             StartCoroutine(ReduceRewardFrequency());
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
+        if (stunned)
+        {
+            return;
+        }
         if (Random.Range(0.0f, 1.0f) < rewardFrequency)
         {
             rangedWeapon.SetProjectile(reward);

@@ -13,18 +13,26 @@ public class Executioner : Enemy
 
     void OnVisionStay(Collider2D other)
     {
+        if (stunned)
+        {
+            return;
+        }
         if (other.GetComponent<Player>())
         {
             enemyView.Attack();
             pacer.SetPacingActive(false);
         }
-    } 
+    }
 
     /// <summary>
     /// Returns to pacing after an interuption
     /// </summary>
     public void ResumePacing()
     {
+        if (stunned)
+        {
+            return;
+        }
         pacer.SetPacingActive(true);
     }
 
@@ -35,6 +43,18 @@ public class Executioner : Enemy
     protected override void OnDamageDealt(Damage damage)
     {
         base.OnDamageDealt(damage);
+        pacer.SetPacingActive(false);
+    }
+
+    protected override void EnableStun()
+    {
+        base.EnableStun();
+        ResumePacing();
+    }
+
+    protected override void DisableStun()
+    {
+        base.DisableStun();
         pacer.SetPacingActive(false);
     }
 }

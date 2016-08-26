@@ -33,6 +33,11 @@ public class Damage : MonoBehaviour
     [Range(0.0f, 1.0f)]
     private float damageOverTimeRateIncrease = 0.0f;
 
+    [Tooltip("Stun duration dealt by this damage")]
+    [SerializeField]
+    [Range(0.0f, 10.0f)]
+    private float stun;
+
     [Tooltip("Whether or not this damage component is active and will actually deal damage")]
     [SerializeField]
     private bool active = true;
@@ -120,5 +125,14 @@ public class Damage : MonoBehaviour
     public void SetDamageOverTimeRateIncrease(float damageOverTimeRateIncrease)
     {
         this.damageOverTimeRateIncrease = damageOverTimeRateIncrease;
+    }
+
+    /// <summary>
+    /// Stun dealt by this damage
+    /// </summary>
+    /// <returns>Stun duration in seconds</returns>
+    public float GetStun()
+    {
+        return stun;
     }
 }
