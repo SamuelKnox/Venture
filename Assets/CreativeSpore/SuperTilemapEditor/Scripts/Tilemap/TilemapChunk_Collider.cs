@@ -192,28 +192,31 @@ namespace CreativeSpore.SuperTilemapEditor
                                 for (int i = 0; i < 4; ++i)
                                 {
                                     uint neighborTileData;
+                                    bool isTriggerOrPolygon = ParentTilemap.IsTrigger || 
+                                        ParentTilemap.ColliderType == eColliderType._2D && 
+                                        ParentTilemap.Collider2DType == e2DColliderType.PolygonCollider2D;
                                     switch (i)
                                     {
                                         case 0:  // Up Tile
                                             neighborTileData = (tileIdx + m_width) < m_tileDataList.Count ? 
                                             m_tileDataList[tileIdx + m_width]
                                             :
-                                            ParentTilemap.GetTileData( GridPosX + tx, GridPosY + ty + 1); break;
+                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData( GridPosX + tx, GridPosY + ty + 1); break;
                                         case 1: // Right Tile
                                             neighborTileData = (tileIdx + 1) % m_width != 0 ? //(tileIdx + 1) < m_tileDataList.Count ? 
                                             m_tileDataList[tileIdx + 1]
                                             :
-                                            ParentTilemap.GetTileData(GridPosX + tx + 1, GridPosY + ty); break;
+                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx + 1, GridPosY + ty); break;
                                         case 2: // Down Tile
                                             neighborTileData = tileIdx >= m_width ? 
                                             m_tileDataList[tileIdx - m_width]
                                             :
-                                            ParentTilemap.GetTileData(GridPosX + tx, GridPosY + ty - 1); break;  
+                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx, GridPosY + ty - 1); break;  
                                         case 3: // Left Tile
                                             neighborTileData = tileIdx % m_width != 0 ? //neighborTileId = tileIdx >= 1 ? 
                                             m_tileDataList[tileIdx - 1]
                                             :
-                                            ParentTilemap.GetTileData(GridPosX + tx - 1, GridPosY + ty); break;
+                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx - 1, GridPosY + ty); break;
                                         default: neighborTileData = Tileset.k_TileData_Empty; break;
                                     }
 

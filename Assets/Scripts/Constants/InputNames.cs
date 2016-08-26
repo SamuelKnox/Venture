@@ -29,9 +29,9 @@ public static class InputNames
     public const string ToggleWeapon = "Toggle Weapon";
 
     /// <summary>
-    /// Input name used to open/close the inventory
+    /// Input name used to go back in a menu
     /// </summary>
-    public const string Inventory = "Inventory";
+    public const string Back = "Back";
 
     /// <summary>
     /// Input name used to switch tab to the left
@@ -67,6 +67,11 @@ public static class InputNames
     /// Input name for leveling up a rune
     /// </summary>
     public const string LevelUpRune = "Level Up Rune";
+
+    /// <summary>
+    /// Input name for buying a rune
+    /// </summary>
+    public const string BuyRune = "Buy Rune";
 
     /// <summary>
     /// Input name for interacting with an interactable

@@ -1,3 +1,29 @@
+--- v1.3.7 ---
+- Performance improvements and reduction of memory allocations
+- Fixed some collider issues when using 2D colliders with PolygonCollider2D or when activating isTrigger
+- Fixed Sprites-Default material issue when using UNITY 5.4.0
+- Fixed Undo/Redo tilemap update
+- Fixed empty contacts array when receiving a collision event against a tileChunk with a MeshCollider
+
+--- v1.3.6 ---
+- Added an unselected color multiplier in the tilemap group to be multiplied by the unselected tilemaps tint color to highligh the selected tilemap
+- Added preview of tiles to be filled when using the fill tool
+- Added an option to disable Undo/Redo while painting, to improve the painting performance
+- Added multiediting support in tilemap inspector
+- Improvements in tilemap material management, now using Material Property Block, reducing the memory allocated.
+- Improvements in access to the tilemap data, using a dictionary for tilechunks
+- TileObjectBehaviour sets also tilemap sorting order and sorting layer were it is created
+- If only a single empty tile is selected from a tilemap, the brush will erase when painting
+- Fixed empty contacts array when receiving a collision event from a tileChunk with a MeshCollider
+- Fixed error when calling UpdateMesh for a tilemap during a collision event
+- Fixed issues when dragging a tilemap into a tilemap group
+- Fixed creating assets in the current project view, not in the root folder
+- Fixed some issues when creating a prefab of a tilemap or tilemap group
+- Fixed an issue selecting a tilemap from a tilemap group with a children that is not a tilemap
+- Fixed selecting an empty tile sets the selected tile to empty
+- Fixed updating the tileObjects transform when refreshing the tilemap after changing the CellSize
+- Fixed memory leaks when importing tmx maps
+
 --- v1.3.5 ---
 - Added TMX import options
 - Flipping Horizontally and Vertically properly (not in the opposite way)

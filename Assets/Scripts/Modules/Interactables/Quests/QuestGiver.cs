@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CustomUnityLibrary;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -20,6 +21,10 @@ public class QuestGiver : Interactable
     [Tooltip("Quests that can be given")]
     [SerializeField]
     private List<Quest> quests = new List<Quest>();
+
+    [Tooltip("Whether or not this is a main questline questgiver.  If yes, the quests will be saved across playthroughs.")]
+    [SerializeField]
+    private bool mainQuestGiver = false;
 
     private Player player;
 
@@ -44,6 +49,35 @@ public class QuestGiver : Interactable
     /// </summary>
     public override void OnInteractionEnter()
     {
+        questText.enabled = true;
+        if (quests.Count == 0)
+        {
+            questText.text = outOfQuestsDialog;
+            return;
+        }
+        var questsToRemove = new List<Quest>();
+        foreach (var quest in quests)
+        {
+            foreach (var playerQuest in player.GetQuests())
+            {
+                if (quest.name == playerQuest.name.TrimEnd(GameObjectUtility.CloneSuffix))
+                {
+                    if (!playerQuest.IsComplete())
+                    {
+                        questText.text = playerQuest.GetDescription();
+                        return;
+                    }
+                    else
+                    {
+                        questsToRemove.Add(quest);
+                    }
+                }
+            }
+        }
+        foreach (var quest in questsToRemove)
+        {
+            quests.Remove(quest);
+        }
         ActivateQuest();
     }
 
@@ -60,12 +94,6 @@ public class QuestGiver : Interactable
     /// </summary>
     public void ActivateQuest()
     {
-        questText.enabled = true;
-        if (quests.Count == 0)
-        {
-            questText.text = outOfQuestsDialog;
-            return;
-        }
         var activeQuest = quests.Where(q => q.IsQualified()).FirstOrDefault();
         if (!activeQuest)
         {
@@ -79,6 +107,7 @@ public class QuestGiver : Interactable
             return;
         }
         questText.text = activeQuest.GetDescription();
+        activeQuest.SetLongTermQuest(mainQuestGiver);
         player.AddQuest(activeQuest);
         activeQuest.OnQuestComplete += OnQuestComplete;
     }
@@ -99,7 +128,7 @@ public class QuestGiver : Interactable
     private void SetUpQuests()
     {
         quests = quests.OrderBy(q => q.GetDifficulty()).ThenBy(q => Random.Range(0.0f, 1.0f)).ToList();
-        foreach(var quest in quests)
+        foreach (var quest in quests)
         {
             quest.enabled = false;
         }

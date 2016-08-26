@@ -199,6 +199,7 @@ public class SaveData
             var collectedQuestPrefab = questPrefabs.Where(q => q.name == questNames[i]).First();
             var questInstance = UnityEngine.Object.Instantiate(collectedQuestPrefab) as Quest;
             questInstance.SetComplete(questsComplete[i]);
+            questInstance.SetLongTermQuest(true);
             quests.Add(questInstance);
         }
         return quests.ToArray();
@@ -215,6 +216,10 @@ public class SaveData
         var questsComplete = new List<bool>();
         foreach (var quest in quests)
         {
+            if (!quest.IsLongTermQuest())
+            {
+                continue;
+            }
             questNames.Add(quest.name.TrimEnd(GameObjectUtility.CloneSuffix));
             questsComplete.Add(quest.IsComplete());
         }

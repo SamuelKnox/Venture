@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 
 public class UIInventoryController : MonoBehaviour
 {
-    private const string characterAButton = "Select Equipment";
-    private const string characterBButton = "Exit";
-    private const string characterXButton = "Change Runes";
-    private const string characterYButton = "Remove Runes";
-    private const string equipmentAButton = "Equip";
-    private const string equipmentBButton = "Back";
-    private const string equipmentXButton = null;
-    private const string equipmentYButton = null;
-    private const string runesAButton = "Attach";
-    private const string runesBButton = "Back";
-    private const string runesXButton = null;
-    private const string runesYButton = null;
+    private const string CharacterAButton = "Select Equipment";
+    private const string CharacterBButton = "Exit";
+    private const string CharacterXButton = "Change Runes";
+    private const string CharacterYButton = "Remove Runes";
+    private const string EquipmentAButton = "Equip";
+    private const string EquipmentBButton = "Back";
+    private const string EquipmentXButton = null;
+    private const string EquipmentYButton = null;
+    private const string RunesAButton = "Attach";
+    private const string RunesBButton = "Back";
+    private const string RunesXButton = null;
+    private const string RunesYButton = null;
 
     [Tooltip("View used to display the title of the current inventory panel")]
     [SerializeField]
@@ -122,7 +122,7 @@ public class UIInventoryController : MonoBehaviour
             characterView.UpdateDescription(equipment);
             equipmentDescriptionView.UpdateDescription(equipment);
         }
-        if (Input.GetButtonDown(InputNames.Inventory))
+        if (Input.GetButtonDown(InputNames.Back))
         {
             Time.timeScale = 1.0f;
             var blacksmith = FindObjectOfType<Blacksmith>();
@@ -190,7 +190,7 @@ public class UIInventoryController : MonoBehaviour
             ChangeMode(InventoryMode.Character, itemButton);
             dirty = true;
         }
-        if (Input.GetButtonDown(InputNames.Inventory))
+        if (Input.GetButtonDown(InputNames.Back))
         {
             ChangeMode(InventoryMode.Character, itemButton);
             dirty = true;
@@ -224,7 +224,7 @@ public class UIInventoryController : MonoBehaviour
             runesView.UpdateDescription(rune);
             runeDescriptionView.SetDescription(rune, equipmentWithRuneAttached);
         }
-        if (Input.GetButtonDown(InputNames.Inventory))
+        if (Input.GetButtonDown(InputNames.Back))
         {
             var equipmentItemButton = characterView.GetItemButton(runeableEquipmentItemButton.GetItemType());
             ChangeMode(InventoryMode.Character, equipmentItemButton);
@@ -334,22 +334,22 @@ public class UIInventoryController : MonoBehaviour
         switch (inventoryMode)
         {
             case InventoryMode.Character:
-                gamePadInstructions[GamePadInputs.A] = characterAButton;
-                gamePadInstructions[GamePadInputs.B] = characterBButton;
-                gamePadInstructions[GamePadInputs.X] = characterXButton;
-                gamePadInstructions[GamePadInputs.Y] = characterYButton;
+                gamePadInstructions[GamePadInputs.A] = CharacterAButton;
+                gamePadInstructions[GamePadInputs.B] = CharacterBButton;
+                gamePadInstructions[GamePadInputs.X] = CharacterXButton;
+                gamePadInstructions[GamePadInputs.Y] = CharacterYButton;
                 break;
             case InventoryMode.Equipment:
-                gamePadInstructions[GamePadInputs.A] = equipmentAButton;
-                gamePadInstructions[GamePadInputs.B] = equipmentBButton;
-                gamePadInstructions[GamePadInputs.X] = equipmentXButton;
-                gamePadInstructions[GamePadInputs.Y] = equipmentYButton;
+                gamePadInstructions[GamePadInputs.A] = EquipmentAButton;
+                gamePadInstructions[GamePadInputs.B] = EquipmentBButton;
+                gamePadInstructions[GamePadInputs.X] = EquipmentXButton;
+                gamePadInstructions[GamePadInputs.Y] = EquipmentYButton;
                 break;
             case InventoryMode.Runes:
-                gamePadInstructions[GamePadInputs.A] = runesAButton;
-                gamePadInstructions[GamePadInputs.B] = runesBButton;
-                gamePadInstructions[GamePadInputs.X] = runesXButton;
-                gamePadInstructions[GamePadInputs.Y] = runesYButton;
+                gamePadInstructions[GamePadInputs.A] = RunesAButton;
+                gamePadInstructions[GamePadInputs.B] = RunesBButton;
+                gamePadInstructions[GamePadInputs.X] = RunesXButton;
+                gamePadInstructions[GamePadInputs.Y] = RunesYButton;
                 break;
             default:
                 Debug.LogError("Invalid InventoryMode supplied!", gameObject);

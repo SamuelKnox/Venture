@@ -44,8 +44,8 @@ public class StatsView : MonoBehaviour
 
     void Update()
     {
-        healthText.text = playerHealth.GetCurrentHitPoints() + "/" + playerHealth.GetMaxHitPoints();
-        manaText.text = playerMana.GetCurrentManaPoints() + "/" + playerMana.GetMaxManaPoints();
+        healthText.text = (int)playerHealth.GetCurrentHitPoints() + "/" + (int)playerHealth.GetMaxHitPoints();
+        manaText.text = (int)playerMana.GetCurrentManaPoints() + "/" + (int)playerMana.GetMaxManaPoints();
         prestigeText.text = player.GetPrestige().ToString();
         goldText.text = player.GetGold().ToString();
     }

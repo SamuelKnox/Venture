@@ -30,12 +30,15 @@ public class Projectile : MonoBehaviour
 
     void Start()
     {
-        transform.RotateTowardsVelocity();
+        if(body2D.constraints != RigidbodyConstraints2D.FreezeRotation)
+        {
+            transform.RotateTowardsVelocity();
+        }
     }
 
     void Update()
     {
-        if (body2D.gravityScale != 0)
+        if (body2D.gravityScale != 0 && body2D.constraints != RigidbodyConstraints2D.FreezeRotation)
         {
             transform.RotateTowardsVelocity();
         }

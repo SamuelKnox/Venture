@@ -13,6 +13,10 @@ namespace CreativeSpore.SuperTilemapEditor
     {
         public static T CreateAssetInSelectedDirectory<T>(string name = null) where T : ScriptableObject
         {
+            var asset = ScriptableObject.CreateInstance<T>();
+            ProjectWindowUtil.CreateAsset(asset, "New " + typeof(T).Name + ".asset");
+            return asset;
+            /*
             T asset = ScriptableObject.CreateInstance<T>();
 
             string path = GetAssetSelectedPath();
@@ -31,7 +35,7 @@ namespace CreativeSpore.SuperTilemapEditor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             EditorUtility.FocusProjectWindow();
-            return asset;
+            return asset;*/
         }
 
         public static string GetAssetSelectedPath()

@@ -57,13 +57,27 @@ namespace CreativeSpore.SuperTilemapEditor
                 m_meshFilter.sharedMesh.name = ParentTilemap.name + "_mesh";
                 m_needsRebuildMesh = true;
             }
-
-            if (m_meshRenderer.sharedMaterial == null)
+#if UNITY_EDITOR
+            // fix prefab preview, not compatible with MaterialPropertyBlock. I need to create a new material and change the main texture and color directly.
+            if (UnityEditor.PrefabUtility.GetPrefabType(gameObject) == UnityEditor.PrefabType.Prefab)
+            {
+                if (m_meshRenderer.sharedMaterial == null || m_meshRenderer.sharedMaterial == ParentTilemap.Material)
+                {
+                    m_meshRenderer.sharedMaterial = new Material(ParentTilemap.Material);
+                    m_meshRenderer.sharedMaterial.name += "_copy";
+                    m_meshRenderer.sharedMaterial.hideFlags = HideFlags.DontSave;
+                    m_meshRenderer.sharedMaterial.color = ParentTilemap.TintColor;
+                    m_meshRenderer.sharedMaterial.mainTexture = ParentTilemap.Tileset ? ParentTilemap.Tileset.AtlasTexture : null;
+                }
+            }
+            else
+#endif
+            //NOTE: else above
             {
                 m_meshRenderer.sharedMaterial = ParentTilemap.Material;
-                m_meshRenderer.sharedMaterial.mainTexture = Tileset.AtlasTexture;
             }
-            m_meshRenderer.enabled = ParentTilemap.IsVisible;
+
+            m_meshRenderer.enabled = ParentTilemap.IsVisible;                       
 
             if (m_needsRebuildMesh)
             {
@@ -71,10 +85,11 @@ namespace CreativeSpore.SuperTilemapEditor
                 if (FillMeshData())
                 {
                     m_invalidateBrushes = false;
+                    m_uvArray = m_uv.ToArray();
                     Mesh mesh = m_meshFilter.sharedMesh;
                     mesh.Clear();
                     mesh.vertices = m_vertices.ToArray();
-                    mesh.uv = m_uv.ToArray();
+                    mesh.uv = m_uvArray;
                     mesh.triangles = m_triangles.ToArray();
                     mesh.RecalculateNormals(); //NOTE: allow directional lights to work properly
                 }
@@ -108,9 +123,6 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 return false;
             }
-
-            m_meshRenderer.sharedMaterial = ParentTilemap.Material;
-            m_meshRenderer.sharedMaterial.mainTexture = Tileset.AtlasTexture;
 
             int totalTiles = m_width * m_height;
             if (m_vertices == null)

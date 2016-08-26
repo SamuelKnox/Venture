@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LevelGenerator2D;
+using UnityEngine;
 
 [RequireComponent(typeof(EnemyView))]
 [RequireComponent(typeof(Spawner))]

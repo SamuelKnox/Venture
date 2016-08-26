@@ -621,11 +621,6 @@ public class Player : Character
             }
             item.transform.SetParent(container);
         }
-        var equippedEquipment = inventory.GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>()).Where(e => e.IsEquipped());
-        foreach (var equipment in equippedEquipment)
-        {
-            equipment.ActivateRunes();
-        }
         SetStartingActiveWeapon();
     }
 

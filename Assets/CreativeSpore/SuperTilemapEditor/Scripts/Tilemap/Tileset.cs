@@ -241,7 +241,8 @@ namespace CreativeSpore.SuperTilemapEditor
 
         public Tile SelectedTile { get { return SelectedTileId != k_TileId_Empty ? m_tiles[SelectedTileId] : null; } }
         public List<BrushContainer> Brushes { get { return m_brushes; } }
-        public IList<Tile> Tiles { get { return m_tiles.AsReadOnly(); } }
+        //public IList<Tile> Tiles { get { return m_tiles.AsReadOnly(); } } //NOTE: removed AsReadOnly for performance and for removing memory allocation
+        public List<Tile> Tiles { get { return m_tiles; } }
         public float PixelsPerUnit { get { return m_pixelsPerUnit; } set { m_pixelsPerUnit = value; } }
 
         public void SetTiles(List<Tile> tiles) { m_tiles = tiles; }

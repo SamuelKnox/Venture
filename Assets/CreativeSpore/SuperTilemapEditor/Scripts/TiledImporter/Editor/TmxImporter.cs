@@ -126,7 +126,7 @@ namespace CreativeSpore.TiledImporter
                 tilemapBhv.Tileset = tileset;
                 tilemapBhv.OrderInLayer = orderInLayer++;
                 tilemapBhv.IsVisible =layer.Visible;
-                tilemapBhv.Material.color = new Color(1f, 1f, 1f, layer.Opacity);
+                tilemapBhv.TintColor = new Color(1f, 1f, 1f, layer.Opacity);
                 for (int gx = 0; gx < layer.Width; gx++)
                     for (int gy = 0; gy < layer.Height; gy++)
                     {

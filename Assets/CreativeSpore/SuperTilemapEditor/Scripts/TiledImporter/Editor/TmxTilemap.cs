@@ -32,6 +32,7 @@ namespace CreativeSpore.TiledImporter
                 texture.filterMode = FilterMode.Point;
                 texture.name = tileset.Name;
                 texture.LoadImage(File.ReadAllBytes(Path.Combine(FilePathDirectory, tileset.Image.Source)));
+                texture.hideFlags = HideFlags.DontSave;
                 m_dicTilesetTex2d.Add(
                     tileset.FirstGId,
                     texture

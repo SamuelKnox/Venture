@@ -20,6 +20,11 @@ public abstract class Item : MonoBehaviour
     [TextArea(1, 5)]
     private string description;
 
+    [Tooltip("How much gold this item costs in stores")]
+    [SerializeField]
+    [Range(1, 1000)]
+    private int cost;
+
     /// <summary>
     /// Gets the Item's type
     /// </summary>
@@ -72,5 +77,14 @@ public abstract class Item : MonoBehaviour
     public string GetDescription()
     {
         return description;
+    }
+
+    /// <summary>
+    /// Gets the cost in gold for this item
+    /// </summary>
+    /// <returns>Cost in gold</returns>
+    public int GetCost()
+    {
+        return cost;
     }
 }

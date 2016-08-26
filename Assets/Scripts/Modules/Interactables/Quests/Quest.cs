@@ -1,4 +1,5 @@
 ﻿using CustomUnityLibrary;
+using LevelGenerator2D;
 using UnityEngine;
 
 [RequireComponent(typeof(Spawner))]
@@ -36,6 +37,10 @@ public abstract class Quest : MonoBehaviour
     [SerializeField]
     private bool completedQuest = false;
 
+    [Tooltip("Whether or not this quest is completable over multiple lives")]
+    [SerializeField]
+    private bool longTermQuest = false;
+
     protected Player player;
 
     private Spawner[] spawners;
@@ -58,6 +63,30 @@ public abstract class Quest : MonoBehaviour
             Debug.LogError(this + " does not have a description!", gameObject);
             return;
         }
+    }
+
+    /// <summary>
+    /// Whether or not the player is qualified to take on this quest
+    /// </summary>
+    /// <returns>Is qualified</returns>
+    public abstract bool IsQualified();
+
+    /// <summary>
+    /// Checks whether or the quest is long term and should be saved across multiple playthroughs
+    /// </summary>
+    /// <returns>Whether or not the quest is long term</returns>
+    public bool IsLongTermQuest()
+    {
+        return longTermQuest;
+    }
+
+    /// <summary>
+    /// Sets whether or not this is a long term quest, and should be saved across multiple playthroughs
+    /// </summary>
+    /// <param name="longTermQuest">Whether or not a long term quest</param>
+    public void SetLongTermQuest(bool longTermQuest)
+    {
+        this.longTermQuest = longTermQuest;
     }
 
     /// <summary>
@@ -122,12 +151,6 @@ public abstract class Quest : MonoBehaviour
             OnQuestComplete(this);
         }
     }
-
-    /// <summary>
-    /// Whether or not the player is qualified to take on this quest
-    /// </summary>
-    /// <returns>Is qualified</returns>
-    public abstract bool IsQualified();
 
     /// <summary>
     /// Initializes and turns off spawners

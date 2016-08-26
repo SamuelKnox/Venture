@@ -165,6 +165,38 @@ public class RangedWeapon : MonoBehaviour
     }
 
     /// <summary>
+    /// Gets the time it takes for the ranged weapon to be able to fire again
+    /// </summary>
+    /// <returns>Cooldown rate</returns>
+    public float GetFireCooldown()
+    {
+        return fireCooldown;
+    }
+
+    /// <summary>
+    /// Gets the projectile prefab used for the RangedWeapon
+    /// </summary>
+    /// <returns>Projectile Prefab</returns>
+    public Projectile GetProjectile()
+    {
+        return projectile;
+    }
+
+    /// <summary>
+    /// Sets the projectile prefab used with this RangedWeapon
+    /// </summary>
+    /// <param name="projectile">Projectile Prefab</param>
+    public void SetProjectile(Projectile projectile)
+    {
+        if (!projectile)
+        {
+            Debug.LogError("Cannot set Projectile to be null!", gameObject);
+            return;
+        }
+        this.projectile = projectile;
+    }
+
+    /// <summary>
     /// Makes the Projectiles not check for collision with the Ranged Weapon
     /// </summary>
     /// <param name="projectileInstance">Projectile whose collision will be ignored</param>

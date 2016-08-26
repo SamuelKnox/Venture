@@ -82,33 +82,18 @@ namespace CreativeSpore.SuperTilemapEditor
                 int gx = tileIdx % m_width;
                 int gy = tileIdx / m_width;
                 if (tileObjData == null || tileObjData.tilePrefabData != tilePrefabData || tileObjData.obj == null)
-                {
-                    Vector3 chunkLocPos = new Vector3((gx + .5f) * CellSize.x, (gy + .5f) * CellSize.y);
-                    if (tilePrefabData.offsetMode == TilePrefabData.eOffsetMode.Pixels)
-                    {
-                        float ppu = Tileset.TilePxSize.x / CellSize.x;
-                        chunkLocPos += tilePrefabData.offset / ppu;
-                    }
-                    else //if (tilePrefabData.offsetMode == TilePrefabData.eOffsetMode.Units)
-                    {
-                        chunkLocPos += tilePrefabData.offset;
-                    }
-                    Vector3 worldPos = transform.TransformPoint(chunkLocPos);
+                {                    
 #if UNITY_EDITOR
                     tileObj = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(tilePrefabData.prefab);
-                    tileObj.transform.position = worldPos;
-                    tileObj.transform.rotation = transform.rotation;
                     // allow destroy the object with undo operations
                     if (ParentTilemap.IsUndoEnabled)
                     {
                         UnityEditor.Undo.RegisterCreatedObjectUndo(tileObj, Tilemap.k_UndoOpName + ParentTilemap.name);
                     }
 #else
-                    tileObj = (GameObject)Instantiate(tilePrefabData.prefab, worldPos, transform.rotation);
+                    tileObj = (GameObject)Instantiate(tilePrefabData.prefab, Vector3.zero, transform.rotation);
 #endif
-                    tileObj.transform.parent = transform.parent;
-                    tileObj.transform.localRotation = tilePrefabData.prefab.transform.localRotation;
-                    tileObj.transform.localScale = tilePrefabData.prefab.transform.localScale;
+                    _SetTileObjTransform(tileObj, gx, gy, tilePrefabData);
                     if (tileObjData != null)
                     {
                         m_tileObjToBeRemoved.Add(tileObjData.obj);
@@ -129,6 +114,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 }
                 else if (tileObjData.obj != null)
                 {
+                    _SetTileObjTransform(tileObjData.obj, gx, gy, tilePrefabData);
                     tileObjData.obj.SendMessage(k_OnTilePrefabCreation,
                         new OnTilePrefabCreationData()
                         {
@@ -140,6 +126,27 @@ namespace CreativeSpore.SuperTilemapEditor
                 }
             }
             return null;
+        }
+
+        private void _SetTileObjTransform(GameObject tileObj, int gx, int gy, TilePrefabData tilePrefabData)
+        {
+            Vector3 chunkLocPos = new Vector3((gx + .5f) * CellSize.x, (gy + .5f) * CellSize.y);
+            if (tilePrefabData.offsetMode == TilePrefabData.eOffsetMode.Pixels)
+            {
+                float ppu = Tileset.TilePxSize.x / CellSize.x;
+                chunkLocPos += tilePrefabData.offset / ppu;
+            }
+            else //if (tilePrefabData.offsetMode == TilePrefabData.eOffsetMode.Units)
+            {
+                chunkLocPos += tilePrefabData.offset;
+            }
+            Vector3 worldPos = transform.TransformPoint(chunkLocPos);
+
+            tileObj.transform.position = worldPos;
+            tileObj.transform.rotation = transform.rotation;            
+            tileObj.transform.parent = transform.parent;
+            tileObj.transform.localRotation = tilePrefabData.prefab.transform.localRotation;
+            tileObj.transform.localScale = tilePrefabData.prefab.transform.localScale;
         }
 
         private void DestroyTileObject(int locGridX, int locGridY)

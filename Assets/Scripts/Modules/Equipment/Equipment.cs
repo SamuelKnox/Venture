@@ -128,17 +128,6 @@ public abstract class Equipment : Item
     }
 
     /// <summary>
-    /// Activates all of the runes on this equipment
-    /// </summary>
-    public void ActivateRunes()
-    {
-        foreach (var rune in GetRunes())
-        {
-            rune.Activate(this);
-        }
-    }
-
-    /// <summary>
     /// Deactivates all runes on this equipment
     /// </summary>
     public void DeactivateRunes()

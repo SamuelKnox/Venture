@@ -50,6 +50,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
             // Draw Tilemap List
             m_tilemapReordList.DoLayoutList();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_unselectedColorMultiplier"));
             EditorGUILayout.Space();
 
             // Draw Tilemap Inspector
@@ -197,7 +198,6 @@ namespace CreativeSpore.SuperTilemapEditor
                 {
                     UnityEditorInternal.ComponentUtility.CopyComponent(copiedTilemap);
                     UnityEditorInternal.ComponentUtility.PasteComponentValues(newTilemap);
-                    obj.SendMessage("_DoDuplicate");
                     obj.name = GameObjectUtility.GetUniqueNameForSibling(obj.transform.parent, copiedTilemap.name);
                 }
             };

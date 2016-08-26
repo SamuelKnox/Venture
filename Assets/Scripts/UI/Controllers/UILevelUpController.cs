@@ -63,7 +63,7 @@ public class UILevelUpController : MonoBehaviour
             Debug.LogError("Could not find rune!", item.gameObject);
             return;
         }
-        if (Input.GetButtonDown(InputNames.Inventory))
+        if (Input.GetButtonDown(InputNames.Back))
         {
             FinishLevelingUpRunes();
         }

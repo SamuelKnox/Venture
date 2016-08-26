@@ -14,4 +14,14 @@
     /// Scene name for player to level up runes
     /// </summary>
     public const string LevelUp = "Level Up";
+
+    /// <summary>
+    /// Scene name for rune shop menu
+    /// </summary>
+    public const string RuneShop = "Rune Shop";
+
+    /// <summary>
+    /// Scene name for equipment shop menu
+    /// </summary>
+    public const string EquipmentShop = "Equipment Shop";
 }

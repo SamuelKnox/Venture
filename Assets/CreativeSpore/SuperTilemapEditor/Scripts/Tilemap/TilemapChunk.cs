@@ -74,6 +74,7 @@ namespace CreativeSpore.SuperTilemapEditor
         private List<Vector3> m_vertices;
         private List<Vector2> m_uv;
         private List<int> m_triangles;
+        private Vector2[] m_uvArray;
         // private List<Color32> m_colors; TODO: add color vertex support
 
         struct AnimTileData
@@ -86,71 +87,76 @@ namespace CreativeSpore.SuperTilemapEditor
 
         #region Monobehaviour Methods
 
+        [SerializeField]
+        private MaterialPropertyBlock m_matPropBlock;
+        void UpdateMaterialPropertyBlock()
+        {
+            if(m_matPropBlock == null)
+                m_matPropBlock = new MaterialPropertyBlock();
+            m_meshRenderer.GetPropertyBlock(m_matPropBlock);
+#if UNITY_EDITOR
+            if (ParentTilemap.ParentTilemapGroup && 
+                (Selection.activeGameObject == ParentTilemap.ParentTilemapGroup.gameObject ||
+                Selection.activeGameObject && Selection.activeGameObject.transform.parent && 
+                Selection.activeGameObject.transform.parent.gameObject == ParentTilemap.ParentTilemapGroup.gameObject) &&
+                ParentTilemap.ParentTilemapGroup.SelectedTilemap != ParentTilemap &&
+                !Application.isPlaying
+            )
+            {
+                m_matPropBlock.SetColor("_Color", ParentTilemap.TintColor * ParentTilemap.ParentTilemapGroup.UnselectedColorMultiplier);
+            }
+            else
+#endif
+            {
+                m_matPropBlock.SetColor("_Color", ParentTilemap.TintColor);
+            }
+            if (Tileset && Tileset.AtlasTexture != null)
+                m_matPropBlock.SetTexture("_MainTex", Tileset.AtlasTexture);
+            else
+                m_matPropBlock.SetTexture("_MainTex", default(Texture));
+            m_meshRenderer.SetPropertyBlock(m_matPropBlock);
+        }
+
+
+        static Dictionary<Material, Material> s_dicMaterialCopyWithPixelSnap = new Dictionary<Material, Material>();
         void OnWillRenderObject()
         {
+            if (!ParentTilemap.Tileset)
+                return;
+
+            if (ParentTilemap.PixelSnap && ParentTilemap.Material.HasProperty("PixelSnap"))
+            {
+                Material matCopyWithPixelSnap;
+                if(!s_dicMaterialCopyWithPixelSnap.TryGetValue(ParentTilemap.Material, out matCopyWithPixelSnap))
+                {
+                    matCopyWithPixelSnap = new Material(ParentTilemap.Material);
+                    matCopyWithPixelSnap.name += "_pixelSnapCopy";
+                    matCopyWithPixelSnap.hideFlags = HideFlags.DontSave;
+                    matCopyWithPixelSnap.EnableKeyword("PIXELSNAP_ON");
+                    matCopyWithPixelSnap.SetFloat("PixelSnap", 1f);
+                    s_dicMaterialCopyWithPixelSnap[ParentTilemap.Material] = matCopyWithPixelSnap;
+                }
+                m_meshRenderer.sharedMaterial = matCopyWithPixelSnap;
+            }
+            else
+            {
+                m_meshRenderer.sharedMaterial = ParentTilemap.Material;
+            }
+
+            UpdateMaterialPropertyBlock();
+
             if (m_animatedTiles.Count > 0) //TODO: add fps attribute to update animated tiles when necessary
             {
-
-                Dictionary<TilesetBrush, Vector2[]> animTileCache = new Dictionary<TilesetBrush, Vector2[]>();
                 for (int i = 0; i < m_animatedTiles.Count; ++i)
                 {
                     AnimTileData animTileData = m_animatedTiles[i];
-                    Vector2[] uvs;
-                    if (!animTileCache.TryGetValue(animTileData.Brush, out uvs))
-                    {
-                        //NOTE: GetAnimTileData will be called only once per brush, because after this call, the brush will be in the cache dictionary
-                        uint tileData = animTileData.Brush.GetAnimTileData();
-                        Rect tileUV = animTileData.Brush.GetAnimUV();
-
-                        bool flipH = (tileData & Tileset.k_TileFlag_FlipH) != 0;
-                        bool flipV = (tileData & Tileset.k_TileFlag_FlipV) != 0;
-                        bool rot90 = (tileData & Tileset.k_TileFlag_Rot90) != 0;
-
-                        //NOTE: xMinMax and yMinMax is opposite if width or height is negative
-                        float u0 = tileUV.xMin + Tileset.AtlasTexture.texelSize.x * InnerPadding;
-                        float v0 = tileUV.yMin + Tileset.AtlasTexture.texelSize.y * InnerPadding;
-                        float u1 = tileUV.xMax - Tileset.AtlasTexture.texelSize.x * InnerPadding;
-                        float v1 = tileUV.yMax - Tileset.AtlasTexture.texelSize.y * InnerPadding;
-
-                        if (flipV)
-                        {
-                            float v = v0;
-                            v0 = v1;
-                            v1 = v;
-                        }
-                        if (flipH)
-                        {
-                            float u = u0;
-                            u0 = u1;
-                            u1 = u;
-                        }
-
-                        uvs = new Vector2[4];
-                        if (rot90)
-                        {
-                            uvs[0] = new Vector2(u1, v0);
-                            uvs[1] = new Vector2(u1, v1);
-                            uvs[2] = new Vector2(u0, v0);
-                            uvs[3] = new Vector2(u0, v1);
-                        }
-                        else
-                        {
-                            uvs[0] = new Vector2(u0, v0);
-                            uvs[1] = new Vector2(u1, v0);
-                            uvs[2] = new Vector2(u0, v1);
-                            uvs[3] = new Vector2(u1, v1);
-                        }
-
-                        animTileCache[animTileData.Brush] = uvs;
-                    }
-
-                    m_uv[animTileData.VertexIdx + 0] = uvs[0];
-                    m_uv[animTileData.VertexIdx + 1] = uvs[1];
-                    m_uv[animTileData.VertexIdx + 2] = uvs[2];
-                    m_uv[animTileData.VertexIdx + 3] = uvs[3];
+                    Vector2[] uvs = animTileData.Brush.GetAnimUVWithFlags();
+                    m_uvArray[animTileData.VertexIdx + 0] = uvs[0];
+                    m_uvArray[animTileData.VertexIdx + 1] = uvs[1];
+                    m_uvArray[animTileData.VertexIdx + 2] = uvs[2];
+                    m_uvArray[animTileData.VertexIdx + 3] = uvs[3];
                 }
-                m_meshFilter.sharedMesh.uv = m_uv.ToArray();
-
+                m_meshFilter.sharedMesh.uv = m_uvArray;
             }
         }
 
@@ -171,13 +177,20 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 _DoDuplicate();
             }
-            // Refresh only if Mesh is null (this happens if hideFlags == DontSave)
-            m_needsRebuildMesh = m_meshFilter.sharedMesh == null;
-            m_needsRebuildColliders = ParentTilemap.ColliderType == eColliderType._3D && (m_meshCollider == null || m_meshCollider.sharedMesh == null);
-            s_isOnValidate = true;
-            UpdateMesh();
-            UpdateColliders();
-            s_isOnValidate = false;
+#if UNITY_EDITOR
+            // fix prefab preview
+            if (UnityEditor.PrefabUtility.GetPrefabType(gameObject) == UnityEditor.PrefabType.Prefab)
+            {
+                m_needsRebuildMesh = true;
+                UpdateMesh();
+            }
+            else
+#endif
+            {
+                m_needsRebuildMesh = true;
+                m_needsRebuildColliders = true;
+                ParentTilemap.UpdateMesh();
+            }
         }
 
         private void _DoDuplicate()
@@ -252,6 +265,16 @@ namespace CreativeSpore.SuperTilemapEditor
         #endregion
 
         #region Public Methods
+
+        /// <summary>
+        /// This fix should be called on next update after updating the MeshCollider (sharedMesh, convex or isTrigger property). 
+        /// For some reason, if this is not called, the OnCollision event will return a collision 
+        /// data with empty contacts points array until this is called for all colliders not touching the tilechunk collider when it was modified
+        /// </summary>
+        public void ApplyContactsEmptyFix()
+        {
+            if (m_meshCollider) m_meshCollider.convex = m_meshCollider.convex;
+        }
 
         public void DrawColliders()
         {

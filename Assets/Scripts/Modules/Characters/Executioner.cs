@@ -18,7 +18,7 @@ public class Executioner : Enemy
             enemyView.Attack();
             pacer.SetPacingActive(false);
         }
-    }
+    } 
 
     /// <summary>
     /// Returns to pacing after an interuption
