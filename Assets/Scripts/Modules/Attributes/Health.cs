@@ -1,0 +1,197 @@
+﻿using CreativeSpore.SmartColliders;
+using CustomUnityLibrary;
+using UnityEngine;
+
+public class Health : MonoBehaviour
+{
+    /// <summary>
+    /// Delegate for taking damage
+    /// </summary>
+    public delegate void DamageDealt(Damage damage);
+
+    /// <summary>
+    /// Event called when damage is received
+    /// </summary>
+    public event DamageDealt OnDamageDealt;
+
+    [Tooltip("Current hit points")]
+    [SerializeField]
+    [Range(0.0f, 1000.0f)]
+    private float currentHitPoints = 100.0f;
+
+    [Tooltip("Max hit points")]
+    [SerializeField]
+    [Range(0.0f, 1000.0f)]
+    private float maxHitPoints = 100.0f;
+
+    [Tooltip("Damage over time left to be applied")]
+    [SerializeField]
+    [Range(0.0f, 100.0f)]
+    private float damageOverTime = 0.0f;
+
+    [Tooltip("How fast damage over time is distributed")]
+    [SerializeField]
+    [Range(0.0f, 10.0f)]
+    private float damageOverTimeRate = 1.0f;
+
+    [Tooltip("How long invincible after receiving damage.  Damage over time does not reset the timer.")]
+    [SerializeField]
+    [Range(0.0f, 10.0f)]
+    private float invincibilityCooldown = 1.0f;
+
+    [Tooltip("Optional health view, used to display the health")]
+    [SerializeField]
+    private HealthView healthView;
+
+    private float totalInvincibilityCooldown;
+
+    void Awake()
+    {
+        SetInvincibilityTime(invincibilityCooldown);
+    }
+
+    void Update()
+    {
+        ApplyDamageOverTime();
+        UpdateCooldownTimer();
+    }
+
+    void OnValidate()
+    {
+        currentHitPoints = Mathf.Min(currentHitPoints, maxHitPoints);
+    }
+
+    /// <summary>
+    /// Checks whether or not this GameObject is dead
+    /// </summary>
+    /// <returns>Whether or not dead</returns>
+    public bool IsDead()
+    {
+        return currentHitPoints <= 0;
+    }
+
+    /// <summary>
+    /// Gets the current hit points
+    /// </summary>
+    /// <returns>Current hit points</returns>
+    public float GetCurrentHitPoints()
+    {
+        return currentHitPoints;
+    }
+
+    public void SetCurrentHitPoints(float hitPoints)
+    {
+        currentHitPoints = Mathf.Clamp(hitPoints, 0, GetMaxHitPoints());
+    }
+
+    /// <summary>
+    /// Gets the max hit points
+    /// </summary>
+    /// <returns>Max hit points</returns>
+    public float GetMaxHitPoints()
+    {
+        return maxHitPoints;
+    }
+
+    /// <summary>
+    /// Sets the max hit points
+    /// </summary>
+    /// <param name="maxHitPoints">Max hit points to use</param>
+    public void SetMaxHitPoints(float maxHitPoints)
+    {
+        this.maxHitPoints = maxHitPoints;
+    }
+
+    /// <summary>
+    /// Gets the duration of invincibility after taking damage
+    /// </summary>
+    /// <returns>Seconds</returns>
+    public float GetInvincibilityTime()
+    {
+        return invincibilityCooldown;
+    }
+
+    /// <summary>
+    /// Sets the duration of invincibility after taking damage
+    /// </summary>
+    /// <param name="time">Seconds</param>
+    public void SetInvincibilityTime(float time)
+    {
+        invincibilityCooldown = time;
+        totalInvincibilityCooldown = invincibilityCooldown;
+    }
+
+    /// <summary>
+    /// Deals damage to this Health
+    /// </summary>
+    /// <param name="damage">Damage to deal</param>
+    public void ApplyDamage(Damage damage)
+    {
+        if (!damage)
+        {
+            Debug.LogError("Cannot apply null damage to " + gameObject + "!", gameObject);
+            return;
+        }
+        bool harmful = damage.GetBaseDamage() > 0 || damage.GetDamageOverTime() > 0 || damage.GetKnockBack() > 0;
+        bool friendly = TeamUtility.IsFriendly(gameObject, damage.gameObject);
+        bool coolingDown = invincibilityCooldown > 0;
+        if (!harmful || friendly || coolingDown)
+        {
+            return;
+        }
+        currentHitPoints -= damage.GetBaseDamage();
+        damageOverTime += damage.GetDamageOverTime();
+        damageOverTimeRate += damage.GetDamageOverTimeRateIncrease();
+        invincibilityCooldown = totalInvincibilityCooldown;
+        var knockBackDirection = (transform.position - damage.transform.position).normalized;
+        var knockBack = knockBackDirection * damage.GetKnockBack();
+        var platformCharacterController = GetComponent<PlatformCharacterController>();
+        if (platformCharacterController)
+        {
+            platformCharacterController.PlatformCharacterPhysics.Velocity = knockBack;
+            return;
+        }
+        var body = GetComponent<Rigidbody2D>();
+        if (body)
+        {
+            body.AddForce(knockBack);
+        }
+        if (OnDamageDealt != null)
+        {
+            OnDamageDealt(damage);
+        }
+        if (healthView)
+        {
+            healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+        }
+    }
+
+    /// <summary>
+    /// Updates the time remaining for invincibility
+    /// </summary>
+    private void UpdateCooldownTimer()
+    {
+        invincibilityCooldown -= Time.deltaTime;
+    }
+
+    /// <summary>
+    /// Applies the damage over time
+    /// </summary>
+    private void ApplyDamageOverTime()
+    {
+        if (damageOverTime > 0)
+        {
+            float damage = Mathf.Min(Time.deltaTime * damageOverTimeRate, damageOverTime);
+            damageOverTime -= damage;
+            currentHitPoints -= damage;
+            if (healthView)
+            {
+                healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+            }
+            if (IsDead() && OnDamageDealt != null)
+            {
+                OnDamageDealt(null);
+            }
+        }
+    }
+}
