@@ -1,0 +1,213 @@
+fileFormatVersion: 2
+guid: e31317783b3af174c8ecfb433a04657b
+timeCreated: 1470771359
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: player_upper_torso
+    21300002: player_lower_torso
+    21300004: player_head
+    21300006: player_left_shoulder
+    21300008: player_right_shoulder
+    21300010: player_left_thigh
+    21300012: player_right_thigh
+    21300014: player_left_arm
+    21300016: player_right_arm
+    21300018: player_left_leg
+    21300020: player_right_leg
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: player_upper_torso
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1342
+        width: 982
+        height: 886
+      alignment: 9
+      pivot: {x: 0.59373367, y: 0.14892386}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_lower_torso
+      rect:
+        serializedVersion: 2
+        x: 1222
+        y: 1985
+        width: 567
+        height: 164
+      alignment: 9
+      pivot: {x: 0.4832064, y: 0.77095294}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_head
+      rect:
+        serializedVersion: 2
+        x: 2123
+        y: 283
+        width: 1999
+        height: 2004
+      alignment: 9
+      pivot: {x: 0.5444584, y: 0.9830712}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_left_shoulder
+      rect:
+        serializedVersion: 2
+        x: 4372
+        y: 1682
+        width: 314
+        height: 496
+      alignment: 9
+      pivot: {x: 0.48989072, y: 0.8903528}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_right_shoulder
+      rect:
+        serializedVersion: 2
+        x: 5031
+        y: 1669
+        width: 288
+        height: 548
+      alignment: 9
+      pivot: {x: 0.48897976, y: 0.87648}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_left_thigh
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 610
+        width: 335
+        height: 450
+      alignment: 9
+      pivot: {x: 0.53789866, y: 0.902042}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_right_thigh
+      rect:
+        serializedVersion: 2
+        x: 1035
+        y: 628
+        width: 335
+        height: 454
+      alignment: 9
+      pivot: {x: 0.5, y: 0.91947365}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_left_arm
+      rect:
+        serializedVersion: 2
+        x: 4404
+        y: 952
+        width: 356
+        height: 572
+      alignment: 9
+      pivot: {x: 0.46433628, y: 0.93836945}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_right_arm
+      rect:
+        serializedVersion: 2
+        x: 5013
+        y: 839
+        width: 386
+        height: 672
+      alignment: 9
+      pivot: {x: 0.42599502, y: 0.93926114}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_left_leg
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 0
+        width: 374
+        height: 433
+      alignment: 9
+      pivot: {x: 0.41513324, y: 0.91782683}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: player_right_leg
+      rect:
+        serializedVersion: 2
+        x: 1037
+        y: 25
+        width: 375
+        height: 435
+      alignment: 9
+      pivot: {x: 0.44075164, y: 0.9232024}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
