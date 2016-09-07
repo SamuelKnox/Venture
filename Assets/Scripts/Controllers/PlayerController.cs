@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(PlayerView))]
+[RequireComponent(typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
     [Tooltip("Whether or not to use input to determine speed, or snap speed to a constant")]
@@ -21,10 +22,19 @@ public class PlayerController : MonoBehaviour
     [Range(0.0f, 1.0f)]
     private float axisJumpingThreshold = 0.5f;
 
-    [Tooltip("Number of jumps allowed, where 2 means the player can double jump (Once off of the ground, and once while mid-air)")]
+    [Tooltip("Layers which have a quicksand effect on the player")]
     [SerializeField]
-    [Range(1, 5)]
-    private int numberJumpsAllowed = 1;
+    private LayerMask quicksandLayers;
+
+    [Tooltip("Vertical handicap applied to player when quicksand is in effect")]
+    [SerializeField]
+    [Range(1.0f, 100.0f)]
+    private float quicksandSinkRate = 50.0f;
+
+    [Tooltip("Handicap applied to player jumping while in quicksand")]
+    [SerializeField]
+    [Range(1.0f, 100.0f)]
+    private float quicksandJumpHandicap = 25.0f;
 
     private Player player;
     private PlatformCharacterController platformCharacterController;
@@ -33,6 +43,10 @@ public class PlayerController : MonoBehaviour
     private Health health;
     private QuestsView questsView;
     private bool controllable = true;
+    private bool inQuicksand = false;
+    private Vector3 initialGravity;
+    private float initialJumpSpeed;
+    private Collider2D playerCollider;
 
     void Awake()
     {
@@ -40,6 +54,9 @@ public class PlayerController : MonoBehaviour
         platformCharacterController = GetComponent<PlatformCharacterController>();
         playerView = GetComponent<PlayerView>();
         health = GetComponentInChildren<Health>();
+        playerCollider = GetComponent<Collider2D>();
+        initialGravity = platformCharacterController.PlatformCharacterPhysics.Gravity;
+        initialJumpSpeed = platformCharacterController.JumpingSpeed;
         if (!health)
         {
             Debug.LogError("Could not find player health!", gameObject);
@@ -100,30 +117,51 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collider2D)
+    void OnHitboxEnter(Collider2D collider2D)
     {
         var interactable = collider2D.GetComponent<Interactable>();
         if (interactable && !nearbyInteractable)
         {
             nearbyInteractable = interactable;
         }
+        if (quicksandLayers.Contains(collider2D.gameObject.layer))
+        {
+            inQuicksand = true;
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity / quicksandSinkRate;
+            platformCharacterController.PlatformCharacterPhysics.Velocity = platformCharacterController.PlatformCharacterPhysics.Gravity;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed / quicksandJumpHandicap;
+        }
     }
 
-    void OnTriggerExit2D(Collider2D collider2D)
+    void OnHitboxStay(Collider2D collider2D)
+    {
+        var collectable = collider2D.GetComponent<Collectable>();
+        if (collectable)
+        {
+            Collect(collectable);
+        }
+        if (quicksandLayers.Contains(collider2D.gameObject.layer))
+        {
+            platformCharacterController.IsGrounded = true;
+            if (playerCollider.bounds.max.y <= collider2D.bounds.max.y)
+            {
+                player.Die();
+            }
+        }
+    }
+
+    void OnHitboxExit(Collider2D collider2D)
     {
         var interactable = collider2D.GetComponent<Interactable>();
         if (interactable && interactable == nearbyInteractable)
         {
             nearbyInteractable = null;
         }
-    }
-
-    void OnCollectorStay(Collider2D collider2D)
-    {
-        var collectable = collider2D.GetComponent<Collectable>();
-        if (collectable)
+        if (quicksandLayers.Contains(collider2D.gameObject.layer))
         {
-            Collect(collectable);
+            inQuicksand = false;
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed;
         }
     }
 
@@ -166,6 +204,10 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Move(Vector2 input)
     {
+        if (inQuicksand)
+        {
+            input = Vector2.zero;
+        }
         float horizontalMovement = input.x * Mathf.Abs(input.x);
         float absoluteHorizontalMovement = Mathf.Abs(horizontalMovement);
         float verticalMovement = input.y * Mathf.Abs(input.y);
@@ -189,7 +231,15 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Jump(float verticalInput)
     {
-        bool jumping = Input.GetButton(InputNames.Jump) && verticalInput > -axisJumpingThreshold;
+        bool jumping;
+        if (inQuicksand)
+        {
+            jumping = Input.GetButtonDown(InputNames.Jump);
+        }
+        else
+        {
+            jumping = Input.GetButton(InputNames.Jump) && verticalInput > -axisJumpingThreshold;
+        }
         bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -axisJumpingThreshold;
         platformCharacterController.SetActionState(eControllerActions.Jump, jumping);
         platformCharacterController.SetActionState(eControllerActions.PlatformDropDown, droppingDown);

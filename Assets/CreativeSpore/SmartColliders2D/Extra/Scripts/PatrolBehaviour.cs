@@ -80,7 +80,7 @@ public class PatrolBehaviour : MonoBehaviour
     }
 #endif
 
-    void FixedUpdate()
+    void Update()
     {
         if( Path != null && Path.Count > 0 )
         {

@@ -85,9 +85,9 @@ namespace CreativeSpore.SmartColliders
         /// </summary>
         public float SlopeAngle { get { return m_slopeAngle; } set { m_slopeAngle = value; } }        
         /// <summary>
-        /// The real velocity of this game object or how much it is moving from previous frame to the next one
+        /// The instant velocity of this game object or how much it is moving from previous frame to the next one
         /// </summary>
-        public Vector3 RealVelocity { get { return m_realVelocity; } }
+        public Vector3 InstantVelocity { get { return m_instantVelocity; } }
         /// <summary>
         /// Distance to the ground
         /// </summary>
@@ -101,7 +101,7 @@ namespace CreativeSpore.SmartColliders
         /// </summary>
         public bool GetIfActionHasChanged(eControllerActions action) { return (m_actionChanged & action) != 0; }
         /// <summary>
-        /// Set an action
+        /// Sets an action
         /// </summary>
         public void SetActionState(eControllerActions action, bool value) { m_actionFlags = (value ? (m_actionFlags | action) : (m_actionFlags & ~action)); }        
 
@@ -127,7 +127,7 @@ namespace CreativeSpore.SmartColliders
         private bool m_isGrounded;
         private float m_slopeAngle;
         private Vector3 m_prevPos;
-        private Vector3 m_realVelocity;
+        private Vector3 m_instantVelocity;
         private float m_groundDist;
         private float m_horSpeedScale = 1f;
         private float m_verSpeedScale = 1f;
@@ -142,7 +142,7 @@ namespace CreativeSpore.SmartColliders
         private PlatformCharacterPhysics m_platformPhysics = new PlatformCharacterPhysics();
         
         private SmartPlatformCollider m_smartCollider;
-        void Start()
+        protected virtual void Start()
         {
             m_smartCollider = GetComponent<SmartPlatformCollider>();
             m_smartCollider.OnSideCollision += OnSideCollision;
@@ -156,13 +156,14 @@ namespace CreativeSpore.SmartColliders
             m_smartCollider.LayerCollision = m_smartCollider.LayerCollision & ~ClimbingLayers;
         }
 
-        void Reset()
+        protected virtual void Reset()
         {
             m_maxWalkingSpeed = m_platformPhysics.SolveMaxSpeedWithAccAndDrag(m_walkingAcc, m_walkingDrag);
         }
 
-        void FixedUpdate()
-        {            
+
+        protected virtual void Update()
+        {
             DoClimbing();
 
             if (!m_isClimbing)
@@ -219,16 +220,19 @@ namespace CreativeSpore.SmartColliders
                         m_smartCollider.OneWayCollisionDown = m_savedOneWayCollisionDown;
                     }
                 }
-                m_realVelocity = (transform.position - m_prevPos) / Time.deltaTime;
+                m_instantVelocity = (transform.position - m_prevPos) / Time.deltaTime;
                 m_prevPos = transform.position;
                 m_platformPhysics.Drag = new Vector2(m_walkingDrag, 0f);
                 m_platformPhysics.MaxHSpeed = MaxWalkingSpeed * m_horSpeedScale;
                 m_platformPhysics.Position = transform.position;
                 m_platformPhysics.UpdatePhysics(Time.deltaTime);
                 m_groundDist = _CalculateGroundDist();
-                transform.position = m_platformPhysics.Position;
                 bool wasGrounded = m_isGrounded;
                 m_isGrounded = m_smartCollider.enabled && m_smartCollider.IsGrounded() && m_platformPhysics.DeltaDisp.y <= 0f;
+
+                // NOTE: Unity 5.4 has a bug in TransformDirection being affected by scale (x is negated to flip the sprite). 
+                // So instead of calling TransformDirection I will rotate it directly.
+                transform.position = transform.position + transform.rotation * (m_platformPhysics.Position - transform.position);
 
                 //+++ Do slopes
                 // If over a slope, move the character in the slope direction
@@ -268,7 +272,7 @@ namespace CreativeSpore.SmartColliders
             m_prevActionFlags = m_actionFlags;
         }
 
-        private float _CalculateGroundDist()
+        protected float _CalculateGroundDist()
         {
             float groundDist = float.MaxValue;
             for (int i = 0; i < m_smartCollider.BottomCheckPoints.Count; ++i)
@@ -439,9 +443,9 @@ namespace CreativeSpore.SmartColliders
         [SerializeField]
         private float m_ladderWidthFactor = 2f;
         private bool m_isClimbing = false;
-        private Collider2D m_currentClimbingCollider; 
+        private Collider2D m_currentClimbingCollider;
 
-        void DoClimbing()
+        protected void DoClimbing()
         {
             float fHorAxis = 0f;
             float fVerAxis = 0f;
@@ -525,7 +529,7 @@ namespace CreativeSpore.SmartColliders
         }
 
 
-        private void StartClimbing()
+        protected void StartClimbing()
         {
             if (!m_isClimbing)
             {
@@ -535,7 +539,7 @@ namespace CreativeSpore.SmartColliders
             }
         }
 
-        private void StopClimbing()
+        protected void StopClimbing()
         {
             if (m_isClimbing)
             {
@@ -550,7 +554,7 @@ namespace CreativeSpore.SmartColliders
         /// Returns the Collider2D of a climbing collider below the smart rect collider
         /// </summary>
         /// <returns></returns>
-        private Collider2D GetClimbingColliderBelow(float SkinBottomWidthFactor = 1.1f)
+        protected Collider2D GetClimbingColliderBelow(float SkinBottomWidthFactor = 1.1f)
         {
             //for (int i = 0; i < m_smartRectCollider.BottomCheckPoints.Count; ++i)
             int i = (m_smartCollider.BottomCheckPoints.Count + 1) / 2;
@@ -570,7 +574,7 @@ namespace CreativeSpore.SmartColliders
         /// Returns the Collider2D of a climbing collider above or inside the smart rect collider
         /// </summary>
         /// <returns></returns>
-        private Collider2D GetClimbingColliderAbove()
+        protected Collider2D GetClimbingColliderAbove()
         {
             //for (int i = 0; i < m_smartRectCollider.TopCheckPoints.Count; ++i)
             int i = (m_smartCollider.TopCheckPoints.Count + 1) / 2;

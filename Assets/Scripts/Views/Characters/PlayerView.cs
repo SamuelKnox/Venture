@@ -170,8 +170,8 @@ public class PlayerView : MonoBehaviour
     {
         if (!climbing)
         {
-            float x = platformCharacterController.RealVelocity.x;
-            float y = platformCharacterController.RealVelocity.y;
+            float x = platformCharacterController.InstantVelocity.x;
+            float y = platformCharacterController.InstantVelocity.y;
             animator.SetFloat(AnimationNames.Player.Floats.HorizontalSpeed, x);
             animator.SetFloat(AnimationNames.Player.Floats.VerticalSpeed, y);
         }

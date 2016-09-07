@@ -29,6 +29,34 @@ public abstract class Enemy : Character
     }
 
     /// <summary>
+    /// Death for enemy
+    /// </summary>
+    public override void Die()
+    {
+        if (OnDeath != null)
+        {
+            OnDeath(this);
+        }
+        var spawners = GetComponentsInChildren<Spawner>();
+        foreach (var spawner in spawners)
+        {
+            var rewards = spawner.Spawn();
+            foreach (var reward in rewards)
+            {
+                var body2D = reward.GetComponent<Rigidbody2D>();
+                if (body2D)
+                {
+                    body2D.AddForce(new Vector2(UnityEngine.Random.Range(-RewardForce.x, RewardForce.x), UnityEngine.Random.Range(0.0f, RewardForce.y)));
+                }
+            }
+        }
+        foreach (var monoBehaviour in GetComponentsInChildren<MonoBehaviour>())
+        {
+            monoBehaviour.enabled = false;
+        }
+    }
+
+    /// <summary>
     /// Gets the amount of time the enemy should be stunned for on damage dealt
     /// </summary>
     /// <returns>Stun duration in seconds</returns>
@@ -60,34 +88,6 @@ public abstract class Enemy : Character
         else
         {
             enemyView.Hurt();
-        }
-    }
-
-    /// <summary>
-    /// Death for enemy
-    /// </summary>
-    protected override void Die()
-    {
-        if (OnDeath != null)
-        {
-            OnDeath(this);
-        }
-        var spawners = GetComponentsInChildren<Spawner>();
-        foreach (var spawner in spawners)
-        {
-            var rewards = spawner.Spawn();
-            foreach (var reward in rewards)
-            {
-                var body2D = reward.GetComponent<Rigidbody2D>();
-                if (body2D)
-                {
-                    body2D.AddForce(new Vector2(UnityEngine.Random.Range(-RewardForce.x, RewardForce.x), UnityEngine.Random.Range(0.0f, RewardForce.y)));
-                }
-            }
-        }
-        foreach (var monoBehaviour in GetComponentsInChildren<MonoBehaviour>())
-        {
-            monoBehaviour.enabled = false;
         }
     }
 

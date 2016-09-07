@@ -139,10 +139,16 @@ public class Health : MonoBehaviour
         {
             return;
         }
+        invincibilityCooldown = totalInvincibilityCooldown;
+        var orbOfProtection = GetComponentInChildren<OrbOfProtection>();
+        if (orbOfProtection)
+        {
+            Destroy(orbOfProtection.gameObject);
+            return;
+        }
         currentHitPoints -= damage.GetBaseDamage();
         damageOverTime += damage.GetDamageOverTime();
         damageOverTimeRate += damage.GetDamageOverTimeRateIncrease();
-        invincibilityCooldown = totalInvincibilityCooldown;
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
         var knockBack = knockBackDirection * damage.GetKnockBack();
         var platformCharacterController = GetComponent<PlatformCharacterController>();

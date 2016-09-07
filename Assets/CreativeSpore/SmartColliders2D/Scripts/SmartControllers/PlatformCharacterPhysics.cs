@@ -62,7 +62,11 @@ namespace CreativeSpore.SmartColliders
             // Update Position
             m_prevPos = m_pos;
             Vector3 disp = m_vel * timeDt + .5f * m_acc * timeDt * timeDt;
-            disp.x = Mathf.Clamp(disp.x, -m_maxHSpeed * timeDt, m_maxHSpeed * timeDt);
+
+			float l_maxHDisp = m_maxHSpeed * timeDt;
+
+			disp.x = Mathf.Clamp(disp.x, -l_maxHDisp, l_maxHDisp);
+
             m_pos += disp;
             // Update Velocity
             m_vel += m_acc * timeDt;

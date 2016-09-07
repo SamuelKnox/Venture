@@ -543,8 +543,9 @@ public class Player : Character
     /// <summary>
     /// Player dies
     /// </summary>
-    protected override void Die()
+    public override void Die()
     {
+        health.SetCurrentHitPoints(0);
         playerView.Die();
     }
 

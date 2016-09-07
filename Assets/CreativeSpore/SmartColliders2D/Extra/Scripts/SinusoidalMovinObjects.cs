@@ -28,11 +28,10 @@ public class SinusoidalMovinObjects : MonoBehaviour
         {
             ObjectList.Add(transform.GetChild( transform.childCount - i - 1));
         }
-        FixedUpdate();
+        Update();
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (Frequency >= 0f && Frequency < Vector3.kEpsilon) Frequency = Vector3.kEpsilon;
         else if (Frequency <= 0f && Frequency > -Vector3.kEpsilon) Frequency = -Vector3.kEpsilon;

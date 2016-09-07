@@ -53,10 +53,10 @@ public class Ghost : Enemy
     /// <summary>
     /// Prevents the ghost from moving before death, then destroys it after death
     /// </summary>
-    protected override void Die()
+    public override void Die()
     {
-        body2D.constraints = RigidbodyConstraints2D.FreezeAll;
         base.Die();
+        body2D.constraints = RigidbodyConstraints2D.FreezeAll;
         Destroy(gameObject);
     }
 

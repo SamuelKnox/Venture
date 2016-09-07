@@ -22,6 +22,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
             TilesetBrush brush = (TilesetBrush)target;
             if (brush.Tileset == null)
             {

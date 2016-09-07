@@ -29,7 +29,7 @@ public abstract class Character : MonoBehaviour
     /// <summary>
     /// Called when character dies
     /// </summary>
-    protected abstract void Die();
+    public abstract void Die();
 
     /// <summary>
     /// Calls when character is stunned
