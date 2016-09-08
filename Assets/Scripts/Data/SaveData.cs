@@ -198,6 +198,7 @@ public class SaveData
         {
             var collectedQuestPrefab = questPrefabs.Where(q => q.name == questNames[i]).First();
             var questInstance = UnityEngine.Object.Instantiate(collectedQuestPrefab) as Quest;
+            questInstance.name = questInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
             questInstance.SetComplete(questsComplete[i]);
             questInstance.SetLongTermQuest(true);
             quests.Add(questInstance);

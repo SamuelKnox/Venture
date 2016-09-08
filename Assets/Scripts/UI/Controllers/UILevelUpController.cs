@@ -31,6 +31,11 @@ public class UILevelUpController : MonoBehaviour
     void Start()
     {
         LoadData();
+        if (runes.Length == 0)
+        {
+            Debug.LogError("Cannot level up runes, because the player doesn't have any!", gameObject);
+            return;
+        }
         runesView.CreateTabs(GetRuneTypes());
         runesView.MoveTab(0, runes);
         prestigeView.UpdatePrestige(prestige);
@@ -123,10 +128,6 @@ public class UILevelUpController : MonoBehaviour
         }
         itemContainer.gameObject.SetActive(false);
         runes = items.Where(i => i.GetComponent<Rune>()).Select(r => r.GetComponent<Rune>()).ToArray();
-        if (runes.Count() == 0)
-        {
-            FinishLevelingUpRunes();
-        }
     }
 
     /// <summary>

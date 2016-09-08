@@ -1,4 +1,5 @@
 ﻿using CustomUnityLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -6,6 +7,10 @@ using UnityEngine;
 
 public class QuestGiver : Interactable
 {
+    [Tooltip("Container used to store quests")]
+    [SerializeField]
+    private Transform questContainer;
+
     [Tooltip("Text where quest is going to be displayed")]
     [SerializeField]
     private TextMeshPro questText;
@@ -18,15 +23,12 @@ public class QuestGiver : Interactable
     [SerializeField]
     private string notQualifiedDialog;
 
-    [Tooltip("Quests that can be given")]
-    [SerializeField]
-    private List<Quest> quests = new List<Quest>();
-
     [Tooltip("Whether or not this is a main questline questgiver.  If yes, the quests will be saved across playthroughs.")]
     [SerializeField]
     private bool mainQuestGiver = false;
 
     private Player player;
+    private Quest activeQuest;
 
     protected override void Awake()
     {
@@ -50,35 +52,40 @@ public class QuestGiver : Interactable
     public override void OnInteractionEnter()
     {
         questText.enabled = true;
-        if (quests.Count == 0)
-        {
-            questText.text = outOfQuestsDialog;
-            return;
-        }
+        var quests = questContainer.GetComponentsInChildren<Quest>().ToList();
         var questsToRemove = new List<Quest>();
         foreach (var quest in quests)
         {
+            if (quest.transform == questContainer)
+            {
+                continue;
+            }
             foreach (var playerQuest in player.GetQuests())
             {
-                if (quest.name == playerQuest.name.TrimEnd(GameObjectUtility.CloneSuffix))
+                if (quest.name == playerQuest.name)
                 {
-                    if (!playerQuest.IsComplete())
+                    if (playerQuest.IsComplete())
                     {
-                        questText.text = playerQuest.GetDescription();
-                        return;
+                        questsToRemove.Add(quest);
+                        Destroy(quest.gameObject);
                     }
                     else
                     {
-                        questsToRemove.Add(quest);
+                        activeQuest = playerQuest;
                     }
                 }
             }
         }
-        foreach (var quest in questsToRemove)
+        foreach(var quest in questsToRemove)
         {
             quests.Remove(quest);
         }
-        ActivateQuest();
+        if (quests.Count() == 0 && !activeQuest)
+        {
+            questText.text = outOfQuestsDialog;
+            return;
+        }
+        ActivateQuest(quests.ToArray());
     }
 
     /// <summary>
@@ -92,9 +99,12 @@ public class QuestGiver : Interactable
     /// <summary>
     /// Activates the quest and has the quest giver present it
     /// </summary>
-    public void ActivateQuest()
+    public void ActivateQuest(Quest[] quests)
     {
-        var activeQuest = quests.Where(q => q.IsQualified()).FirstOrDefault();
+        if (!activeQuest)
+        {
+            activeQuest = quests.Where(q => q.IsQualified()).OrderBy(q => q.GetDifficulty()).ThenBy(q => UnityEngine.Random.Range(0.0f, 1.0f)).FirstOrDefault();
+        }
         if (!activeQuest)
         {
             questText.text = notQualifiedDialog;
@@ -106,10 +116,10 @@ public class QuestGiver : Interactable
             Debug.LogError("Attempting to active quest " + activeQuest + ", but this quest has already been completed!", activeQuest.gameObject);
             return;
         }
-        questText.text = activeQuest.GetDescription();
         activeQuest.SetLongTermQuest(mainQuestGiver);
         player.AddQuest(activeQuest);
         activeQuest.OnQuestComplete += OnQuestComplete;
+        questText.text = activeQuest.GetDescription();
     }
 
     /// <summary>
@@ -118,8 +128,13 @@ public class QuestGiver : Interactable
     /// <param name="quest">Quest which was completed</param>
     private void OnQuestComplete(Quest quest)
     {
-        quests.Remove(quest);
+        if (quest != activeQuest)
+        {
+            Debug.LogError("Completed a quest that was not the active quest!", quest.gameObject);
+            return;
+        }
         quest.OnQuestComplete -= OnQuestComplete;
+        activeQuest = null;
     }
 
     /// <summary>
@@ -127,7 +142,7 @@ public class QuestGiver : Interactable
     /// </summary>
     private void SetUpQuests()
     {
-        quests = quests.OrderBy(q => q.GetDifficulty()).ThenBy(q => Random.Range(0.0f, 1.0f)).ToList();
+        var quests = questContainer.GetComponentsInChildren<Quest>();
         foreach (var quest in quests)
         {
             quest.enabled = false;

@@ -44,14 +44,6 @@ public class Player : Character
     [SerializeField]
     private Transform questContainer;
 
-    [Tooltip("Player's currently active quests")]
-    [SerializeField]
-    private List<Quest> activeQuests = new List<Quest>();
-
-    [Tooltip("Player's completed quests")]
-    [SerializeField]
-    private List<Quest> completedQuests = new List<Quest>();
-
     [Tooltip("Damage dealt by player when contact with an enemy is made")]
     [SerializeField]
     private Damage defensiveDamage;
@@ -139,11 +131,10 @@ public class Player : Character
     /// <param name="quest">Quest to add</param>
     public bool AddQuest(Quest quest)
     {
-        if (activeQuests.Contains(quest))
+        if (questContainer.GetComponentsInChildren<Quest>().Contains(quest))
         {
             return false;
         }
-        activeQuests.Add(quest);
         quest.transform.SetParent(questContainer);
         quest.transform.position = transform.position;
         quest.OnQuestComplete += OnQuestComplete;
@@ -157,8 +148,6 @@ public class Player : Character
     /// <param name="quest">Quest which was completed</param>
     private void OnQuestComplete(Quest quest)
     {
-        activeQuests.Remove(quest);
-        completedQuests.Add(quest);
         prestige += quest.GetPrestige();
         quest.OnQuestComplete -= OnQuestComplete;
         questsView.UpdateQuests();
@@ -692,13 +681,9 @@ public class Player : Character
         var quests = SaveData.LoadQuests();
         foreach (var quest in quests)
         {
-            if (quest.IsComplete())
+
+            if (!quest.IsComplete())
             {
-                completedQuests.Add(quest);
-            }
-            else
-            {
-                activeQuests.Add(quest);
                 quest.OnQuestComplete += OnQuestComplete;
             }
             quest.transform.SetParent(questContainer);

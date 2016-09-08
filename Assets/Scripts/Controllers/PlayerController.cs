@@ -253,7 +253,7 @@ public class PlayerController : MonoBehaviour
     private void GameOver()
     {
         player.Save();
-        if (player.GetPrestige() > 0)
+        if (player.GetPrestige() > 0 && player.GetRunes().Length > 0)
         {
             SceneManager.LoadScene(SceneNames.LevelUp);
         }
