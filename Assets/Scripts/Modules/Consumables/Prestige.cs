@@ -20,12 +20,6 @@ public class Prestige : Consumable
     /// </summary>
     private void AddPlayerPrestige()
     {
-        var player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError(gameObject + " could not find Player!", gameObject);
-            return;
-        }
-        player.SetPrestige(player.GetPrestige() + prestigeIncrease);
+        PlayerManager.Player.SetPrestige(PlayerManager.Player.GetPrestige() + prestigeIncrease);
     }
 }

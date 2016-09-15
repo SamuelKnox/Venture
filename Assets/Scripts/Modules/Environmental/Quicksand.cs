@@ -7,15 +7,13 @@ public class Quicksand : MonoBehaviour
     [Range(0.0f, 1.0f)]
     [SerializeField]
     private float handicap = 0.1f;
-
-    //private Damage damage;
+    
     private Vector3 initialGravity;
     private float initialJumpSpeed;
     private int sandCount;
 
     void Awake()
     {
-        //damage = GetComponent<Damage>();
         var playerController = FindObjectOfType<PlatformCharacterController>();
         if (!playerController)
         {
@@ -24,11 +22,6 @@ public class Quicksand : MonoBehaviour
         }
         initialGravity = playerController.PlatformCharacterPhysics.Gravity;
         initialJumpSpeed = playerController.JumpingSpeed;
-    }
-
-    void Start()
-    {
-        //damage.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -41,16 +34,6 @@ public class Quicksand : MonoBehaviour
             playerController.PlatformCharacterPhysics.Gravity = initialGravity * handicap;
             playerController.JumpingSpeed = initialJumpSpeed * handicap;
         }
-        //var player = other.GetComponent<Player>();
-        //if (player)
-        //{
-        //    var playerCollider = player.GetComponent<Collider2D>();
-        //    var topOfPlayerY = player.transform.position.y + playerCollider.bounds.extents.y;
-        //    if (transform.position.y >= topOfPlayerY)
-        //    {
-        //        damage.SetActive(true);
-        //    }
-        //}
     }
 
     void OnTriggerExit2D(Collider2D other)
@@ -64,8 +47,6 @@ public class Quicksand : MonoBehaviour
                 playerController.PlatformCharacterPhysics.Gravity = initialGravity;
                 playerController.JumpingSpeed = initialJumpSpeed;
             }
-            //damage.SetActive(false);
-            //playerController.JumpingSpeed = initialJumpSpeed;
         }
     }
 }

@@ -29,7 +29,7 @@ public class SpeedRune : YellowRune
     /// <param name="change">Change is speed modifier</param>
     private void AdjustPlayerHorizontalSpeedModifier(float change)
     {
-        var platformCharacterController = GetPlayer().GetComponent<PlatformCharacterController>();
+        var platformCharacterController = PlayerManager.Player.GetComponent<PlatformCharacterController>();
         if (!platformCharacterController)
         {
             Debug.LogError("A Platform Character Controller was not found!", gameObject);
@@ -37,14 +37,16 @@ public class SpeedRune : YellowRune
         platformCharacterController.WalkingAcc *= 1.0f + change;
         platformCharacterController.AirborneAcc *= 1.0f + change;
         Debug.LogWarning("this works?");
-        //platformCharacterController.WalkingAcc += change;
-        //platformCharacterController.AirborneAcc += change;
         platformCharacterController.MaxWalkingSpeed = Mathf.Infinity;
     }
 
+    /// <summary>
+    /// Changes the height at which the player jumps
+    /// </summary>
+    /// <param name="change">How much to change the jump height by</param>
     private void AdjustPlayerJumpHeight(float change)
     {
-        var platformCharacterController = GetPlayer().GetComponent<PlatformCharacterController>();
+        var platformCharacterController = PlayerManager.Player.GetComponent<PlatformCharacterController>();
         if (!platformCharacterController)
         {
             Debug.LogError("A Platform Character Controller was not found!", gameObject);

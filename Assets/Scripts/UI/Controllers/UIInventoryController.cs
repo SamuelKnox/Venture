@@ -53,20 +53,9 @@ public class UIInventoryController : MonoBehaviour
 
     private InventoryMode inventoryMode = InventoryMode.Character;
     private GameObject previousSelectedGameObject;
-    private Player player;
     private ItemButton runeableEquipmentItemButton;
     private bool dirty;
     private Dictionary<GamePadInputs, string> gamePadInstructions = new Dictionary<GamePadInputs, string>();
-
-    void Awake()
-    {
-        player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.Log(gameObject + " could not find Player!", gameObject);
-            return;
-        }
-    }
 
     void Start()
     {
@@ -177,7 +166,7 @@ public class UIInventoryController : MonoBehaviour
         }
         if (Input.GetButtonDown(InputNames.EquipEquipment))
         {
-            var equipmentOfType = player.GetInventory().GetItems(equipment.GetItemType()).Select(i => i.GetComponent<Equipment>());
+            var equipmentOfType = PlayerManager.Player.GetInventory().GetItems(equipment.GetItemType()).Select(i => i.GetComponent<Equipment>());
             foreach (var equipmentPiece in equipmentOfType)
             {
                 if (equipmentPiece == equipment)
@@ -186,7 +175,7 @@ public class UIInventoryController : MonoBehaviour
                 }
                 equipmentPiece.DetachAllRunes();
             }
-            player.Equip(equipment);
+            PlayerManager.Player.Equip(equipment);
             ChangeMode(InventoryMode.Character, itemButton);
             dirty = true;
         }
@@ -214,7 +203,7 @@ public class UIInventoryController : MonoBehaviour
         Equipment equipmentWithRuneAttached = null;
         if (rune)
         {
-            var equipment = player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
+            var equipment = PlayerManager.Player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
             var socketedEquipment = equipment.Where(e => e.GetRuneSocketTypes().Contains(rune.GetRuneType()));
             equipmentWithRuneAttached = socketedEquipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
         }

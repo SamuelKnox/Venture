@@ -73,6 +73,16 @@
             /// Animation name for player's vertical speed
             /// </summary>
             public const string VerticalSpeed = "Vertical Speed";
+
+            /// <summary>
+            /// Animation name for horizontal input
+            /// </summary>
+            public const string HorizontalInput = "Horizontal Input";
+
+            /// <summary>
+            /// Animation name for vertical input
+            /// </summary>
+            public const string VerticalInput = "Vertical Input";
         }
 
         public static class Triggers

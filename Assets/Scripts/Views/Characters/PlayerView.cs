@@ -19,7 +19,6 @@ public class PlayerView : MonoBehaviour
     private PlatformCharacterController platformCharacterController;
     private PlayerController playerController;
     private Animator animator;
-    private Player player;
     private bool climbing;
     private bool attacking;
     private Collectable collectable;
@@ -29,7 +28,6 @@ public class PlayerView : MonoBehaviour
         platformCharacterController = GetComponent<PlatformCharacterController>();
         playerController = GetComponent<PlayerController>();
         animator = GetComponent<Animator>();
-        player = GetComponent<Player>();
     }
 
     void Update()
@@ -71,6 +69,8 @@ public class PlayerView : MonoBehaviour
             return;
         }
         attacking = true;
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
         animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);
     }
 
@@ -84,6 +84,8 @@ public class PlayerView : MonoBehaviour
             return;
         }
         attacking = true;
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
         animator.SetTrigger(AnimationNames.Player.Triggers.WandAttack);
     }
 
@@ -113,7 +115,7 @@ public class PlayerView : MonoBehaviour
         if (collectable.IsSpecialItem() && !this.collectable)
         {
             this.collectable = collectable;
-            var equippedWeapon = player.GetActiveWeapon();
+            var equippedWeapon = PlayerManager.Player.GetActiveWeapon();
             if (equippedWeapon)
             {
                 equippedWeapon.gameObject.SetActive(false);
@@ -149,7 +151,7 @@ public class PlayerView : MonoBehaviour
             return;
         }
         collectable.gameObject.SetActive(false);
-        var equippedWeapon = player.GetActiveWeapon();
+        var equippedWeapon = PlayerManager.Player.GetActiveWeapon();
         equippedWeapon.gameObject.SetActive(true);
         Destroy(collectable);
         FinishAttacking();

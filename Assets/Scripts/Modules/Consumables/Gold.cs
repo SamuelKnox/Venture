@@ -20,12 +20,6 @@ public class Gold : Consumable
     /// </summary>
     private void IncreasePlayerGold()
     {
-        var player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError(gameObject + " could not find Player!", gameObject);
-            return;
-        }
-        player.SetGold(player.GetGold() + goldIncrease);
+        PlayerManager.Player.SetGold(PlayerManager.Player.GetGold() + goldIncrease);
     }
 }

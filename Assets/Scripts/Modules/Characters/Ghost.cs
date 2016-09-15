@@ -13,18 +13,11 @@ public class Ghost : Enemy
     private float maxSpeed = 1.0f;
 
     private Rigidbody2D body2D;
-    private Player player;
 
     protected override void Awake()
     {
         base.Awake();
         body2D = GetComponent<Rigidbody2D>();
-        player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError(gameObject + " could not find player!");
-            return;
-        }
     }
 
     void Start()
@@ -68,11 +61,11 @@ public class Ghost : Enemy
         float x = transform.localScale.x;
         float y = transform.localScale.y;
         float z = transform.localScale.z;
-        if (transform.position.x < player.transform.position.x)
+        if (transform.position.x < PlayerManager.Player.transform.position.x)
         {
             x = Mathf.Abs(x);
         }
-        else if (transform.position.x > player.transform.position.x)
+        else if (transform.position.x > PlayerManager.Player.transform.position.x)
         {
             x = -Mathf.Abs(x);
         }
@@ -84,7 +77,7 @@ public class Ghost : Enemy
     /// </summary>
     private void MoveTowardsPlayer()
     {
-        var direction = (player.transform.position - transform.position).normalized;
+        var direction = (PlayerManager.Player.transform.position - transform.position).normalized;
         var force = Vector2.Scale(direction, acceleration);
         body2D.AddForce(force);
         body2D.velocity = Vector2.ClampMagnitude(body2D.velocity, maxSpeed);

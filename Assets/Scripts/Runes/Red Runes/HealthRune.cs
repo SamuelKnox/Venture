@@ -28,7 +28,7 @@ public class HealthRune : RedRune
     /// <param name="change">Amount to change by</param>
     private void AdjustPlayerHitPoints(float change)
     {
-        var playerHealth = GetPlayer().GetComponentInChildren<Health>();
+        var playerHealth = PlayerManager.Player.GetComponentInChildren<Health>();
         playerHealth.SetMaxHitPoints(playerHealth.GetMaxHitPoints() + change);
         playerHealth.SetCurrentHitPoints(playerHealth.GetMaxHitPoints());
     }
@@ -39,7 +39,7 @@ public class HealthRune : RedRune
     /// <param name="time">Change in seconds</param>
     private void AdjustPlayerInvincibilityTime(float time)
     {
-        var playerHealth = GetPlayer().GetComponentInChildren<Health>();
+        var playerHealth = PlayerManager.Player.GetComponentInChildren<Health>();
         playerHealth.SetInvincibilityTime(playerHealth.GetInvincibilityTime() + time);
     }
 }

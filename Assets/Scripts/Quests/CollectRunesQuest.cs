@@ -13,7 +13,7 @@ public class CollectRunesQuest : Quest
         {
             return;
         }
-        if (player.GetInventory().GetItems(ItemType.Rune).Length >= runesNeeded)
+        if (PlayerManager.Player.GetInventory().GetItems(ItemType.Rune).Length >= runesNeeded)
         {
             Complete();
         }
@@ -25,6 +25,6 @@ public class CollectRunesQuest : Quest
     /// <returns>Player has enough runes</returns>
     public override bool IsQualified()
     {
-        return player.GetInventory().GetItems(ItemType.Rune).Length < runesNeeded;
+        return PlayerManager.Player.GetInventory().GetItems(ItemType.Rune).Length < runesNeeded;
     }
 }

@@ -30,19 +30,8 @@ public class UIRuneShopController : MonoBehaviour
     [Tooltip("List of Runes which can be sold")]
     [SerializeField]
     private List<Rune> runesForSale = new List<Rune>();
-
-    private Player player;
+    
     private GameObject previousSelectedGameObject;
-
-    void Awake()
-    {
-        player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.Log(gameObject + " could not find Player!", gameObject);
-            return;
-        }
-    }
 
     void Start()
     {
@@ -120,12 +109,12 @@ public class UIRuneShopController : MonoBehaviour
             Debug.LogError("Item could not be found!", gameObject);
             return;
         }
-        if (player.GetGold() < item.GetCost())
+        if (PlayerManager.Player.GetGold() < item.GetCost())
         {
             runesView.AttemptToPurchaseUnaffordableItem();
             return;
         }
-        player.SpendGold(item.GetCost());
+        PlayerManager.Player.SpendGold(item.GetCost());
         var itemInstance = Instantiate(item);
         var collectable = itemInstance.GetComponent<Collectable>();
         if (!collectable)
@@ -133,6 +122,6 @@ public class UIRuneShopController : MonoBehaviour
             Debug.LogError("Could not find Collectable on Rune!", gameObject);
             return;
         }
-        player.Collect(collectable);
+        PlayerManager.Player.Collect(collectable);
     }
 }

@@ -38,13 +38,7 @@ public class HealthPotion : Consumable
     /// </summary>
     private void HealPlayer()
     {
-        var player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError(gameObject + " could not find Player!", gameObject);
-            return;
-        }
-        var playerHealth = player.GetComponentInChildren<Health>();
+        var playerHealth = PlayerManager.Player.GetComponentInChildren<Health>();
         if (!playerHealth)
         {
             Debug.LogError(gameObject + " could not find player health!", gameObject);

@@ -48,13 +48,23 @@ public class Damage : MonoBehaviour
         {
             return;
         }
-        var health = other.GetComponent<Health>();
-        if (!health)
+        bool friendly = TeamUtility.IsFriendly(gameObject, other.gameObject);
+        if (friendly)
         {
             return;
         }
-        var friendly = TeamUtility.IsFriendly(gameObject, health.gameObject);
-        if (!friendly)
+        var shield = other.GetComponent<Shield>();
+        if (shield)
+        {
+            shield.ApplyDamage(this);
+            var shieldedHealth = other.transform.root.GetComponentInChildren<Health>();
+            if (shieldedHealth)
+            {
+                shieldedHealth.ResetInvincibilityTime();
+            }
+        }
+        var health = other.GetComponent<Health>();
+        if (health)
         {
             health.ApplyDamage(this);
             if (OnDamageDealt != null)

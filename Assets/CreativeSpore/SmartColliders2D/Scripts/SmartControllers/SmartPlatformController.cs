@@ -79,7 +79,8 @@ namespace CreativeSpore.SmartColliders
         /// </summary>
         public float PlatformDropTime = 0.15f;
         /// <summary>
-        /// Drag applied to rigid body when player is swimming
+        /// Drag applied to rigid body when 
+        /// is swimming
         /// </summary>
         public float SwimmingDrag = 25f;
         /// <summary>

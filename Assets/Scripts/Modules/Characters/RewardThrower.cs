@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(RangedWeapon))]
-public class Thrower : Enemy
+public class RewardThrower : Enemy
 {
     [Tooltip("Reward thrown")]
     [SerializeField]

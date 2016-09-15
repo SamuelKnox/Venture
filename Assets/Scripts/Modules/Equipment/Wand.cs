@@ -19,22 +19,18 @@ public class Wand : Weapon
     void Awake()
     {
         rangedWeapon = GetComponent<RangedWeapon>();
-        var player = FindObjectOfType<Player>();
-        if (player)
-        {
-            mana = player.GetComponentInChildren<Mana>();
+            mana = PlayerManager.Player.GetComponentInChildren<Mana>();
             if (!mana)
             {
                 Debug.LogError(gameObject + " could not find Mana!", gameObject);
                 return;
             }
-        }
     }
 
     /// <summary>
     /// Casts the wand's spell
     /// </summary>
-    public void CastSpell()
+    public void CastSpell(Vector2 direction)
     {
         bool canAffordManaCost = mana.GetCurrentManaPoints() >= manaCost || allowManaOverflow && mana.GetCurrentManaPoints() > 0;
         bool wandIsReady = rangedWeapon.IsReady();
@@ -43,8 +39,6 @@ public class Wand : Weapon
             return;
         }
         mana.SetCurrentManaPoints(mana.GetCurrentManaPoints() - manaCost);
-        var root = transform.root;
-        var direction = Mathf.Sign(root.localScale.x) * root.right;
         var projectile = rangedWeapon.Fire(direction, true);
         if (projectile)
         {

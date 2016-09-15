@@ -63,3 +63,14 @@ public enum GamePadInputs
     X,
     Y
 }
+
+/// <summary>
+/// Cardinal Directions
+/// </summary>
+public enum Direction
+{
+    North,
+    South,
+    East,
+    West
+}

@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(PlayerView))]
+[RequireComponent(typeof(OxygenView))]
 [RequireComponent(typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
@@ -36,7 +37,25 @@ public class PlayerController : MonoBehaviour
     [Range(1.0f, 100.0f)]
     private float quicksandJumpHandicap = 25.0f;
 
-    private Player player;
+    [Tooltip("Layers which have a swimming effect on the player")]
+    [SerializeField]
+    private LayerMask swimmingLayers;
+
+    [Tooltip("Vertical handicap applied to player when swimming is in effect")]
+    [SerializeField]
+    [Range(1.0f, 10.0f)]
+    private float swimmingSinkRate = 2.5f;
+
+    [Tooltip("Handicap applied to player jumping while in water")]
+    [SerializeField]
+    [Range(1.0f, 10.0f)]
+    private float swimmingJumpHandicap = 2.5f;
+
+    [Tooltip("Handicap applied to player horizontal movement while in water")]
+    [SerializeField]
+    [Range(1.0f, 10.0f)]
+    private float swimmingWalkHandicap = 2.5f;
+
     private PlatformCharacterController platformCharacterController;
     private PlayerView playerView;
     private Interactable nearbyInteractable;
@@ -44,18 +63,20 @@ public class PlayerController : MonoBehaviour
     private QuestsView questsView;
     private bool controllable = true;
     private bool inQuicksand = false;
+    private bool inWater = false;
     private Vector3 initialGravity;
+    private float initialWalkSpeed;
     private float initialJumpSpeed;
     private Collider2D playerCollider;
 
     void Awake()
     {
-        player = GetComponent<Player>();
         platformCharacterController = GetComponent<PlatformCharacterController>();
         playerView = GetComponent<PlayerView>();
         health = GetComponentInChildren<Health>();
         playerCollider = GetComponent<Collider2D>();
         initialGravity = platformCharacterController.PlatformCharacterPhysics.Gravity;
+        initialWalkSpeed = platformCharacterController.WalkingAcc;
         initialJumpSpeed = platformCharacterController.JumpingSpeed;
         if (!health)
         {
@@ -72,7 +93,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        player.Load();
+        PlayerManager.Player.Load();
     }
 
     void Update()
@@ -91,20 +112,20 @@ public class PlayerController : MonoBehaviour
             SetPlayerControllable(true);
             return;
         }
-        if (!controllable || player.IsStunned())
+        if (!controllable || PlayerManager.Player.IsStunned())
         {
             return;
         }
         var directionalInput = GetDirectionalInput();
         Move(directionalInput);
         Jump(directionalInput.y);
-        if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid() && !playerView.IsAttacking())
+        if (Input.GetButtonDown(InputNames.Attack) && PlayerManager.Player.IsAttackValid() && !playerView.IsAttacking())
         {
             Attack();
         }
         if (Input.GetButtonDown(InputNames.ToggleWeapon))
         {
-            player.ToggleWeapon();
+            PlayerManager.Player.ToggleWeapon();
             playerView.FinishAttacking();
         }
         if (Input.GetButtonDown(InputNames.QuestLeft))
@@ -131,6 +152,17 @@ public class PlayerController : MonoBehaviour
             platformCharacterController.PlatformCharacterPhysics.Velocity = platformCharacterController.PlatformCharacterPhysics.Gravity;
             platformCharacterController.JumpingSpeed = initialJumpSpeed / quicksandJumpHandicap;
         }
+        if (swimmingLayers.Contains(collider2D.gameObject.layer))
+        {
+            inWater = true;
+            float initialXVelocity = platformCharacterController.PlatformCharacterPhysics.Velocity.x / swimmingWalkHandicap;
+            float initialYVelocity = platformCharacterController.PlatformCharacterPhysics.Velocity.y / swimmingJumpHandicap;
+            float initialZVelocity = platformCharacterController.PlatformCharacterPhysics.Velocity.z;
+            platformCharacterController.PlatformCharacterPhysics.Velocity = new Vector3(initialXVelocity, initialYVelocity, initialZVelocity);
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity / swimmingSinkRate;
+            platformCharacterController.WalkingAcc /= swimmingWalkHandicap;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed / swimmingJumpHandicap;
+        }
     }
 
     void OnHitboxStay(Collider2D collider2D)
@@ -145,7 +177,19 @@ public class PlayerController : MonoBehaviour
             platformCharacterController.IsGrounded = true;
             if (playerCollider.bounds.max.y <= collider2D.bounds.max.y)
             {
-                player.Die();
+                PlayerManager.Player.Die();
+            }
+        }
+        if (swimmingLayers.Contains(collider2D.gameObject.layer))
+        {
+            platformCharacterController.IsGrounded = true;
+            if (playerCollider.bounds.max.y <= collider2D.bounds.max.y)
+            {
+                PlayerManager.Player.ConsumeOxygen();
+            }
+            else
+            {
+                PlayerManager.Player.RefillOxygen();
             }
         }
     }
@@ -161,6 +205,13 @@ public class PlayerController : MonoBehaviour
         {
             inQuicksand = false;
             platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed;
+        }
+        if (swimmingLayers.Contains(collider2D.gameObject.layer))
+        {
+            inWater = false;
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity;
+            platformCharacterController.WalkingAcc = initialWalkSpeed;
             platformCharacterController.JumpingSpeed = initialJumpSpeed;
         }
     }
@@ -196,7 +247,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="item">Item to collect</param>
     public void Collect(Collectable collectable)
     {
-        player.Collect(collectable);
+        PlayerManager.Player.Collect(collectable);
     }
 
     /// <summary>
@@ -232,7 +283,7 @@ public class PlayerController : MonoBehaviour
     private void Jump(float verticalInput)
     {
         bool jumping;
-        if (inQuicksand)
+        if (inQuicksand || inWater)
         {
             jumping = Input.GetButtonDown(InputNames.Jump);
         }
@@ -252,8 +303,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void GameOver()
     {
-        player.Save();
-        if (player.GetPrestige() > 0 && player.GetRunes().Length > 0)
+        PlayerManager.Player.Save();
+        if (PlayerManager.Player.GetPrestige() > 0 && PlayerManager.Player.GetRunes().Length > 0)
         {
             SceneManager.LoadScene(SceneNames.LevelUp);
         }
@@ -268,7 +319,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Attack()
     {
-        var activeWeapon = player.GetActiveWeapon();
+        var activeWeapon = PlayerManager.Player.GetActiveWeapon();
         if (!activeWeapon)
         {
             return;
@@ -295,7 +346,7 @@ public class PlayerController : MonoBehaviour
                 }
                 break;
             default:
-                Debug.LogError("An invalid WeaponType is active!", player.gameObject);
+                Debug.LogError("An invalid WeaponType is active!", PlayerManager.Player.gameObject);
                 return;
         }
     }

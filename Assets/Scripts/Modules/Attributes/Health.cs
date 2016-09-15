@@ -1,5 +1,4 @@
 ﻿using CreativeSpore.SmartColliders;
-using CustomUnityLibrary;
 using UnityEngine;
 
 public class Health : MonoBehaviour
@@ -13,6 +12,10 @@ public class Health : MonoBehaviour
     /// Event called when damage is received
     /// </summary>
     public event DamageDealt OnDamageDealt;
+
+    [Tooltip("Whether or not this unit is invincible.  If invincible, Damage will not affect this.")]
+    [SerializeField]
+    private bool invincible = false;
 
     [Tooltip("Current hit points")]
     [SerializeField]
@@ -42,6 +45,11 @@ public class Health : MonoBehaviour
     [Tooltip("Optional health view, used to display the health")]
     [SerializeField]
     private HealthView healthView;
+
+    [Tooltip("How much of the knockback damage is received, where 0 is no knock back, 1 is normal knockback, and 2 is double knockback")]
+    [SerializeField]
+    [Range(0.0f, 2.0f)]
+    private float knockBackReceived = 1.0f;
 
     private float totalInvincibilityCooldown;
 
@@ -82,6 +90,14 @@ public class Health : MonoBehaviour
     public void SetCurrentHitPoints(float hitPoints)
     {
         currentHitPoints = Mathf.Clamp(hitPoints, 0, GetMaxHitPoints());
+        if (OnDamageDealt != null)
+        {
+            OnDamageDealt(null);
+        }
+        if (healthView)
+        {
+            healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+        }
     }
 
     /// <summary>
@@ -112,6 +128,14 @@ public class Health : MonoBehaviour
     }
 
     /// <summary>
+    /// Resets the invincibility time to full invincibility
+    /// </summary>
+    public void ResetInvincibilityTime()
+    {
+        SetInvincibilityTime(totalInvincibilityCooldown);
+    }
+
+    /// <summary>
     /// Sets the duration of invincibility after taking damage
     /// </summary>
     /// <param name="time">Seconds</param>
@@ -127,6 +151,10 @@ public class Health : MonoBehaviour
     /// <param name="damage">Damage to deal</param>
     public void ApplyDamage(Damage damage)
     {
+        if (invincible)
+        {
+            return;
+        }
         if (!damage)
         {
             Debug.LogError("Cannot apply null damage to " + gameObject + "!", gameObject);
@@ -139,8 +167,9 @@ public class Health : MonoBehaviour
         {
             return;
         }
+        var root = transform.root;
         invincibilityCooldown = totalInvincibilityCooldown;
-        var orbOfProtection = GetComponentInChildren<OrbOfProtection>();
+        var orbOfProtection = root.GetComponentInChildren<OrbOfProtection>();
         if (orbOfProtection)
         {
             Destroy(orbOfProtection.gameObject);
@@ -150,25 +179,29 @@ public class Health : MonoBehaviour
         damageOverTime += damage.GetDamageOverTime();
         damageOverTimeRate += damage.GetDamageOverTimeRateIncrease();
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
-        var knockBack = knockBackDirection * damage.GetKnockBack();
-        var platformCharacterController = GetComponent<PlatformCharacterController>();
+        float knockBackForce = damage.GetKnockBack() * knockBackReceived;
+        var knockBack = knockBackDirection * knockBackForce;
+        var platformCharacterController = root.GetComponent<PlatformCharacterController>();
         if (platformCharacterController)
         {
-            platformCharacterController.PlatformCharacterPhysics.Velocity = knockBack;
-            return;
+            platformCharacterController.PlatformCharacterPhysics.Velocity = Vector3.zero;
+            platformCharacterController.PlatformCharacterPhysics.AddAcceleration(knockBack);
         }
-        var body = GetComponent<Rigidbody2D>();
-        if (body)
+        else
         {
-            body.AddForce(knockBack);
-        }
-        if (OnDamageDealt != null)
-        {
-            OnDamageDealt(damage);
-        }
-        if (healthView)
-        {
-            healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+            var body = root.GetComponent<Rigidbody2D>();
+            if (body)
+            {
+                body.AddForce(knockBack);
+            }
+            if (OnDamageDealt != null)
+            {
+                OnDamageDealt(damage);
+            }
+            if (healthView)
+            {
+                healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+            }
         }
     }
 

@@ -31,13 +31,7 @@ public class QuestsView : MonoBehaviour
     /// </summary>
     public void UpdateQuests()
     {
-        var player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError("Could not find player!", gameObject);
-            return;
-        }
-        activeQuests = player.GetQuests().Where(q => !q.IsComplete()).ToArray();
+        activeQuests = PlayerManager.Player.GetQuests().Where(q => !q.IsComplete()).ToArray();
         if (activeQuests.Length > 0)
         {
             UpdateQuestDescription(activeQuests[questIndex]);

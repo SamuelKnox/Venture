@@ -10,14 +10,12 @@ public class Mortar : Enemy
     private float maximumWaitTime = 10.0f;
 
     private RangedWeapon rangedWeapon;
-    private Player player;
     private bool firing = false;
 
     protected override void Awake()
     {
         base.Awake();
         rangedWeapon = GetComponent<RangedWeapon>();
-        player = FindObjectOfType<Player>();
     }
 
     void Start()
@@ -34,7 +32,7 @@ public class Mortar : Enemy
         {
             return;
         }
-        rangedWeapon.Fire(player.transform);
+        rangedWeapon.Fire(PlayerManager.Player.transform);
     }
 
     /// <summary>
@@ -54,7 +52,7 @@ public class Mortar : Enemy
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(0, maximumWaitTime));
-            if (!firing && rangedWeapon.IsValidShot(player.transform))
+            if (!firing && rangedWeapon.IsValidShot(PlayerManager.Player.transform))
             {
                 firing = true;
                 enemyView.Attack();

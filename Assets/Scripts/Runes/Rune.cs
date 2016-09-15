@@ -21,8 +21,6 @@ public abstract class Rune : Item
     [TextArea(1, 5)]
     private string noMoreUpgradesDescription;
 
-    private static Player player;
-
     void Awake()
     {
         if (string.IsNullOrEmpty(noMoreUpgradesDescription))
@@ -86,20 +84,6 @@ public abstract class Rune : Item
     public static int GetMaxLevel()
     {
         return Maxlevel;
-    }
-
-    /// <summary>
-    /// Gets the player if reference is known. Otherwise, finds player and returns it, or null if not found.  Used for common reference needed to player.
-    /// </summary>
-    /// <returns>Player, or null if not in scene</returns>
-    protected static Player GetPlayer()
-    {
-        if (player)
-        {
-            return player;
-        }
-        player = FindObjectOfType<Player>();
-        return player;
     }
 
     /// <summary>

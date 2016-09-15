@@ -26,18 +26,12 @@ public class QuestGiver : Interactable
     [Tooltip("Whether or not this is a main questline questgiver.  If yes, the quests will be saved across playthroughs.")]
     [SerializeField]
     private bool mainQuestGiver = false;
-
-    private Player player;
+    
     private Quest activeQuest;
 
     protected override void Awake()
     {
         base.Awake();
-        player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError("Could not find player!", gameObject);
-        }
         questText.enabled = false;
     }
 
@@ -60,7 +54,7 @@ public class QuestGiver : Interactable
             {
                 continue;
             }
-            foreach (var playerQuest in player.GetQuests())
+            foreach (var playerQuest in PlayerManager.Player.GetQuests())
             {
                 if (quest.name == playerQuest.name)
                 {
@@ -117,7 +111,7 @@ public class QuestGiver : Interactable
             return;
         }
         activeQuest.SetLongTermQuest(mainQuestGiver);
-        player.AddQuest(activeQuest);
+        PlayerManager.Player.AddQuest(activeQuest);
         activeQuest.OnQuestComplete += OnQuestComplete;
         questText.text = activeQuest.GetDescription();
     }

@@ -1,10 +1,11 @@
-﻿using CustomUnityLibrary;
+﻿using CreativeSpore.SmartColliders;
+using CustomUnityLibrary;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 [Serializable]
+[RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Inventory))]
 [RequireComponent(typeof(PlayerView))]
 public class Player : Character
@@ -22,6 +23,11 @@ public class Player : Character
     [SerializeField]
     [Range(0, 100000)]
     private int gold = 0;
+
+    [Tooltip("How much oxygen percent the player has remaining")]
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    private float oxygen;
 
     [Tooltip("The player's level, which is based on prestige")]
     [SerializeField]
@@ -48,16 +54,38 @@ public class Player : Character
     [SerializeField]
     private Damage defensiveDamage;
 
+    [Tooltip("View used to display Oxygen consumption")]
+    [SerializeField]
+    private OxygenView oxygenView;
+
+    [Tooltip("Rate at which player consumes oxygen (by percentage per second)")]
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    private float oxygenConsumptionRate = 0.01f;
+
+    [Tooltip("How long (in seconds) the player can fall before taking damage")]
+    [SerializeField]
+    [Range(1.0f, 10.0f)]
+    private float maxFallTimeWithoutDamage = 3.0f;
+
+    [Tooltip("Damage dealt per second of falling after max fall time has been reached")]
+    [SerializeField]
+    [Range(1.0f, 100.0f)]
+    private float fallDamagePerSecond = 10.0f;
+
     private static float stunTime;
 
+    private PlatformCharacterController platformCharacterController;
     private Inventory inventory;
     private PlayerView playerView;
     private Weapon activeWeapon;
     private QuestsView questsView;
+    private float fallCounter = 0.0f;
 
     protected override void Awake()
     {
         base.Awake();
+        platformCharacterController = GetComponent<PlatformCharacterController>();
         inventory = GetComponent<Inventory>();
         playerView = GetComponent<PlayerView>();
         AddItemsToInventory();
@@ -72,6 +100,11 @@ public class Player : Character
     void Start()
     {
         SetStartingActiveWeapon();
+    }
+
+    void Update()
+    {
+        ApplyFallDamage();
     }
 
     /// <summary>
@@ -140,17 +173,6 @@ public class Player : Character
         quest.OnQuestComplete += OnQuestComplete;
         questsView.UpdateQuests();
         return true;
-    }
-
-    /// <summary>
-    /// Called when quest is complete
-    /// </summary>
-    /// <param name="quest">Quest which was completed</param>
-    private void OnQuestComplete(Quest quest)
-    {
-        prestige += quest.GetPrestige();
-        quest.OnQuestComplete -= OnQuestComplete;
-        questsView.UpdateQuests();
     }
 
     /// <summary>
@@ -360,7 +382,14 @@ public class Player : Character
         {
             return;
         }
-        bow.Fire(transform.root.right);
+        float x = Input.GetAxis(InputNames.Horizontal);
+        float y = Input.GetAxis(InputNames.Vertical);
+        var direction = new Vector2(x, y);
+        if (direction == Vector2.zero)
+        {
+            direction = transform.root.right;
+        }
+        bow.Fire(direction);
     }
 
     /// <summary>
@@ -373,7 +402,14 @@ public class Player : Character
         {
             return;
         }
-        wand.CastSpell();
+        float x = Input.GetAxis(InputNames.Horizontal);
+        float y = Input.GetAxis(InputNames.Vertical);
+        var direction = new Vector2(x, y);
+        if (direction == Vector2.zero)
+        {
+            direction = transform.root.right;
+        }
+        wand.CastSpell(direction);
     }
 
     /// <summary>
@@ -529,12 +565,35 @@ public class Player : Character
         Player.stunTime = stunTime;
     }
 
+    public void RefillOxygen()
+    {
+        oxygen = 1.0f;
+        oxygenView.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Reduces the remainin amount of oxygen the player has
+    /// </summary>
+    public void ConsumeOxygen()
+    {
+        oxygenView.gameObject.SetActive(true);
+        if (oxygen <= 0.0f)
+        {
+            health.SetCurrentHitPoints(health.GetCurrentHitPoints() - health.GetMaxHitPoints() * oxygenConsumptionRate * Time.deltaTime);
+        }
+        else
+        {
+            oxygen -= oxygenConsumptionRate * Time.deltaTime;
+            oxygen = Mathf.Max(0.0f, oxygen);
+            oxygenView.SetOxygen(oxygen);
+        }
+    }
+
     /// <summary>
     /// Player dies
     /// </summary>
     public override void Die()
     {
-        health.SetCurrentHitPoints(0);
         playerView.Die();
     }
 
@@ -552,6 +611,37 @@ public class Player : Character
     protected override void DisableStun()
     {
         playerView.SetStun(false);
+    }
+
+    /// <summary>
+    /// Deals damage to the player if they fall for long enough
+    /// </summary>
+    private void ApplyFallDamage()
+    {
+        if (platformCharacterController.InstantVelocity.y < 0)
+        {
+            fallCounter += Time.deltaTime;
+        }
+        else
+        {
+            if (fallCounter >= maxFallTimeWithoutDamage)
+            {
+                float damage = (fallCounter - maxFallTimeWithoutDamage) * fallDamagePerSecond;
+                health.SetCurrentHitPoints(health.GetCurrentHitPoints() - damage);
+            }
+            fallCounter = 0.0f;
+        }
+    }
+
+    /// <summary>
+    /// Called when quest is complete
+    /// </summary>
+    /// <param name="quest">Quest which was completed</param>
+    private void OnQuestComplete(Quest quest)
+    {
+        prestige += quest.GetPrestige();
+        quest.OnQuestComplete -= OnQuestComplete;
+        questsView.UpdateQuests();
     }
 
     /// <summary>

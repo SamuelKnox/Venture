@@ -9,13 +9,11 @@ public class Springer : Enemy
 
     private bool visible;
     private Rigidbody2D body;
-    private Player player;
 
     protected override void Awake()
     {
         base.Awake();
         body = GetComponent<Rigidbody2D>();
-        player = FindObjectOfType<Player>();
     }
 
     void FixedUpdate()
@@ -27,11 +25,11 @@ public class Springer : Enemy
         if (visible && body.velocity == Vector2.zero)
         {
             var force = spring;
-            if (player.transform.position.x < transform.position.x)
+            if (PlayerManager.Player.transform.position.x < transform.position.x)
             {
                 force.x = -Mathf.Abs(spring.x);
             }
-            else if (player.transform.position.x == transform.position.x)
+            else if (PlayerManager.Player.transform.position.x == transform.position.x)
             {
                 force.x = 0.0f;
             }

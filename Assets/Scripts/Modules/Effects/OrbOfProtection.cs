@@ -9,7 +9,8 @@ public class OrbOfProtection : MonoBehaviour
 
     void Awake()
     {
-        var health = GetComponentInParent<Health>();
+        var root = transform.root;
+        var health = root.GetComponentInChildren<Health>();
         if (!health)
         {
             Debug.LogError("Could not find health in parent!", gameObject);

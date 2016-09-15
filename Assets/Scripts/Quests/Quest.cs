@@ -41,19 +41,11 @@ public abstract class Quest : MonoBehaviour
     [SerializeField]
     private bool longTermQuest = false;
 
-    protected Player player;
-
     private Spawner[] spawners;
 
     protected virtual void Awake()
     {
         SetUpSpawners();
-        player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError("Could not find player!", gameObject);
-            return;
-        }
     }
 
     void Start()
@@ -185,7 +177,7 @@ public abstract class Quest : MonoBehaviour
                 {
                     var collectable = reward.GetOrAddComponent<Collectable>();
                     collectable.SetHighPriority(true);
-                    player.Collect(collectable);
+                    PlayerManager.Player.Collect(collectable);
                 }
             }
         }

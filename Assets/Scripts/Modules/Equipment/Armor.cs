@@ -9,13 +9,7 @@ public abstract class Armor : Equipment
     /// <param name="damageOverTime">Damage over time amount to apply</param>
     public override void SetDamageOverTime(float damageOverTime)
     {
-        var player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError("Could not find player!", gameObject);
-            return;
-        }
-        var playerDamage = player.GetDefensiveDamage();
+        var playerDamage = PlayerManager.Player.GetDefensiveDamage();
         playerDamage.SetDamageOverTime(playerDamage.GetDamageOverTime() - GetDamageOverTime() + damageOverTime);
         this.damageOverTime = damageOverTime;
     }
@@ -26,13 +20,7 @@ public abstract class Armor : Equipment
     /// <param name="damageOverTimeRateIncrease">Increase in the rate at which damage is applied</param>
     public override void SetDamageOverTimeRateIncrease(float damageOverTimeRateIncrease)
     {
-        var player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError("Could not find player!", gameObject);
-            return;
-        }
-        var playerDamage = player.GetDefensiveDamage();
+        var playerDamage = PlayerManager.Player.GetDefensiveDamage();
         playerDamage.SetDamageOverTimeRateIncrease(playerDamage.GetDamageOverTimeRateIncrease() - GetDamageOverTimeRateIncrease() + damageOverTimeRateIncrease);
         this.damageOverTimeRateIncrease = damageOverTimeRateIncrease;
     }
