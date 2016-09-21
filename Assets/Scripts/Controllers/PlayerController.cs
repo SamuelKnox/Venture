@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(PlayerView))]
-[RequireComponent(typeof(OxygenView))]
 [RequireComponent(typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
@@ -22,6 +21,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     [Range(0.0f, 1.0f)]
     private float axisJumpingThreshold = 0.5f;
+
+    [Tooltip("How powerful a bow shot is")]
+    [SerializeField]
+    [Range(0.0f, 10.0f)]
+    private float bowPower = 5.0f;
+
+    [Tooltip("The maximum time to draw a bow.  Once this draw time is reached, the bow will fire at full power")]
+    [SerializeField]
+    [Range(0.0f, 5.0f)]
+    private float maxBowDrawTime = 1.0f;
 
     [Tooltip("Layers which have a quicksand effect on the player")]
     [SerializeField]
@@ -68,6 +77,8 @@ public class PlayerController : MonoBehaviour
     private float initialWalkSpeed;
     private float initialJumpSpeed;
     private Collider2D playerCollider;
+    private bool bowDrawn = false;
+    private float bowDrawnTime = 0.0f;
 
     void Awake()
     {
@@ -122,6 +133,14 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown(InputNames.Attack) && PlayerManager.Player.IsAttackValid() && !playerView.IsAttacking())
         {
             Attack();
+        }
+        if (bowDrawn)
+        {
+            bowDrawnTime += Time.deltaTime;
+            if (Input.GetButtonUp(InputNames.Attack))
+            {
+                Attack();
+            }
         }
         if (Input.GetButtonDown(InputNames.ToggleWeapon))
         {
@@ -333,7 +352,23 @@ public class PlayerController : MonoBehaviour
             case ItemType.RangedWeapon:
                 if (activeWeapon.GetComponent<Bow>())
                 {
-                    playerView.BowAttack();
+                    if (!bowDrawn)
+                    {
+                        bowDrawn = true;
+                        playerView.DrawBow();
+                    }
+                    else
+                    {
+                        float bowEffectiveness = 1.0f;
+                        if (maxBowDrawTime > 0.0f)
+                        {
+                            bowEffectiveness = Mathf.Min(bowDrawnTime / maxBowDrawTime, 1.0f);
+                        }
+                        PlayerManager.Player.SetBowEffectiveness(bowEffectiveness);
+                        playerView.BowAttack();
+                        bowDrawnTime = 0.0f;
+                        bowDrawn = false;
+                    }
                 }
                 else if (activeWeapon.GetComponent<Wand>())
                 {

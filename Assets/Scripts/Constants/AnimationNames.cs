@@ -93,7 +93,12 @@
             public const string MeleeWeaponAttack = "Melee Weapon Attack";
 
             /// <summary>
-            /// Animation name for player's ranged attack
+            /// Animation name for player's bow draw
+            /// </summary>
+            public const string BowDraw = "Bow Draw";
+
+            /// <summary>
+            /// Animation name for player's bow attack
             /// </summary>
             public const string BowAttack = "Bow Attack";
 

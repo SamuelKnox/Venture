@@ -81,6 +81,7 @@ public class Player : Character
     private Weapon activeWeapon;
     private QuestsView questsView;
     private float fallCounter = 0.0f;
+    private float bowEffectiveness = 1.0f;
 
     protected override void Awake()
     {
@@ -373,6 +374,15 @@ public class Player : Character
     }
 
     /// <summary>
+    /// Sets the effectiveness of the player's bow, where 1 is full power, 0.5 is half power, and 0 is no power
+    /// </summary>
+    /// <param name="effectiveness">Percentage of bow's effectiveness</param>
+    public void SetBowEffectiveness(float effectiveness)
+    {
+        bowEffectiveness = effectiveness;
+    }
+
+    /// <summary>
     /// Fires the player's bow
     /// </summary>
     public void FireBow()
@@ -389,7 +399,18 @@ public class Player : Character
         {
             direction = transform.root.right;
         }
-        bow.Fire(direction);
+        var rangedWeapon = bow.GetComponent<RangedWeapon>();
+        if (!rangedWeapon)
+        {
+            Debug.LogError("Bow could not find ranged weapon!", bow.gameObject);
+            return;
+        }
+        float fullPower = rangedWeapon.GetForce();
+        rangedWeapon.SetForce(fullPower * bowEffectiveness);
+        var projectile = bow.Fire(direction);
+        var projectileDamage = projectile.GetDamage();
+        projectileDamage.Modify(bowEffectiveness);
+        rangedWeapon.SetForce(fullPower);
     }
 
     /// <summary>

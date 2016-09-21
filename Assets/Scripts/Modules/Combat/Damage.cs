@@ -84,12 +84,34 @@ public class Damage : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the amount of damage dealt by this
+    /// Modifies the effectiveness of this damage by a percent, where 0.5 is half effectiveness, 2.0 is double effectiveness, and 1.0f is normal effectiveness.
+    /// </summary>
+    /// <param name="percent">Percent to modify damage by</param>
+    public void Modify(float percent)
+    {
+        SetBaseDamage(GetBaseDamage() * percent);
+        SetKnockBack(GetKnockBack() * percent);
+        SetDamageOverTime(GetDamageOverTime() * percent);
+        SetDamageOverTimeRateIncrease(GetDamageOverTimeRateIncrease() * percent);
+        SetStun(GetStun() * percent);
+    }
+
+    /// <summary>
+    /// Gets the amount of damage dealt
     /// </summary>
     /// <returns>Damage points</returns>
     public float GetBaseDamage()
     {
         return baseDamage;
+    }
+
+    /// <summary>
+    /// Sets the amount of damage dealt
+    /// </summary>
+    /// <param name="baseDamage">Damage points</param>
+    public void SetBaseDamage(float baseDamage)
+    {
+        this.baseDamage = baseDamage;
     }
 
     /// <summary>
@@ -99,6 +121,15 @@ public class Damage : MonoBehaviour
     public float GetKnockBack()
     {
         return knockBack;
+    }
+
+    /// <summary>
+    /// Sets the amount of knock back done by this Damage
+    /// </summary>
+    /// <param name="knockBack">Knock back force</param>
+    public void SetKnockBack(float knockBack)
+    {
+        this.knockBack = knockBack;
     }
 
     /// <summary>
@@ -144,5 +175,14 @@ public class Damage : MonoBehaviour
     public float GetStun()
     {
         return stun;
+    }
+
+    /// <summary>
+    /// Sets the stun dealt by this damage
+    /// </summary>
+    /// <param name="stun">Stun duration in seconds</param>
+    public void SetStun(float stun)
+    {
+        this.stun = stun;
     }
 }

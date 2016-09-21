@@ -60,15 +60,28 @@ public class PlayerView : MonoBehaviour
     }
 
     /// <summary>
-    /// Initiates a bow attack
+    /// Initiates the bow attack
     /// </summary>
-    public void BowAttack()
+    public void DrawBow()
     {
         if (attacking)
         {
             return;
         }
         attacking = true;
+        animator.SetTrigger(AnimationNames.Player.Triggers.BowDraw);
+    }
+
+    /// <summary>
+    /// Executes a bow attack
+    /// </summary>
+    public void BowAttack()
+    {
+        if (!attacking)
+        {
+            Debug.LogError("Player is attemping to fire their bow, but the Player is not in the attacking state!", gameObject);
+            return;
+        }
         animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
         animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
         animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);

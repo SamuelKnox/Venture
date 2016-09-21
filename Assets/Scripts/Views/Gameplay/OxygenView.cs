@@ -13,6 +13,8 @@ public class OxygenView : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI oxygenText;
 
+    public int MyProperty { get; set; }
+
     void Awake()
     {
         gameObject.SetActive(false);

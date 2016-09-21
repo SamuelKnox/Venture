@@ -30,13 +30,15 @@ public class Wand : Weapon
     /// <summary>
     /// Casts the wand's spell
     /// </summary>
-    public void CastSpell(Vector2 direction)
+    /// <param name="direction">Direction to cast the spell</param>
+    /// <returns>The Projectile cast, or null if spell cast failed</returns>
+    public Projectile CastSpell(Vector2 direction)
     {
         bool canAffordManaCost = mana.GetCurrentManaPoints() >= manaCost || allowManaOverflow && mana.GetCurrentManaPoints() > 0;
         bool wandIsReady = rangedWeapon.IsReady();
         if(!canAffordManaCost || !wandIsReady)
         {
-            return;
+            return null;
         }
         mana.SetCurrentManaPoints(mana.GetCurrentManaPoints() - manaCost);
         var projectile = rangedWeapon.Fire(direction, true);
@@ -47,6 +49,7 @@ public class Wand : Weapon
             damage.SetDamageOverTime(GetDamageOverTime());
             damage.SetDamageOverTimeRateIncrease(GetDamageOverTimeRateIncrease());
         }
+        return projectile;
     }
 
     public override void SetDamageOverTime(float damageOverTime)
