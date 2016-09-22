@@ -103,6 +103,11 @@
             public const string BowAttack = "Bow Attack";
 
             /// <summary>
+            /// Animation name for player's wand prepartion
+            /// </summary>
+            public const string WandPreparation = "Wand Preparation";
+
+            /// <summary>
             /// Animation name for player when casting spell
             /// </summary>
             public const string WandAttack = "Wand Attack";

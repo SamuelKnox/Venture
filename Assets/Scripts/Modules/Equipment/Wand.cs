@@ -19,24 +19,24 @@ public class Wand : Weapon
     void Awake()
     {
         rangedWeapon = GetComponent<RangedWeapon>();
-            mana = PlayerManager.Player.GetComponentInChildren<Mana>();
-            if (!mana)
-            {
-                Debug.LogError(gameObject + " could not find Mana!", gameObject);
-                return;
-            }
+        mana = PlayerManager.Player.GetComponentInChildren<Mana>();
+        if (!mana)
+        {
+            Debug.LogError(gameObject + " could not find Mana!", gameObject);
+            return;
+        }
     }
 
     /// <summary>
-    /// Casts the wand's spell
+    /// Casts the wand's projectile
     /// </summary>
-    /// <param name="direction">Direction to cast the spell</param>
+    /// <param name="direction">Direction to cast the projectile</param>
     /// <returns>The Projectile cast, or null if spell cast failed</returns>
-    public Projectile CastSpell(Vector2 direction)
+    public Projectile CastProjectile(Vector2 direction)
     {
         bool canAffordManaCost = mana.GetCurrentManaPoints() >= manaCost || allowManaOverflow && mana.GetCurrentManaPoints() > 0;
         bool wandIsReady = rangedWeapon.IsReady();
-        if(!canAffordManaCost || !wandIsReady)
+        if (!canAffordManaCost || !wandIsReady)
         {
             return null;
         }
@@ -52,11 +52,27 @@ public class Wand : Weapon
         return projectile;
     }
 
+    /// <summary>
+    /// Casts the wand's spell, based on its equipped roons
+    /// </summary>
+    public void CastSpell()
+    {
+        Debug.Log("Casting spell!");
+    }
+
+    /// <summary>
+    /// Sets the damage dealt over time by this wand
+    /// </summary>
+    /// <param name="damageOverTime">Dame over time value</param>
     public override void SetDamageOverTime(float damageOverTime)
     {
         this.damageOverTime = damageOverTime;
     }
 
+    /// <summary>
+    /// Sets the rate the damage over time is increased
+    /// </summary>
+    /// <param name="damageOverTimeRateIncrease">Damage over time increase rate</param>
     public override void SetDamageOverTimeRateIncrease(float damageOverTimeRateIncrease)
     {
         this.damageOverTimeRateIncrease = damageOverTimeRateIncrease;

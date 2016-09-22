@@ -30,7 +30,12 @@ public class PlayerController : MonoBehaviour
     [Tooltip("The maximum time to draw a bow.  Once this draw time is reached, the bow will fire at full power")]
     [SerializeField]
     [Range(0.0f, 5.0f)]
-    private float maxBowDrawTime = 1.0f;
+    private float bowDrawTime = 1.0f;
+
+    [Tooltip("The time required to cast a spell from the wand.  If the button is held for this long, the wand's spell will be cast.  Otherwise, the wand's projectile will be cast.")]
+    [SerializeField]
+    [Range(0.0f, 5.0f)]
+    private float wandPreparationTime = 1.0f;
 
     [Tooltip("Layers which have a quicksand effect on the player")]
     [SerializeField]
@@ -77,8 +82,8 @@ public class PlayerController : MonoBehaviour
     private float initialWalkSpeed;
     private float initialJumpSpeed;
     private Collider2D playerCollider;
-    private bool bowDrawn = false;
-    private float bowDrawnTime = 0.0f;
+    private bool attackInitiated = false;
+    private float attackInitiatedTime = 0.0f;
 
     void Awake()
     {
@@ -130,16 +135,19 @@ public class PlayerController : MonoBehaviour
         var directionalInput = GetDirectionalInput();
         Move(directionalInput);
         Jump(directionalInput.y);
-        if (Input.GetButtonDown(InputNames.Attack) && PlayerManager.Player.IsAttackValid() && !playerView.IsAttacking())
+        if (!attackInitiated && Input.GetButtonDown(InputNames.Attack) && PlayerManager.Player.IsAttackValid() && !playerView.IsAttacking())
         {
-            Attack();
+            attackInitiated = true;
+            InitiateAttack();
         }
-        if (bowDrawn)
+        if (attackInitiated)
         {
-            bowDrawnTime += Time.deltaTime;
+            attackInitiatedTime += Time.deltaTime;
             if (Input.GetButtonUp(InputNames.Attack))
             {
-                Attack();
+                ExecuteAttack(attackInitiatedTime);
+                attackInitiatedTime = 0.0f;
+                attackInitiated = false;
             }
         }
         if (Input.GetButtonDown(InputNames.ToggleWeapon))
@@ -148,10 +156,6 @@ public class PlayerController : MonoBehaviour
             playerView.FinishAttacking();
         }
         if (Input.GetButtonDown(InputNames.QuestLeft))
-        {
-            questsView.SwitchQuest(-1);
-        }
-        if (Input.GetButtonDown(InputNames.QuestRight))
         {
             questsView.SwitchQuest(1);
         }
@@ -336,7 +340,45 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Initiates the player's attack with their currently equipped weapon
     /// </summary>
-    private void Attack()
+    private void InitiateAttack()
+    {
+        var activeWeapon = PlayerManager.Player.GetActiveWeapon();
+        if (!activeWeapon)
+        {
+            return;
+        }
+        var activeWeaponType = activeWeapon.GetItemType();
+        switch (activeWeaponType)
+        {
+            case ItemType.MeleeWeapon:
+                //Initiate Melee Weapon Attack
+                break;
+            case ItemType.RangedWeapon:
+                if (activeWeapon.GetComponent<Bow>())
+                {
+                    playerView.DrawBow();
+                }
+                else if (activeWeapon.GetComponent<Wand>())
+                {
+                    playerView.PrepareWand();
+                }
+                else
+                {
+                    Debug.LogError("Attempting to attack with a Ranged Weapon that is neither a bow nor a wand!", activeWeapon.gameObject);
+                    return;
+                }
+                break;
+            default:
+                Debug.LogError("An invalid WeaponType is active!", PlayerManager.Player.gameObject);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Executes the player's attack with the currently equipped weapon
+    /// </summary>
+    /// <param name="attackInitiationTime">Duration attack button was held down</param>
+    private void ExecuteAttack(float attackInitiationTime)
     {
         var activeWeapon = PlayerManager.Player.GetActiveWeapon();
         if (!activeWeapon)
@@ -352,26 +394,17 @@ public class PlayerController : MonoBehaviour
             case ItemType.RangedWeapon:
                 if (activeWeapon.GetComponent<Bow>())
                 {
-                    if (!bowDrawn)
+                    float bowEffectiveness = 1.0f;
+                    if (bowDrawTime > 0.0f)
                     {
-                        bowDrawn = true;
-                        playerView.DrawBow();
+                        bowEffectiveness = Mathf.Min(attackInitiatedTime / bowDrawTime, 1.0f);
                     }
-                    else
-                    {
-                        float bowEffectiveness = 1.0f;
-                        if (maxBowDrawTime > 0.0f)
-                        {
-                            bowEffectiveness = Mathf.Min(bowDrawnTime / maxBowDrawTime, 1.0f);
-                        }
-                        PlayerManager.Player.SetBowEffectiveness(bowEffectiveness);
-                        playerView.BowAttack();
-                        bowDrawnTime = 0.0f;
-                        bowDrawn = false;
-                    }
+                    PlayerManager.Player.SetBowEffectiveness(bowEffectiveness);
+                    playerView.BowAttack();
                 }
                 else if (activeWeapon.GetComponent<Wand>())
                 {
+                    PlayerManager.Player.SetWandCharged(attackInitiatedTime >= wandPreparationTime);
                     playerView.WandAttack();
                 }
                 else

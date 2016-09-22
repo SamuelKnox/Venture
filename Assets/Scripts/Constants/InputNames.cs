@@ -79,12 +79,7 @@ public static class InputNames
     public const string Interact = "Interact";
 
     /// <summary>
-    /// Toggles the displayed quest to the left
-    /// </summary>
-    public const string QuestLeft = "Quest Left";
-
-    /// <summary>
     /// Toggles the displayed quest to the right
     /// </summary>
-    public const string QuestRight = "Quest Right";
+    public const string QuestLeft = "Toggle Quest";
 }

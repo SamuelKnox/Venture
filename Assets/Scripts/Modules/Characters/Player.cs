@@ -82,6 +82,7 @@ public class Player : Character
     private QuestsView questsView;
     private float fallCounter = 0.0f;
     private float bowEffectiveness = 1.0f;
+    private bool wandCharged = false;
 
     protected override void Awake()
     {
@@ -383,6 +384,15 @@ public class Player : Character
     }
 
     /// <summary>
+    /// Sets whether or not the player's wand is charged.  If it is charged, it will cast the wand's spell.  If it is not charged, it will cast a projectile.
+    /// </summary>
+    /// <param name="charged">Whether or not the wand is charged.</param>
+    public void SetWandCharged(bool charged)
+    {
+        wandCharged = charged;
+    }
+
+    /// <summary>
     /// Fires the player's bow
     /// </summary>
     public void FireBow()
@@ -423,14 +433,21 @@ public class Player : Character
         {
             return;
         }
-        float x = Input.GetAxis(InputNames.Horizontal);
-        float y = Input.GetAxis(InputNames.Vertical);
-        var direction = new Vector2(x, y);
-        if (direction == Vector2.zero)
+        if (wandCharged)
         {
-            direction = transform.root.right;
+            wand.CastSpell();
         }
-        wand.CastSpell(direction);
+        else
+        {
+            float x = Input.GetAxis(InputNames.Horizontal);
+            float y = Input.GetAxis(InputNames.Vertical);
+            var direction = new Vector2(x, y);
+            if (direction == Vector2.zero)
+            {
+                direction = transform.root.right;
+            }
+            wand.CastProjectile(direction);
+        }
     }
 
     /// <summary>

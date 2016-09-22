@@ -90,10 +90,24 @@ public class PlayerView : MonoBehaviour
     /// <summary>
     /// Initiates a wand attack
     /// </summary>
-    public void WandAttack()
+    public void PrepareWand()
     {
         if (attacking)
         {
+            return;
+        }
+        attacking = true;
+        animator.SetTrigger(AnimationNames.Player.Triggers.WandPreparation);
+    }
+
+    /// <summary>
+    /// Executes a wand attack
+    /// </summary>
+    public void WandAttack()
+    {
+        if (!attacking)
+        {
+            Debug.LogError("Player is attemping to cast a spell, but the Player is not in the attacking state!", gameObject);
             return;
         }
         attacking = true;
