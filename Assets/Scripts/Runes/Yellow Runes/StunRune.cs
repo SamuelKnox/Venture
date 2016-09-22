@@ -1,6 +1,6 @@
 ﻿using System;
 
-public class StunRune : PurpleRune
+public class StunRune : YellowRune
 {
     /// <summary>
     /// Applies stun to the equipment

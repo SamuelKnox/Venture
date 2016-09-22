@@ -39,9 +39,9 @@ public enum RuneType
     Red,
     Blue,
     Yellow,
-    Purple,
-    Green,
-    Orange
+    MeleeWeapon,
+    Bow,
+    Wand
 }
 
 /// <summary>

@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
-
-public abstract class RedRune : Rune
+﻿public abstract class RedRune : Rune
 {
     private const RuneType TypeOfRune = RuneType.Red;
 

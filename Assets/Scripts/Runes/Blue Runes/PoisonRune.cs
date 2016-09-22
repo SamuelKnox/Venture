@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PoisonRune : GreenRune
+public class PoisonRune : BlueRune
 {
     /// <summary>
     /// Applies poison to the equipment

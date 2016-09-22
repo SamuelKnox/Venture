@@ -22,11 +22,6 @@ public class PlayerController : MonoBehaviour
     [Range(0.0f, 1.0f)]
     private float axisJumpingThreshold = 0.5f;
 
-    [Tooltip("How powerful a bow shot is")]
-    [SerializeField]
-    [Range(0.0f, 10.0f)]
-    private float bowPower = 5.0f;
-
     [Tooltip("The maximum time to draw a bow.  Once this draw time is reached, the bow will fire at full power")]
     [SerializeField]
     [Range(0.0f, 5.0f)]
@@ -351,7 +346,7 @@ public class PlayerController : MonoBehaviour
         switch (activeWeaponType)
         {
             case ItemType.MeleeWeapon:
-                //Initiate Melee Weapon Attack
+                playerView.MeleeWeaponAttack();
                 break;
             case ItemType.RangedWeapon:
                 if (activeWeapon.GetComponent<Bow>())
@@ -389,8 +384,7 @@ public class PlayerController : MonoBehaviour
         switch (activeWeaponType)
         {
             case ItemType.MeleeWeapon:
-                playerView.MeleeWeaponAttack();
-                break;
+                return;
             case ItemType.RangedWeapon:
                 if (activeWeapon.GetComponent<Bow>())
                 {

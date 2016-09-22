@@ -57,7 +57,8 @@ public class Wand : Weapon
     /// </summary>
     public void CastSpell()
     {
-        Debug.Log("Casting spell!");
+        var wandRune = GetRune(RuneType.Wand) as WandRune;
+        wandRune.ActivateAbility(this);
     }
 
     /// <summary>
