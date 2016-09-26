@@ -22,19 +22,15 @@ public enum Tag
 /// </summary>
 public enum ItemType
 {
-    Rune,
+    Roon,
     MeleeWeapon,
-    RangedWeapon,
-    Boots,
-    Gloves,
-    Helmet,
-    Leggings,
+    RangedWeapon
 }
 
 /// <summary>
-/// Types of runes available
+/// Types of roons available
 /// </summary>
-public enum RuneType
+public enum RoonType
 {
     Red,
     Blue,
@@ -49,8 +45,8 @@ public enum RuneType
 /// </summary>
 public enum InventoryMode
 {
-    EquipmentBrowser,
-    RuneEditor
+    WeaponBrowser,
+    RoonEditor
 }
 
 /// <summary>

@@ -164,7 +164,7 @@ public class PlayerView : MonoBehaviour
     /// <param name="stunned">Whether or not is stunned</param>
     public void SetStun(bool stunned)
     {
-        animator.SetBool(AnimationNames.Enemy.Bools.Stunned, stunned);
+        animator.SetBool(AnimationNames.Player.Bools.Stunned, stunned);
         SoundManager.Instance.Play(stunSound, false, gameObject);
     }
 

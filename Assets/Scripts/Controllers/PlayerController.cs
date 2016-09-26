@@ -123,7 +123,7 @@ public class PlayerController : MonoBehaviour
             SetPlayerControllable(true);
             return;
         }
-        if (!controllable || PlayerManager.Player.IsStunned())
+        if (!controllable || PlayerManager.Player.GetSpeed() <= 0.0f)
         {
             return;
         }
@@ -145,7 +145,7 @@ public class PlayerController : MonoBehaviour
                 attackInitiated = false;
             }
         }
-        if (Input.GetButtonDown(InputNames.ToggleWeapon))
+        if (!attackInitiated && !playerView.IsAttacking() && Input.GetButtonDown(InputNames.ToggleWeapon))
         {
             PlayerManager.Player.ToggleWeapon();
             playerView.FinishAttacking();
@@ -322,7 +322,7 @@ public class PlayerController : MonoBehaviour
     private void GameOver()
     {
         PlayerManager.Player.Save();
-        if (PlayerManager.Player.GetPrestige() > 0 && PlayerManager.Player.GetRunes().Length > 0)
+        if (PlayerManager.Player.GetPrestige() > 0 && PlayerManager.Player.GetRoons().Length > 0)
         {
             SceneManager.LoadScene(SceneNames.LevelUp);
         }

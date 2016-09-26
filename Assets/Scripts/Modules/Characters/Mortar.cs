@@ -18,8 +18,9 @@ public class Mortar : Enemy
         rangedWeapon = GetComponent<RangedWeapon>();
     }
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         StartCoroutine(HoldFire());
     }
 
@@ -28,10 +29,6 @@ public class Mortar : Enemy
     /// </summary>
     public void FireAtPlayer()
     {
-        if (stunned)
-        {
-            return;
-        }
         rangedWeapon.Fire(PlayerManager.Player.transform);
     }
 

@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 
 public class UIInventoryController : MonoBehaviour
 {
-    private const string CharacterAButton = "Select Equipment";
+    private const string CharacterAButton = "Select Weapon";
     private const string CharacterBButton = "Exit";
-    private const string CharacterXButton = "Change Runes";
-    private const string CharacterYButton = "Remove Runes";
-    private const string EquipmentAButton = "Equip";
-    private const string EquipmentBButton = "Back";
-    private const string EquipmentXButton = null;
-    private const string EquipmentYButton = null;
-    private const string RunesAButton = "Attach";
-    private const string RunesBButton = "Back";
-    private const string RunesXButton = null;
-    private const string RunesYButton = null;
+    private const string CharacterXButton = "Change Roons";
+    private const string CharacterYButton = "Remove Roons";
+    private const string WeaponAButton = "Equip";
+    private const string WeaponBButton = "Back";
+    private const string WeaponXButton = null;
+    private const string WeaponYButton = null;
+    private const string RoonsAButton = "Attach";
+    private const string RoonsBButton = "Back";
+    private const string RoonsXButton = null;
+    private const string RoonsYButton = null;
 
     [Tooltip("View used to display the title of the current inventory panel")]
     [SerializeField]
@@ -27,25 +27,25 @@ public class UIInventoryController : MonoBehaviour
     [SerializeField]
     private InventoryInstructionsView instructionsView;
 
-    [Tooltip("View used to display the UI for currently equipped equipment")]
+    [Tooltip("View used to display the UI for currently equipped weapon")]
     [SerializeField]
     private InventoryCharacterView characterView;
 
-    [Tooltip("View used to display the equipment that can potentially be equipped")]
+    [Tooltip("View used to display the weapon that can potentially be equipped")]
     [SerializeField]
-    private InventoryEquipmentView equipmentView;
+    private InventoryWeaponView weaponView;
 
-    [Tooltip("View used to display the long description of the currently chosen equipment")]
+    [Tooltip("View used to display the long description of the currently chosen weapon")]
     [SerializeField]
-    private InventoryEquipmentDescriptionView equipmentDescriptionView;
+    private InventoryWeaponDescriptionView weaponDescriptionView;
 
-    [Tooltip("View used to display the runes to be selected from")]
+    [Tooltip("View used to display the roons to be selected from")]
     [SerializeField]
-    private InventoryRunesView runesView;
+    private InventoryRoonsView roonsView;
 
-    [Tooltip("View used to display the long description of the currently chosen rune")]
+    [Tooltip("View used to display the long description of the currently chosen roon")]
     [SerializeField]
-    private InventoryRuneDescriptionView runeDescriptionView;
+    private InventoryRoonDescriptionView roonDescriptionView;
 
     [Tooltip("GameObject from the character panel which defaults as being selected")]
     [SerializeField]
@@ -53,7 +53,7 @@ public class UIInventoryController : MonoBehaviour
 
     private InventoryMode inventoryMode = InventoryMode.Character;
     private GameObject previousSelectedGameObject;
-    private ItemButton runeableEquipmentItemButton;
+    private ItemButton roonableWeaponItemButton;
     private bool dirty;
     private Dictionary<GamePadInputs, string> gamePadInstructions = new Dictionary<GamePadInputs, string>();
 
@@ -68,7 +68,7 @@ public class UIInventoryController : MonoBehaviour
         var currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
         if (!currentSelectedGameObject)
         {
-            EventSystem.current.SetSelectedGameObject(runeableEquipmentItemButton.gameObject);
+            EventSystem.current.SetSelectedGameObject(roonableWeaponItemButton.gameObject);
             currentSelectedGameObject = EventSystem.current.currentSelectedGameObject;
         }
         dirty = dirty || currentSelectedGameObject != previousSelectedGameObject;
@@ -84,11 +84,11 @@ public class UIInventoryController : MonoBehaviour
             case InventoryMode.Character:
                 UpdateForCharacterMode(itemButton);
                 break;
-            case InventoryMode.Equipment:
-                UpdateForEquipmentMode(itemButton);
+            case InventoryMode.Weapon:
+                UpdateForWeaponMode(itemButton);
                 break;
-            case InventoryMode.Runes:
-                UpdateForRunesMode(itemButton);
+            case InventoryMode.Roons:
+                UpdateForRoonsMode(itemButton);
                 break;
             default:
                 Debug.LogError("A valid InventoryMode could not be found!", gameObject);
@@ -99,17 +99,17 @@ public class UIInventoryController : MonoBehaviour
     /// <summary>
     /// Update loop for character screen
     /// </summary>
-    /// <param name="changedSelectedGameObject">If the selected character equipment has changed since last frame</param>
-    /// <param name="itemButton">Currently selected character equipment</param>
+    /// <param name="changedSelectedGameObject">If the selected character weapon has changed since last frame</param>
+    /// <param name="itemButton">Currently selected character weapon</param>
     private void UpdateForCharacterMode(ItemButton itemButton)
     {
         var item = itemButton.GetItem();
-        var equipment = item ? item.GetComponent<Equipment>() : null;
+        var weapon = item ? item.GetComponent<Weapon>() : null;
         if (dirty)
         {
             dirty = false;
-            characterView.UpdateDescription(equipment);
-            equipmentDescriptionView.UpdateDescription(equipment);
+            characterView.UpdateDescription(weapon);
+            weaponDescriptionView.UpdateDescription(weapon);
         }
         if (Input.GetButtonDown(InputNames.Back))
         {
@@ -123,29 +123,29 @@ public class UIInventoryController : MonoBehaviour
             blacksmith.EndInteraction();
             SceneManager.UnloadScene(SceneNames.Inventory);
         }
-        if (Input.GetButtonDown(InputNames.EquipEquipment))
+        if (Input.GetButtonDown(InputNames.EquipWeapon))
         {
-            ChangeMode(InventoryMode.Equipment, itemButton);
+            ChangeMode(InventoryMode.Weapon, itemButton);
             dirty = true;
         }
-        if (Input.GetButtonDown(InputNames.EditRunes))
+        if (Input.GetButtonDown(InputNames.EditRoons))
         {
-            ChangeMode(InventoryMode.Runes, itemButton);
+            ChangeMode(InventoryMode.Roons, itemButton);
             dirty = true;
         }
-        if (Input.GetButtonDown(InputNames.ClearRunes))
+        if (Input.GetButtonDown(InputNames.ClearRoons))
         {
-            equipment.DetachAllRunes();
+            weapon.DetachAllRoons();
             dirty = true;
         }
     }
 
     /// <summary>
-    /// Update loop for when selecting equipment
+    /// Update loop for when selecting weapon
     /// </summary>
-    /// <param name="changedSelectedGameObject">Whether or not the selected equipment has chanegd since last frame</param>
+    /// <param name="changedSelectedGameObject">Whether or not the selected weapon has chanegd since last frame</param>
     /// <param name="itemButton">Currently selected item button</param>
-    private void UpdateForEquipmentMode(ItemButton itemButton)
+    private void UpdateForWeaponMode(ItemButton itemButton)
     {
         var item = itemButton.GetItem();
         if (!item)
@@ -153,29 +153,29 @@ public class UIInventoryController : MonoBehaviour
             Debug.LogError("Expecting item, but there wasn't one!", gameObject);
             return;
         }
-        var equipment = item.GetComponent<Equipment>();
-        if (!equipment)
+        var weapon = item.GetComponent<Weapon>();
+        if (!weapon)
         {
-            Debug.LogError("Expecting equipment, but there wasn't any!", gameObject);
+            Debug.LogError("Expecting weapon, but there wasn't any!", gameObject);
             return;
         }
         if (dirty)
         {
             dirty = false;
-            equipmentView.UpdateDescription(equipment);
+            weaponView.UpdateDescription(weapon);
         }
-        if (Input.GetButtonDown(InputNames.EquipEquipment))
+        if (Input.GetButtonDown(InputNames.EquipWeapon))
         {
-            var equipmentOfType = PlayerManager.Player.GetInventory().GetItems(equipment.GetItemType()).Select(i => i.GetComponent<Equipment>());
-            foreach (var equipmentPiece in equipmentOfType)
+            var weaponOfType = PlayerManager.Player.GetInventory().GetItems(weapon.GetItemType()).Select(i => i.GetComponent<Weapon>());
+            foreach (var weaponInstance in weaponOfType)
             {
-                if (equipmentPiece == equipment)
+                if (weaponInstance == weapon)
                 {
                     continue;
                 }
-                equipmentPiece.DetachAllRunes();
+                weaponInstance.DetachAllRoons();
             }
-            PlayerManager.Player.Equip(equipment);
+            PlayerManager.Player.Equip(weapon);
             ChangeMode(InventoryMode.Character, itemButton);
             dirty = true;
         }
@@ -187,11 +187,11 @@ public class UIInventoryController : MonoBehaviour
     }
 
     /// <summary>
-    /// Update loop for when in rune selection
+    /// Update loop for when in roon selection
     /// </summary>
-    /// <param name="changedSelectedGameObject">Whether or not the currently selected rune has been changed</param>
+    /// <param name="changedSelectedGameObject">Whether or not the currently selected roon has been changed</param>
     /// <param name="itemButton">Currently selected item button</param>
-    private void UpdateForRunesMode(ItemButton itemButton)
+    private void UpdateForRoonsMode(ItemButton itemButton)
     {
         var item = itemButton.GetItem();
         if (!item)
@@ -199,59 +199,59 @@ public class UIInventoryController : MonoBehaviour
             Debug.LogError("Expecting item in ItemButton!", itemButton.gameObject);
             return;
         }
-        var rune = item.GetComponent<Rune>();
-        Equipment equipmentWithRuneAttached = null;
-        if (rune)
+        var roon = item.GetComponent<Roon>();
+        Weapon weaponWithRoonAttached = null;
+        if (roon)
         {
-            var equipment = PlayerManager.Player.GetInventory().GetItems().Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
-            var socketedEquipment = equipment.Where(e => e.GetRuneSocketTypes().Contains(rune.GetRuneType()));
-            equipmentWithRuneAttached = socketedEquipment.Where(e => e.GetRune(rune.GetRuneType()) == rune).FirstOrDefault();
+            var weapon = PlayerManager.Player.GetInventory().GetItems().Where(i => i.GetComponent<Weapon>()).Select(e => e.GetComponent<Weapon>());
+            var socketedWeapon = weapon.Where(e => e.GetRoonSocketTypes().Contains(roon.GetRoonType()));
+            weaponWithRoonAttached = socketedWeapon.Where(e => e.GetRoon(roon.GetRoonType()) == roon).FirstOrDefault();
         }
         if (dirty)
         {
             dirty = false;
-            runesView.UpdateDescription(rune);
-            runeDescriptionView.SetDescription(rune, equipmentWithRuneAttached);
+            roonsView.UpdateDescription(roon);
+            roonDescriptionView.SetDescription(roon, weaponWithRoonAttached);
         }
         if (Input.GetButtonDown(InputNames.Back))
         {
-            var equipmentItemButton = characterView.GetItemButton(runeableEquipmentItemButton.GetItemType());
-            ChangeMode(InventoryMode.Character, equipmentItemButton);
+            var weaponItemButton = characterView.GetItemButton(roonableWeaponItemButton.GetItemType());
+            ChangeMode(InventoryMode.Character, weaponItemButton);
             dirty = true;
         }
         if (Input.GetButtonDown(InputNames.TabRight))
         {
-            runesView.MoveTab(1);
+            roonsView.MoveTab(1);
             dirty = true;
         }
         if (Input.GetButtonDown(InputNames.TabLeft))
         {
-            runesView.MoveTab(-1);
+            roonsView.MoveTab(-1);
             dirty = true;
         }
-        if (Input.GetButtonDown(InputNames.EquipRune))
+        if (Input.GetButtonDown(InputNames.EquipRoon))
         {
-            if (rune && !rune.IsEquipped())
+            if (roon && !roon.IsEquipped())
             {
-                var equipmentItem = runeableEquipmentItemButton.GetItem();
-                if (!equipmentItem)
+                var weaponItem = roonableWeaponItemButton.GetItem();
+                if (!weaponItem)
                 {
-                    Debug.LogError("Could not find equipment!", gameObject);
+                    Debug.LogError("Could not find item!", gameObject);
                     return;
                 }
-                var equipment = equipmentItem.GetComponent<Equipment>();
-                if (!equipment)
+                var weapon = weaponItem.GetComponent<Weapon>();
+                if (!weapon)
                 {
-                    Debug.LogError("Could not find equipment!", gameObject);
+                    Debug.LogError("Could not find weapon!", gameObject);
                     return;
                 }
-                equipment.SetRune(rune);
+                weapon.SetRoon(roon);
             }
             dirty = true;
         }
-        if (Input.GetButtonDown(InputNames.ClearRunes) && equipmentWithRuneAttached)
+        if (Input.GetButtonDown(InputNames.ClearRoons) && weaponWithRoonAttached)
         {
-            equipmentWithRuneAttached.DetachRune(rune);
+            weaponWithRoonAttached.DetachRoon(roon);
             dirty = true;
         }
     }
@@ -268,46 +268,46 @@ public class UIInventoryController : MonoBehaviour
         UpdateInstructions();
         var itemType = itemButton.GetItemType();
         var item = itemButton.GetItem();
-        var equipment = item ? item.GetComponent<Equipment>() : null;
-        runeableEquipmentItemButton = null;
+        var weapon = item ? item.GetComponent<Weapon>() : null;
+        roonableWeaponItemButton = null;
         switch (this.inventoryMode)
         {
             case InventoryMode.Character:
                 titleView.gameObject.SetActive(true);
                 instructionsView.gameObject.SetActive(true);
                 characterView.gameObject.SetActive(true);
-                equipmentView.gameObject.SetActive(false);
-                equipmentDescriptionView.gameObject.SetActive(true);
-                runesView.gameObject.SetActive(false);
-                runeDescriptionView.gameObject.SetActive(false);
-                characterView.UpdateEquipment(itemType);
+                weaponView.gameObject.SetActive(false);
+                weaponDescriptionView.gameObject.SetActive(true);
+                roonsView.gameObject.SetActive(false);
+                roonDescriptionView.gameObject.SetActive(false);
+                characterView.UpdateWeapon(itemType);
                 characterView.EnableNavigation(true);
                 break;
-            case InventoryMode.Equipment:
+            case InventoryMode.Weapon:
                 titleView.gameObject.SetActive(true);
                 instructionsView.gameObject.SetActive(true);
                 characterView.gameObject.SetActive(true);
-                equipmentView.gameObject.SetActive(true);
-                equipmentDescriptionView.gameObject.SetActive(false);
-                runesView.gameObject.SetActive(false);
-                runeDescriptionView.gameObject.SetActive(false);
+                weaponView.gameObject.SetActive(true);
+                weaponDescriptionView.gameObject.SetActive(false);
+                roonsView.gameObject.SetActive(false);
+                roonDescriptionView.gameObject.SetActive(false);
                 characterView.EnableNavigation(false);
-                bool equipmentButtonSuccess = equipmentView.CreateButtons(itemType);
-                if (!equipmentButtonSuccess)
+                bool weaponButtonSuccess = weaponView.CreateButtons(itemType);
+                if (!weaponButtonSuccess)
                 {
                     ChangeMode(InventoryMode.Character, itemButton);
                 }
                 break;
-            case InventoryMode.Runes:
+            case InventoryMode.Roons:
                 titleView.gameObject.SetActive(true);
                 instructionsView.gameObject.SetActive(true);
                 characterView.gameObject.SetActive(false);
-                equipmentView.gameObject.SetActive(false);
-                equipmentDescriptionView.gameObject.SetActive(false);
-                runesView.gameObject.SetActive(true);
-                runeDescriptionView.gameObject.SetActive(true);
-                runeableEquipmentItemButton = itemButton;
-                runesView.CreateButtons(equipment);
+                weaponView.gameObject.SetActive(false);
+                weaponDescriptionView.gameObject.SetActive(false);
+                roonsView.gameObject.SetActive(true);
+                roonDescriptionView.gameObject.SetActive(true);
+                roonableWeaponItemButton = itemButton;
+                roonsView.CreateButtons(weapon);
                 break;
             default:
                 Debug.LogError("Invalid InventoryMode used!", gameObject);
@@ -328,17 +328,17 @@ public class UIInventoryController : MonoBehaviour
                 gamePadInstructions[GamePadInputs.X] = CharacterXButton;
                 gamePadInstructions[GamePadInputs.Y] = CharacterYButton;
                 break;
-            case InventoryMode.Equipment:
-                gamePadInstructions[GamePadInputs.A] = EquipmentAButton;
-                gamePadInstructions[GamePadInputs.B] = EquipmentBButton;
-                gamePadInstructions[GamePadInputs.X] = EquipmentXButton;
-                gamePadInstructions[GamePadInputs.Y] = EquipmentYButton;
+            case InventoryMode.Weapon:
+                gamePadInstructions[GamePadInputs.A] = WeaponAButton;
+                gamePadInstructions[GamePadInputs.B] = WeaponBButton;
+                gamePadInstructions[GamePadInputs.X] = WeaponXButton;
+                gamePadInstructions[GamePadInputs.Y] = WeaponYButton;
                 break;
-            case InventoryMode.Runes:
-                gamePadInstructions[GamePadInputs.A] = RunesAButton;
-                gamePadInstructions[GamePadInputs.B] = RunesBButton;
-                gamePadInstructions[GamePadInputs.X] = RunesXButton;
-                gamePadInstructions[GamePadInputs.Y] = RunesYButton;
+            case InventoryMode.Roons:
+                gamePadInstructions[GamePadInputs.A] = RoonsAButton;
+                gamePadInstructions[GamePadInputs.B] = RoonsBButton;
+                gamePadInstructions[GamePadInputs.X] = RoonsXButton;
+                gamePadInstructions[GamePadInputs.Y] = RoonsYButton;
                 break;
             default:
                 Debug.LogError("Invalid InventoryMode supplied!", gameObject);
@@ -353,7 +353,7 @@ public class UIInventoryController : MonoBehaviour
     private enum InventoryMode
     {
         Character,
-        Equipment,
-        Runes
+        Weapon,
+        Roons
     }
 }

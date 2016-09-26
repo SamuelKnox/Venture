@@ -11,14 +11,14 @@
     public const string Quests = "Quests/";
 
     /// <summary>
-    /// File path to load runes
+    /// File path to load roons
     /// </summary>
-    public const string Runes = "Runes/";
+    public const string Roons = "Roons/";
 
     /// <summary>
-    /// File path to load equipment
+    /// File path to load weapons
     /// </summary>
-    public const string Equipment = "Equipment/";
+    public const string Weapons = "Weapons/";
 
     /// <summary>
     /// File path to load consumables

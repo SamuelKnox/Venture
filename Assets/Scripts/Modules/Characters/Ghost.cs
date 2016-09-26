@@ -20,26 +20,20 @@ public class Ghost : Enemy
         body2D = GetComponent<Rigidbody2D>();
     }
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         body2D.gravityScale = 0.0f;
     }
 
-    void Update()
+    protected override void Update()
     {
-        if (stunned)
-        {
-            return;
-        }
+        base.Update();
         FacePlayer();
     }
 
     void FixedUpdate()
     {
-        if (stunned)
-        {
-            return;
-        }
         MoveTowardsPlayer();
     }
 

@@ -38,13 +38,9 @@ public class Player : Character
     [SerializeField]
     private Transform weaponContainer;
 
-    [Tooltip("Container for player's runes")]
+    [Tooltip("Container for player's roons")]
     [SerializeField]
-    private Transform runeContainer;
-
-    [Tooltip("Container for player's armor")]
-    [SerializeField]
-    private Transform armorContainer;
+    private Transform roonContainer;
 
     [Tooltip("Container for all of the player's quests")]
     [SerializeField]
@@ -73,8 +69,6 @@ public class Player : Character
     [Range(1.0f, 100.0f)]
     private float fallDamagePerSecond = 10.0f;
 
-    private static float stunTime;
-
     private PlatformCharacterController platformCharacterController;
     private Inventory inventory;
     private PlayerView playerView;
@@ -99,13 +93,16 @@ public class Player : Character
         }
     }
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
+        DestroyDuplicateUniqueItems();
         SetStartingActiveWeapon();
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         ApplyFallDamage();
     }
 
@@ -134,12 +131,12 @@ public class Player : Character
     }
 
     /// <summary>
-    /// Gets all of the player's equipment
+    /// Gets all of the player's weapons
     /// </summary>
-    /// <returns>Equipment on the player</returns>
-    public Equipment[] GetEquipment()
+    /// <returns>Weapons on the player</returns>
+    public Weapon[] GetWeapons()
     {
-        return GetComponentsInChildren<Equipment>(true);
+        return GetComponentsInChildren<Weapon>(true);
     }
 
     /// <summary>
@@ -152,12 +149,12 @@ public class Player : Character
     }
 
     /// <summary>
-    /// Gets all of the player's runes
+    /// Gets all of the player's roons
     /// </summary>
-    /// <returns>Runes in the player's rune container</returns>
-    public Rune[] GetRunes()
+    /// <returns>Roons in the player's roon container</returns>
+    public Roon[] GetRoons()
     {
-        return runeContainer.GetComponentsInChildren<Rune>(true);
+        return roonContainer.GetComponentsInChildren<Roon>(true);
     }
 
     /// <summary>
@@ -298,10 +295,10 @@ public class Player : Character
         {
             return;
         }
-        var equipment = collectable.GetComponent<Equipment>();
-        if (equipment && inventory.Find(equipment.name.TrimEnd(GameObjectUtility.CloneSuffix)))
+        var weapon = collectable.GetComponent<Weapon>();
+        if (weapon && inventory.Find(weapon.name.TrimEnd(GameObjectUtility.CloneSuffix)))
         {
-            Destroy(equipment.gameObject);
+            Destroy(weapon.gameObject);
             return;
         }
         Transform itemContainer = null;
@@ -309,13 +306,9 @@ public class Player : Character
         {
             itemContainer = weaponContainer;
         }
-        else if (collectable.GetComponent<Rune>())
+        else if (collectable.GetComponent<Roon>())
         {
-            itemContainer = runeContainer;
-        }
-        else if (collectable.GetComponent<Armor>())
-        {
-            throw new NotImplementedException("Armor is not collectable yet.");
+            itemContainer = roonContainer;
         }
         collectable.transform.SetParent(itemContainer);
         if (itemContainer)
@@ -329,6 +322,7 @@ public class Player : Character
             if (!inventory.Contains(item))
             {
                 inventory.Add(item);
+                item.transform.localPosition = Vector2.zero;
             }
             else
             {
@@ -345,6 +339,7 @@ public class Player : Character
         {
             Destroy(consumable.gameObject);
         }
+        DestroyDuplicateUniqueItems();
     }
 
     /// <summary>
@@ -407,7 +402,7 @@ public class Player : Character
         var direction = new Vector2(x, y);
         if (direction == Vector2.zero)
         {
-            direction = transform.root.right;
+            direction = new Vector2(GetFacingDirection(), 0);
         }
         var rangedWeapon = bow.GetComponent<RangedWeapon>();
         if (!rangedWeapon)
@@ -421,6 +416,15 @@ public class Player : Character
         var projectileDamage = projectile.GetDamage();
         projectileDamage.Modify(bowEffectiveness);
         rangedWeapon.SetForce(fullPower);
+    }
+
+    /// <summary>
+    /// Gets the direction the player is facing, where -1.0 is left and 1.0 is right.
+    /// </summary>
+    /// <returns>Direction player is facing</returns>
+    public float GetFacingDirection()
+    {
+        return Mathf.Sign(transform.localScale.x);
     }
 
     /// <summary>
@@ -444,7 +448,7 @@ public class Player : Character
             var direction = new Vector2(x, y);
             if (direction == Vector2.zero)
             {
-                direction = transform.root.right;
+                direction = new Vector2(GetFacingDirection(), 0);
             }
             wand.CastProjectile(direction);
         }
@@ -454,33 +458,20 @@ public class Player : Character
     /// Equips the specified item
     /// </summary>
     /// <param name="item">Item to equip</param>
-    public void Equip(Equipment equipment)
+    public void Equip(Weapon weapon)
     {
-        if (!inventory.Contains(equipment))
+        if (!inventory.Contains(weapon))
         {
-            Debug.LogError("Equipping " + equipment.name + ", but " + inventory + " does not contain it!", inventory.gameObject);
+            Debug.LogError("Equipping " + weapon.name + ", but " + inventory + " does not contain it!", inventory.gameObject);
             return;
         }
-        var currentlyEquipped = inventory.GetItems(equipment.GetItemType()).Where(e => e.IsEquipped()).FirstOrDefault();
+        var currentlyEquipped = inventory.GetItems(weapon.GetItemType()).Where(e => e.IsEquipped()).FirstOrDefault();
         if (currentlyEquipped)
         {
             currentlyEquipped.SetEquipped(false);
         }
-        equipment.SetEquipped(true);
-        var weapon = equipment.GetComponent<Weapon>();
-        if (weapon)
-        {
-            SetActiveWeapon(weapon.GetItemType());
-        }
-        var armor = equipment.GetComponent<Armor>();
-        if (armor)
-        {
-            var armorOfType = inventory.GetItems(armor.GetItemType()).Select(a => a.GetComponent<Armor>());
-            foreach (var armorPiece in armorOfType)
-            {
-                armorPiece.gameObject.SetActive(armorPiece == armor);
-            }
-        }
+        weapon.SetEquipped(true);
+        SetActiveWeapon(weapon.GetItemType());
     }
 
     /// <summary>
@@ -576,33 +567,6 @@ public class Player : Character
         }
     }
 
-    /// <summary>
-    /// Checks whether or not the player is stunned
-    /// </summary>
-    /// <returns>Whether or not player is stunned</returns>
-    public bool IsStunned()
-    {
-        return stunned;
-    }
-
-    /// <summary>
-    /// Gets the amount of time the player should be stunned for on damage dealt
-    /// </summary>
-    /// <returns>Stun duration in seconds</returns>
-    public static float GetStunTime()
-    {
-        return stunTime;
-    }
-
-    /// <summary>
-    /// Sets the amount of time the player should be stunned for on damage dealt
-    /// </summary>
-    /// <param name="stunTime">Stun duration in seconds</param>
-    public static void SetStunTime(float stunTime)
-    {
-        Player.stunTime = stunTime;
-    }
-
     public void RefillOxygen()
     {
         oxygen = 1.0f;
@@ -636,22 +600,6 @@ public class Player : Character
     }
 
     /// <summary>
-    /// Stuns the player
-    /// </summary>
-    protected override void EnableStun()
-    {
-        playerView.SetStun(true);
-    }
-
-    /// <summary>
-    /// Finishes player stun
-    /// </summary>
-    protected override void DisableStun()
-    {
-        playerView.SetStun(false);
-    }
-
-    /// <summary>
     /// Deals damage to the player if they fall for long enough
     /// </summary>
     private void ApplyFallDamage()
@@ -668,6 +616,25 @@ public class Player : Character
                 health.SetCurrentHitPoints(health.GetCurrentHitPoints() - damage);
             }
             fallCounter = 0.0f;
+        }
+    }
+
+    /// <summary>
+    /// Destroys duplicate items if they are unique and the player has it in their inventory
+    /// </summary>
+    private void DestroyDuplicateUniqueItems()
+    {
+        foreach (var item in FindObjectsOfType<Item>())
+        {
+            if (!item.IsUnique())
+            {
+                continue;
+            }
+            if (!inventory.Contains(item) && inventory.Find(item.name))
+            {
+                Debug.LogWarning("Destroying " + item.name + ", because the player already has it equipped.", gameObject);
+                Destroy(item.gameObject);
+            }
         }
     }
 
@@ -718,11 +685,7 @@ public class Player : Character
         {
             inventory.Add(item);
         }
-        foreach (var item in runeContainer.GetComponentsInChildren<Item>(true))
-        {
-            inventory.Add(item);
-        }
-        foreach (var item in armorContainer.GetComponentsInChildren<Item>(true))
+        foreach (var item in roonContainer.GetComponentsInChildren<Item>(true))
         {
             inventory.Add(item);
         }
@@ -740,19 +703,19 @@ public class Player : Character
         var items = SaveData.LoadItems();
         foreach (var item in items)
         {
-            var equipment = item.GetComponent<Equipment>();
-            if (equipment)
+            var weapon = item.GetComponent<Weapon>();
+            if (weapon)
             {
-                var existingEquipment = inventory.Find(equipment.name);
-                if (existingEquipment)
+                var existingWeapon = inventory.Find(weapon.name);
+                if (existingWeapon)
                 {
-                    inventory.Remove(existingEquipment, true);
+                    inventory.Remove(existingWeapon, true);
                 }
             }
             Collect(item.GetComponent<Collectable>());
-            if (equipment && equipment.IsEquipped())
+            if (weapon && weapon.IsEquipped())
             {
-                Equip(equipment);
+                Equip(weapon);
             }
             Transform container = null;
             switch (item.GetItemType())
@@ -763,20 +726,8 @@ public class Player : Character
                 case ItemType.RangedWeapon:
                     container = weaponContainer;
                     break;
-                case ItemType.Boots:
-                    container = armorContainer;
-                    break;
-                case ItemType.Gloves:
-                    container = armorContainer;
-                    break;
-                case ItemType.Helmet:
-                    container = armorContainer;
-                    break;
-                case ItemType.Leggings:
-                    container = armorContainer;
-                    break;
-                case ItemType.Rune:
-                    container = runeContainer;
+                case ItemType.Roon:
+                    container = roonContainer;
                     break;
                 default:
                     Debug.LogError("Invalid item type provided!", gameObject);
@@ -793,10 +744,10 @@ public class Player : Character
     private void SaveItems()
     {
         var items = inventory.GetItems();
-        var equipment = items.Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
-        foreach (var equipmentPiece in equipment)
+        var weapons = items.Where(i => i.GetComponent<Weapon>()).Select(e => e.GetComponent<Weapon>());
+        foreach (var weapon in weapons)
         {
-            equipmentPiece.DeactivateRunes();
+            weapon.DeactivateRoons();
         }
         SaveData.SaveItems(inventory.GetItems());
     }

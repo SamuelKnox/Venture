@@ -32,8 +32,9 @@ public class RewardThrower : Enemy
         defaultProjectile = rangedWeapon.GetProjectile();
     }
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         if (rewardFrequencyHalflife > 0.0f)
         {
             StartCoroutine(ReduceRewardFrequency());
@@ -42,10 +43,6 @@ public class RewardThrower : Enemy
 
     void FixedUpdate()
     {
-        if (stunned)
-        {
-            return;
-        }
         if (Random.Range(0.0f, 1.0f) < rewardFrequency)
         {
             rangedWeapon.SetProjectile(reward);
@@ -60,6 +57,10 @@ public class RewardThrower : Enemy
         rangedWeapon.Fire(direction);
     }
 
+    /// <summary>
+    /// Provides diminishing returns on reward drops
+    /// </summary>
+    /// <returns>C# required IEnumerator</returns>
     private IEnumerator ReduceRewardFrequency()
     {
         while (true)

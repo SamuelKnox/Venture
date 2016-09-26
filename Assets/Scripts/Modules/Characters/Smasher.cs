@@ -38,8 +38,9 @@ public class Smasher : Enemy
         InitializeVelocities();
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         if (attacking && body.velocity == Vector2.zero)
         {
             body.velocity = returnVelocity;

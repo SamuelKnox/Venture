@@ -8,11 +8,6 @@
             /// Animation name for when enemy dies
             /// </summary>
             public const string Death = "Dead";
-
-            /// <summary>
-            /// Animation name for when enemy is stunned
-            /// </summary>
-            public const string Stunned = "Stunned";
         }
 
         public static class Floats

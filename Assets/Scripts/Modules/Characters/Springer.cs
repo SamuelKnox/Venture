@@ -18,10 +18,6 @@ public class Springer : Enemy
 
     void FixedUpdate()
     {
-        if (stunned)
-        {
-            return;
-        }
         if (visible && body.velocity == Vector2.zero)
         {
             var force = spring;

@@ -87,6 +87,10 @@ public class Health : MonoBehaviour
         return currentHitPoints;
     }
 
+    /// <summary>
+    /// Sets the current hitpoint for this health component
+    /// </summary>
+    /// <param name="hitPoints">Hit points to set to</param>
     public void SetCurrentHitPoints(float hitPoints)
     {
         currentHitPoints = Mathf.Clamp(hitPoints, 0, GetMaxHitPoints());
@@ -160,7 +164,7 @@ public class Health : MonoBehaviour
             Debug.LogError("Cannot apply null damage to " + gameObject + "!", gameObject);
             return;
         }
-        bool harmful = damage.GetBaseDamage() > 0 || damage.GetDamageOverTime() > 0 || damage.GetKnockBack() > 0;
+        bool harmful = damage.GetBaseDamage() > 0 || damage.GetDamageOverTime() > 0 || damage.GetKnockBack() > 0 || (damage.GetSpeedModifierIntensity() > 0 && damage.GetSpeedModifierDuration() > 0);
         bool friendly = TeamUtility.IsFriendly(gameObject, damage.gameObject);
         bool coolingDown = invincibilityCooldown > 0;
         if (!harmful || friendly || coolingDown)
@@ -181,7 +185,7 @@ public class Health : MonoBehaviour
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
         float knockBackForce = damage.GetKnockBack() * knockBackReceived;
         var knockBack = knockBackDirection * knockBackForce;
-        var platformCharacterController = root.GetComponent<PlatformCharacterController>();
+        var platformCharacterController = root.GetComponentInChildren<PlatformCharacterController>();
         if (platformCharacterController)
         {
             platformCharacterController.PlatformCharacterPhysics.Velocity = Vector3.zero;
@@ -203,6 +207,14 @@ public class Health : MonoBehaviour
                 healthView.AdjustHealth(currentHitPoints / maxHitPoints);
             }
         }
+        var character = root.GetComponentInChildren<Character>();
+        if (!character)
+        {
+            Debug.LogError("Could not find Character associated with " + this, gameObject);
+            return;
+        }
+        character.AddSpeedModifer(damage.GetSpeedModifierIntensity(), damage.GetSpeedModifierDuration());
+        character.AddTintModifier(damage.GetTint(), GetInvincibilityTime());
     }
 
     /// <summary>

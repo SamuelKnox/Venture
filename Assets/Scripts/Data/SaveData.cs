@@ -10,11 +10,11 @@ public class SaveData
     public int prestige;
     public int gold;
     public float level;
-    public List<string> equipmentNames = new List<string>();
-    public List<bool> equipmentEquipped = new List<bool>();
-    public List<string> runeNames = new List<string>();
-    public List<string> runeEquipmentNames = new List<string>();
-    public List<int> runeLevels = new List<int>();
+    public List<string> weaponNames = new List<string>();
+    public List<bool> weaponsEquipped = new List<bool>();
+    public List<string> roonNames = new List<string>();
+    public List<string> roonWeaponNames = new List<string>();
+    public List<int> roonLevels = new List<int>();
     public List<string> questNames = new List<string>();
     public List<bool> questsComplete = new List<bool>();
 
@@ -82,58 +82,58 @@ public class SaveData
     }
 
     /// <summary>
-    /// Loads the players items, including equipment and runes
+    /// Loads the players items, including weapons and roons
     /// </summary>
-    /// <returns>Equipment and runes</returns>
+    /// <returns>Weapons and roons</returns>
     public static Item[] LoadItems()
     {
         var saveData = LoadSaveData();
-        var equipmentNames = saveData.equipmentNames;
-        var equipmentEquipped = saveData.equipmentEquipped;
-        if (equipmentNames.Count != equipmentEquipped.Count)
+        var weaponNames = saveData.weaponNames;
+        var weaponsEquipped = saveData.weaponsEquipped;
+        if (weaponNames.Count != weaponsEquipped.Count)
         {
-            Debug.LogError("Every piece of equipment must either be equipped or unequipped!");
+            Debug.LogError("Every weapon must either be equipped or unequipped!");
             return null;
         }
-        var equipmentPrefabs = Resources.LoadAll<Equipment>(FilePaths.Equipment);
-        var equipment = new List<Equipment>();
-        for (int i = 0; i < equipmentNames.Count && i < equipmentEquipped.Count; i++)
+        var weaponPrefabs = Resources.LoadAll<Weapon>(FilePaths.Weapons);
+        var weapon = new List<Weapon>();
+        for (int i = 0; i < weaponNames.Count && i < weaponsEquipped.Count; i++)
         {
-            var collectedEquipmentPrefab = equipmentPrefabs.Where(p => p.name == equipmentNames[i]).First();
-            var equipmentPiece = UnityEngine.Object.Instantiate(collectedEquipmentPrefab) as Equipment;
-            equipmentPiece.name = equipmentPiece.name.TrimEnd(GameObjectUtility.CloneSuffix);
-            if (equipmentEquipped[i])
+            var collectedWeaponPrefab = weaponPrefabs.Where(p => p.name == weaponNames[i]).First();
+            var weaponInstance = UnityEngine.Object.Instantiate(collectedWeaponPrefab) as Weapon;
+            weaponInstance.name = weaponInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
+            if (weaponsEquipped[i])
             {
-                equipmentPiece.SetEquipped(true);
+                weaponInstance.SetEquipped(true);
             }
-            equipment.Add(equipmentPiece);
+            weapon.Add(weaponInstance);
         }
-        var runeNames = saveData.runeNames;
-        var runeLevels = saveData.runeLevels;
-        var runeEquipmentNames = saveData.runeEquipmentNames;
-        if (runeNames.Count != runeLevels.Count)
+        var roonNames = saveData.roonNames;
+        var roonLevels = saveData.roonLevels;
+        var roonWeaponNames = saveData.roonWeaponNames;
+        if (roonNames.Count != roonLevels.Count)
         {
-            Debug.LogError("Every rune must have a level!");
+            Debug.LogError("Every roon must have a level!");
             return null;
         }
-        var runePrefabs = Resources.LoadAll<Rune>(FilePaths.Runes);
-        var runes = new List<Rune>();
-        for (int i = 0; i < runeNames.Count && i < runeLevels.Count; i++)
+        var roonPrefabs = Resources.LoadAll<Roon>(FilePaths.Roons);
+        var roons = new List<Roon>();
+        for (int i = 0; i < roonNames.Count && i < roonLevels.Count; i++)
         {
-            var collectedRunePrefab = runePrefabs.Where(r => r.name == runeNames[i]).First();
-            var runeInstance = UnityEngine.Object.Instantiate(collectedRunePrefab) as Rune;
-            runeInstance.name = runeInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
-            runeInstance.SetLevel(saveData.runeLevels[i]);
-            runes.Add(runeInstance);
-            if (!string.IsNullOrEmpty(runeEquipmentNames[i]))
+            var collectedRoonPrefab = roonPrefabs.Where(r => r.name == roonNames[i]).First();
+            var roonInstance = UnityEngine.Object.Instantiate(collectedRoonPrefab) as Roon;
+            roonInstance.name = roonInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
+            roonInstance.SetLevel(saveData.roonLevels[i]);
+            roons.Add(roonInstance);
+            if (!string.IsNullOrEmpty(roonWeaponNames[i]))
             {
-                var equipmentPiece = equipment.Where(e => e.name == runeEquipmentNames[i]).First();
-                equipmentPiece.SetRune(runeInstance);
+                var roonedWeapon = weapon.Where(e => e.name == roonWeaponNames[i]).First();
+                roonedWeapon.SetRoon(roonInstance);
             }
         }
         var items = new List<Item>();
-        items.AddRange(equipment.ToArray());
-        items.AddRange(runes.ToArray());
+        items.AddRange(weapon.ToArray());
+        items.AddRange(roons.ToArray());
         return items.ToArray();
     }
 
@@ -144,37 +144,37 @@ public class SaveData
     public static void SaveItems(Item[] items)
     {
         var saveData = LoadSaveData();
-        var equipmentNames = new List<string>();
-        var equipmentEquipped = new List<bool>();
-        var runeNames = new List<string>();
-        var runeLevels = new List<int>();
-        var runeEquipmentNames = new List<string>();
-        var equipment = items.Where(i => i.GetComponent<Equipment>()).Select(e => e.GetComponent<Equipment>());
-        var runes = items.Where(i => i.GetComponent<Rune>()).Select(r => r.GetComponent<Rune>()).ToList();
-        foreach (var equipmentPiece in equipment)
+        var weaponNames = new List<string>();
+        var weaponsEquipped = new List<bool>();
+        var roonNames = new List<string>();
+        var roonLevels = new List<int>();
+        var roonWeaponNames = new List<string>();
+        var weapons = items.Where(i => i.GetComponent<Weapon>()).Select(e => e.GetComponent<Weapon>());
+        var roons = items.Where(i => i.GetComponent<Roon>()).Select(r => r.GetComponent<Roon>()).ToList();
+        foreach (var weapon in weapons)
         {
-            string equipmentName = equipmentPiece.name.TrimEnd(GameObjectUtility.CloneSuffix);
-            equipmentNames.Add(equipmentName);
-            equipmentEquipped.Add(equipmentPiece.IsEquipped());
-            foreach (var rune in equipmentPiece.GetRunes())
+            string weaponName = weapon.name.TrimEnd(GameObjectUtility.CloneSuffix);
+            weaponNames.Add(weaponName);
+            weaponsEquipped.Add(weapon.IsEquipped());
+            foreach (var roon in weapon.GetRoons())
             {
-                runeNames.Add(rune.name.TrimEnd(GameObjectUtility.CloneSuffix));
-                runeLevels.Add(rune.GetLevel());
-                runeEquipmentNames.Add(equipmentName);
-                runes.Remove(rune);
+                roonNames.Add(roon.name.TrimEnd(GameObjectUtility.CloneSuffix));
+                roonLevels.Add(roon.GetLevel());
+                roonWeaponNames.Add(weaponName);
+                roons.Remove(roon);
             }
         }
-        foreach (var rune in runes)
+        foreach (var roon in roons)
         {
-            runeNames.Add(rune.name.TrimEnd(GameObjectUtility.CloneSuffix));
-            runeLevels.Add(rune.GetLevel());
-            runeEquipmentNames.Add(null);
+            roonNames.Add(roon.name.TrimEnd(GameObjectUtility.CloneSuffix));
+            roonLevels.Add(roon.GetLevel());
+            roonWeaponNames.Add(null);
         }
-        saveData.equipmentNames = equipmentNames;
-        saveData.equipmentEquipped = equipmentEquipped;
-        saveData.runeNames = runeNames;
-        saveData.runeLevels = runeLevels;
-        saveData.runeEquipmentNames = runeEquipmentNames;
+        saveData.weaponNames = weaponNames;
+        saveData.weaponsEquipped = weaponsEquipped;
+        saveData.roonNames = roonNames;
+        saveData.roonLevels = roonLevels;
+        saveData.roonWeaponNames = roonWeaponNames;
         SaveSaveData(saveData);
     }
 
@@ -198,7 +198,6 @@ public class SaveData
         {
             var collectedQuestPrefab = questPrefabs.Where(q => q.name == questNames[i]).First();
             var questInstance = UnityEngine.Object.Instantiate(collectedQuestPrefab) as Quest;
-            questInstance.name = questInstance.name.TrimEnd(GameObjectUtility.CloneSuffix);
             questInstance.SetComplete(questsComplete[i]);
             questInstance.SetLongTermQuest(true);
             quests.Add(questInstance);
