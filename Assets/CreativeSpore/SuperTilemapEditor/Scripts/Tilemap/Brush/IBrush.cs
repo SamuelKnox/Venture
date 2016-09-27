@@ -59,7 +59,7 @@ namespace CreativeSpore.SuperTilemapEditor
         /// <returns></returns>
         int GetAnimFrameIdx();
         /// <summary>
-        /// Return the current frame tile data
+        /// Returns the current frame tile data
         /// </summary>
         /// <returns></returns>
         uint GetAnimTileData();

@@ -461,13 +461,9 @@ namespace CreativeSpore.SuperTilemapEditor
         private void FocusSceneView()
         {
             if (SceneView.lastActiveSceneView != null)
-            {
                 SceneView.lastActiveSceneView.Focus();
-            }
             else if (SceneView.sceneViews.Count > 0)
-            {
                 ((SceneView)SceneView.sceneViews[0]).Focus();
-            }
         }
 
         private void DoAutoScroll()

@@ -21,10 +21,43 @@ namespace CreativeSpore.SuperTilemapEditor
         public eTileCollider type;
         public TileColliderData Clone()
         {
+            if(this.vertices == null) this.vertices = new Vector2[0];
             Vector2[] clonedVertices = new Vector2[this.vertices.Length];
             vertices.CopyTo(clonedVertices, 0);
 
             return new TileColliderData { vertices = clonedVertices, type = type };
+        }
+
+        public static Vector2 SnapVertex(Vector2 vertex, Tileset tileset)
+        {
+            vertex.x = Mathf.Clamp01(Mathf.RoundToInt(vertex.x * tileset.TilePxSize.x) / tileset.TilePxSize.x);
+            vertex.y = Mathf.Clamp01(Mathf.RoundToInt(vertex.y * tileset.TilePxSize.y) / tileset.TilePxSize.y);
+            return vertex;
+        }
+
+        /// <summary>
+        /// Snap vertices positions according to the tileset tile size in pixels. This way, the tile colliders will be seamless avoiding precision erros.
+        /// </summary>
+        /// <param name="tileset"></param>
+        public void SnapVertices(Tileset tileset)
+        {
+            if (vertices != null)
+                for (int i = 0; i < vertices.Length; ++i)
+                    vertices[i] = SnapVertex(vertices[i], tileset);
+        }
+
+        public void ApplyFlippingFlags(uint tileData)
+        {
+            if ((tileData & Tileset.k_TileFlag_FlipH) != 0) FlipH();
+            if ((tileData & Tileset.k_TileFlag_FlipV) != 0) FlipV();
+            if ((tileData & Tileset.k_TileFlag_Rot90) != 0) Rot90();
+        }
+
+        public void RemoveFlippingFlags(uint tileData)
+        {
+            if ((tileData & Tileset.k_TileFlag_Rot90) != 0) Rot90Back();
+            if ((tileData & Tileset.k_TileFlag_FlipV) != 0) FlipV();
+            if ((tileData & Tileset.k_TileFlag_FlipH) != 0) FlipH();
         }
 
         public void FlipH()
@@ -53,6 +86,17 @@ namespace CreativeSpore.SuperTilemapEditor
                 vertices[i].x = vertices[i].y;
                 vertices[i].y = tempX;
                 vertices[i].y = 1f - vertices[i].y;
+            }
+        }
+        
+        public void Rot90Back()
+        {
+            for (int i = 0; i < vertices.Length; ++i)
+            {
+                vertices[i].y = 1f - vertices[i].y;
+                float tempX = vertices[i].x;
+                vertices[i].x = vertices[i].y;
+                vertices[i].y = tempX;
             }
         }
     }

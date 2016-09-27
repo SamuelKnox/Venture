@@ -47,7 +47,7 @@ namespace CreativeSpore.SuperTilemapEditor
         /// Warning: changing this value will break the tilemaps made so far. Change this before creating them.
         /// </summary>
         public const int k_chunkSize = 60; 
-        public const string k_UndoOpName = "Paint Op. ";
+        public const string k_UndoOpName = "Paint Op. ";        
 
         /// <summary>
         /// Disable the instantiation of prefabs attached to tiles. Usefull when creating procedural maps and you want
@@ -55,6 +55,11 @@ namespace CreativeSpore.SuperTilemapEditor
         /// Remember to set this to true and call Refresh(false, false, true, false) for each tilemap to instantiate the prefabs
         /// </summary>
         public static bool DisableTilePrefabCreation = false;
+
+        #region Public Events
+        public delegate void OnMeshUpdatedDelegate(Tilemap source);
+        public OnMeshUpdatedDelegate OnMeshUpdated;
+        #endregion
 
         #region Public Properties
         public Tileset Tileset
@@ -130,7 +135,15 @@ namespace CreativeSpore.SuperTilemapEditor
         /// <summary>
         /// Sets the isTrigger property of the collider. You need call Refresh to update the colliders after changing it.
         /// </summary>
-        public bool IsTrigger { get { return m_isTrigger; } set { m_isTrigger = true; } }
+        public bool IsTrigger { get { return m_isTrigger; } set { m_isTrigger = value; } }
+        /// <summary>
+        /// The PhysicsMaterial that is applied to this tilemap colliders.
+        /// </summary>
+        public PhysicMaterial PhysicMaterial { get { return m_physicMaterial; } set { m_physicMaterial = value; } }
+        /// <summary>
+        /// The PhysicsMaterial2D that is applied to this tilemap colliders.
+        /// </summary>
+        public PhysicsMaterial2D PhysicMaterial2D { get { return m_physicMaterial2D; } set { m_physicMaterial2D = value; } }
         /// <summary>
         /// Show the collider normals
         /// </summary>
@@ -140,7 +153,7 @@ namespace CreativeSpore.SuperTilemapEditor
         /// </summary>
         public Vector2 CellSize { get { return m_cellSize; } set { m_cellSize = value; } }
         /// <summary>
-        /// Return the size of the map in units
+        /// Returns the size of the map in units
         /// </summary>
         public Bounds MapBounds { get { return m_mapBounds; } }
         /// <summary>
@@ -157,27 +170,27 @@ namespace CreativeSpore.SuperTilemapEditor
         /// </summary>      
         public bool EnableUndoWhilePainting { get { return m_enableUndoWhilePainting; } set { m_enableUndoWhilePainting = value; } }
         /// <summary>
-        /// Return the minimum horizontal grid position of the tilemap area
+        /// Returns the minimum horizontal grid position of the tilemap area
         /// </summary>
         public int MinGridX { get { return m_minGridX; } set { m_minGridX = Mathf.Min(0, value); } }
         /// <summary>
-        /// Return the minimum vertical grid position of the tilemap area
+        /// Returns the minimum vertical grid position of the tilemap area
         /// </summary>
         public int MinGridY { get { return m_minGridY; } set { m_minGridY = Mathf.Min(0, value); } }
         /// <summary>
-        /// Return the maximum horizontal grid position of the tilemap area
+        /// Returns the maximum horizontal grid position of the tilemap area
         /// </summary>
         public int MaxGridX { get { return m_maxGridX; } set { m_maxGridX = Mathf.Max(0, value); } }
         /// <summary>
-        /// Return the maximum vertical grid position of the tilemap area
+        /// Returns the maximum vertical grid position of the tilemap area
         /// </summary>
         public int MaxGridY { get { return m_maxGridY; } set { m_maxGridY = Mathf.Max(0, value); } }
         /// <summary>
-        /// Return the horizontal size of the grid in tiles
+        /// Returns the horizontal size of the grid in tiles
         /// </summary>
         public int GridWidth { get { return m_maxGridX - m_minGridX + 1; } }
         /// <summary>
-        /// Return the vertical size of the grid in tiles
+        /// Returns the vertical size of the grid in tiles
         /// </summary>
         public int GridHeight { get { return m_maxGridY - m_minGridY + 1; } }
         /// <summary>
@@ -287,6 +300,10 @@ namespace CreativeSpore.SuperTilemapEditor
         private bool m_enableUndoWhilePainting = true;
         [SerializeField]
         private bool m_isTrigger = false;
+        [SerializeField]
+        private PhysicMaterial m_physicMaterial;
+        [SerializeField]
+        private PhysicsMaterial2D m_physicMaterial2D;
 
         [SerializeField]
         Vector2 m_cellSize;
@@ -601,7 +618,7 @@ namespace CreativeSpore.SuperTilemapEditor
         }
 
         /// <summary>
-        /// Return the tile data at the local position
+        /// Returns the tile data at the local position
         /// </summary>
         /// <param name="vLocalPos"></param>
         /// <returns></returns>
@@ -613,7 +630,7 @@ namespace CreativeSpore.SuperTilemapEditor
         }
 
         /// <summary>
-        /// Return the tile data at the grid position
+        /// Returns the tile data at the grid position
         /// </summary>
         /// <param name="gridX"></param>
         /// <param name="gridY"></param>
@@ -636,7 +653,7 @@ namespace CreativeSpore.SuperTilemapEditor
         }
 
         /// <summary>
-        /// Return the tile at the local position
+        /// Returns the tile at the local position
         /// </summary>
         /// <param name="vLocalPos"></param>
         /// <returns></returns>
@@ -648,7 +665,7 @@ namespace CreativeSpore.SuperTilemapEditor
         }
 
         /// <summary>
-        /// Return the tile at the grid position
+        /// Returns the tile at the grid position
         /// </summary>
         /// <param name="gridX"></param>
         /// <param name="gridY"></param>
@@ -724,6 +741,8 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 chunkList[i].UpdateColliders();
             }
+
+            if (OnMeshUpdated != null) OnMeshUpdated(this);
         }
 
         /// <summary>

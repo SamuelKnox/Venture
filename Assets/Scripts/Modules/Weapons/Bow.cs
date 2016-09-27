@@ -6,8 +6,9 @@ public class Bow : Weapon
 {
     private RangedWeapon rangedWeapon;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         rangedWeapon = GetComponent<RangedWeapon>();
     }
 
@@ -41,7 +42,7 @@ public class Bow : Weapon
         {
             projectile.tag = tag;
             var projectileDamage = projectile.GetDamage();
-            projectileDamage.MergeDamage(damage);
+            projectileDamage.AddDamage(damage);
         }
         return projectile;
     }

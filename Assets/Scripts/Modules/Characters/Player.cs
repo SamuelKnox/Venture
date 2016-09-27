@@ -437,19 +437,20 @@ public class Player : Character
         {
             return;
         }
+        float x = Input.GetAxis(InputNames.Horizontal);
+        float y = Input.GetAxis(InputNames.Vertical);
+        var direction = new Vector2(x, y);
+        if (direction == Vector2.zero)
+        {
+            direction = new Vector2(GetFacingDirection(), 0);
+        }
+        direction.Normalize();
         if (wandCharged)
         {
-            wand.CastSpell();
+            wand.CastSpell(direction);
         }
         else
         {
-            float x = Input.GetAxis(InputNames.Horizontal);
-            float y = Input.GetAxis(InputNames.Vertical);
-            var direction = new Vector2(x, y);
-            if (direction == Vector2.zero)
-            {
-                direction = new Vector2(GetFacingDirection(), 0);
-            }
             wand.CastProjectile(direction);
         }
     }

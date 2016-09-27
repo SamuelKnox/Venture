@@ -95,12 +95,20 @@ namespace CreativeSpore.SuperTilemapEditor
                 m_matPropBlock = new MaterialPropertyBlock();
             m_meshRenderer.GetPropertyBlock(m_matPropBlock);
 #if UNITY_EDITOR
-            if (ParentTilemap.ParentTilemapGroup && 
-                (Selection.activeGameObject == ParentTilemap.ParentTilemapGroup.gameObject ||
-                Selection.activeGameObject && Selection.activeGameObject.transform.parent && 
-                Selection.activeGameObject.transform.parent.gameObject == ParentTilemap.ParentTilemapGroup.gameObject) &&
+            // Apply UnselectedColorMultiplier
+            TilemapGroup selectedTilemapGroup;
+            if (
+                !Application.isPlaying &&
+                // Check if there is a parent tilemap group and this tilemap is not the selected tilemap in the tilemap group
+                ParentTilemap.ParentTilemapGroup && 
                 ParentTilemap.ParentTilemapGroup.SelectedTilemap != ParentTilemap &&
-                !Application.isPlaying
+                // Check if the tilemap group or any of its children is selected
+                Selection.activeGameObject &&
+                (Selection.activeGameObject == ParentTilemap.ParentTilemapGroup.gameObject ||
+                ((selectedTilemapGroup = Selection.activeGameObject.GetComponentInParent<TilemapGroup>()) && selectedTilemapGroup == ParentTilemap.ParentTilemapGroup) &&
+                // Exception: the selected object is parent of the tilemap but it's not a tilemap group (ex: grouping tilemaps under a dummy gameobject)
+                !(ParentTilemap.transform.IsChildOf(Selection.activeGameObject.transform) && !Selection.activeGameObject.GetComponent<TilemapGroup>())
+                )
             )
             {
                 m_matPropBlock.SetColor("_Color", ParentTilemap.TintColor * ParentTilemap.ParentTilemapGroup.UnselectedColorMultiplier);
@@ -287,14 +295,14 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 if (m_meshCollider != null && m_meshCollider.sharedMesh != null && m_meshCollider.sharedMesh.normals.Length > 0f)
                 {
-                    Gizmos.color = new Color(0f, 1f, 0f, 0.8f);
+                    Gizmos.color = EditorGlobalSettings.TilemapColliderColor;
                     Gizmos.DrawWireMesh(m_meshCollider.sharedMesh, transform.position, transform.rotation, transform.lossyScale);
                     Gizmos.color = Color.white;
                 }
             }
             else if(ParentTilemap.ColliderType == eColliderType._2D)
             {
-                Gizmos.color = new Color(0f, 1f, 0f, 0.8f);
+                Gizmos.color = EditorGlobalSettings.TilemapColliderColor;
                 Gizmos.matrix = gameObject.transform.localToWorldMatrix;
                 Collider2D[] edgeColliders = GetComponents<Collider2D>();
                 for(int i = 0; i < edgeColliders.Length; ++i)

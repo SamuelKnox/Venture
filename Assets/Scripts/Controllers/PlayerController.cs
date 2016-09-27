@@ -123,7 +123,7 @@ public class PlayerController : MonoBehaviour
             SetPlayerControllable(true);
             return;
         }
-        if (!controllable || PlayerManager.Player.GetSpeed() <= 0.0f)
+        if (!controllable || PlayerManager.Player.GetSpeedModifier() <= 0.0f)
         {
             return;
         }

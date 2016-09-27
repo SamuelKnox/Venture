@@ -96,7 +96,7 @@ public class Damage : MonoBehaviour
     /// Merges another Damage with this Damage
     /// </summary>
     /// <param name="damage">Damage to merge with this damage</param>
-    public void MergeDamage(Damage damage)
+    public void AddDamage(Damage damage)
     {
         SetBaseDamage(GetBaseDamage() + damage.GetBaseDamage());
         SetKnockBack(GetKnockBack() + damage.GetKnockBack());

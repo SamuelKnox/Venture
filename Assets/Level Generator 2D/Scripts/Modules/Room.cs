@@ -1,5 +1,5 @@
 ﻿///Uncomment the line below if you are using Creative Spore's Super Tilemap Editor
-#define USING_SUPER_TILEMAP_EDITOR
+//#define USING_SUPER_TILEMAP_EDITOR
 
 namespace LevelGenerator2D
 {

@@ -123,6 +123,24 @@ public class Health : MonoBehaviour
     }
 
     /// <summary>
+    /// Checks whether or not this Health component can take Damage
+    /// </summary>
+    /// <returns>Whether or not invincible</returns>
+    public bool IsInvincible()
+    {
+        return invincible;
+    }
+
+    /// <summary>
+    /// Sets whether or not this Health component can take Damage
+    /// </summary>
+    /// <param name="invincible">Whether or not invincible</param>
+    public void SetInvincible(bool invincible)
+    {
+        this.invincible = invincible;
+    }
+
+    /// <summary>
     /// Gets the duration of invincibility after taking damage
     /// </summary>
     /// <returns>Seconds</returns>

@@ -23,7 +23,7 @@ public abstract class Weapon : Item
 
     protected Damage damage;
 
-    void Awake()
+    protected virtual void Awake()
     {
         damage = GetComponent<Damage>();
         damage.SetActive(false);

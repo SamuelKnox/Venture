@@ -8,7 +8,7 @@ public abstract class Character : MonoBehaviour
     [Tooltip("Speed modifier for the Character, where 0.0 is immobile, 0.5 is half speed, 1.0f is normal speed, and 2.0 is double speed.")]
     [SerializeField]
     [Range(0.0f, 2.0f)]
-    private float speed = 1.0f;
+    private float speedModifier = 1.0f;
 
     [Tooltip("Tint applied to the Character's sprite(s)")]
     [SerializeField]
@@ -56,9 +56,9 @@ public abstract class Character : MonoBehaviour
     /// </summary>
     public abstract void Die();
 
-    public float GetSpeed()
+    public float GetSpeedModifier()
     {
-        return speed;
+        return speedModifier;
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public abstract class Character : MonoBehaviour
         else
         {
             speedModifiers.Add(intensity, duration);
-            speed *= intensity;
+            speedModifier *= intensity;
         }
     }
 
@@ -129,7 +129,7 @@ public abstract class Character : MonoBehaviour
         {
             if (speedModifier.Value <= 0.0f)
             {
-                speed /= speedModifier.Key;
+                this.speedModifier /= speedModifier.Key;
             }
         }
         speedModifiers = speedModifiers.Where(s => s.Value > 0.0f).ToDictionary(s => s.Key, s => s.Value);

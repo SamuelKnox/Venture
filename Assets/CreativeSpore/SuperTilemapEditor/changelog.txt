@@ -1,3 +1,13 @@
+--- v1.4.0 ---
+- Added support to edit tile colliders directly in the scene view when Colliders tab is selected
+- Added PhysicMaterial and PhysicMaterial2D property to tilemaps
+- Added support to edit multiple brushes
+- Changed the way a tilemap is highlighted when it's a child of a tilemap group
+- Added tilemap event OnMeshUpdated
+- The current selected tilemap colliders are now updated when the tile colliders are modified in the Tile Property Window
+- Fixed tilemap IsTrigger setter
+- Fixed some collider 2D generation issues
+
 --- v1.3.9 ---
 - Added Source HTML Documentation
 - Added GetMouseGridX, GetMouseGridY, GetGridX & GetGridY to helper class TilemapUtils
@@ -5,6 +15,7 @@
 - Fixed updating instantiated prefabs attached to a tile with tile flip and rotation
 - Fixed issues scrolling the tile palette
 - Fixed UVs for animated tiles
+
 --- v1.3.8 ---
 - Improved BrushUtil.GetGridX and BrushUtil.GetGridY precision
 - Added DisableTilePrefabCreation to tilemap class to disable the creation of tile prefabs

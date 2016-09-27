@@ -22,7 +22,8 @@ public abstract class WandRoon : Roon
     /// Activates the roon's ability
     /// </summary>
     /// <param name="wand">Wand roon is being activated from</param>
-    public abstract void ActivateAbility(Wand wand);
+    /// <param name="direction">Direction ability is being activate towards</param>
+    public abstract void ActivateAbility(Wand wand, Vector2 direction);
 
     /// <summary>
     /// Cost in mana to cast this roon's spell

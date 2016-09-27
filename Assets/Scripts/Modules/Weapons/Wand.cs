@@ -17,8 +17,9 @@ public class Wand : Weapon
     private RangedWeapon rangedWeapon;
     private Mana mana;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();        
         rangedWeapon = GetComponent<RangedWeapon>();
         mana = PlayerManager.Player.GetComponentInChildren<Mana>();
         if (!mana)
@@ -47,7 +48,7 @@ public class Wand : Weapon
         {
             projectile.tag = transform.root.tag;
             var projectileDamage = projectile.GetDamage();
-            projectileDamage.MergeDamage(damage);
+            projectileDamage.AddDamage(damage);
         }
         return projectile;
     }
@@ -55,9 +56,14 @@ public class Wand : Weapon
     /// <summary>
     /// Casts the wand's spell, based on its equipped roons
     /// </summary>
-    public void CastSpell()
+    public void CastSpell(Vector2 direction)
     {
         var wandRoon = GetRoon(RoonType.Wand) as WandRoon;
+        if (!wandRoon)
+        {
+            CastProjectile(direction);
+            return;
+        }
         bool canAffordManaCost = mana.GetCurrentManaPoints() >= wandRoon.GetManaCost() || allowManaOverflow && mana.GetCurrentManaPoints() > 0;
         bool wandIsReady = rangedWeapon.IsReady();
         if (!canAffordManaCost || !wandIsReady)
@@ -65,7 +71,7 @@ public class Wand : Weapon
             return;
         }
         mana.SetCurrentManaPoints(mana.GetCurrentManaPoints() - wandRoon.GetManaCost());
-        wandRoon.ActivateAbility(this);
+        wandRoon.ActivateAbility(this, direction);
     }
 
     /// <summary>
