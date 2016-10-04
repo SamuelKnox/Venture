@@ -46,9 +46,9 @@ public class Player : Character
     [SerializeField]
     private Transform questContainer;
 
-    [Tooltip("Damage dealt by player when contact with an enemy is made")]
+    [Tooltip("Handle for melee weapons when sheathed")]
     [SerializeField]
-    private Damage defensiveDamage;
+    private SpriteRenderer meleeWeaponHandle;
 
     [Tooltip("View used to display Oxygen consumption")]
     [SerializeField]
@@ -190,15 +190,6 @@ public class Player : Character
     public void SetLevel(float level)
     {
         this.level = level;
-    }
-
-    /// <summary>
-    /// Gets the damage dealt by this player when defending against contact with an enemy
-    /// </summary>
-    /// <returns>Player's damage dealer</returns>
-    public Damage GetDefensiveDamage()
-    {
-        return defensiveDamage;
     }
 
     /// <summary>
@@ -473,6 +464,11 @@ public class Player : Character
         }
         weapon.SetEquipped(true);
         SetActiveWeapon(weapon.GetItemType());
+        var meleeWeapon = weapon.GetComponent<MeleeWeapon>();
+        if (meleeWeapon)
+        {
+            meleeWeaponHandle.sprite = meleeWeapon.GetHandle();
+        }
     }
 
     /// <summary>
@@ -532,6 +528,8 @@ public class Player : Character
         }
         activeWeapon = newActiveWeapon;
         activeWeapon.gameObject.SetActive(true);
+        bool meleeWeapon = activeWeapon.GetComponent<MeleeWeapon>();
+        meleeWeaponHandle.gameObject.SetActive(!meleeWeapon);
     }
 
     /// <summary>
@@ -674,6 +672,11 @@ public class Player : Character
         for (int i = 0; i < WeaponTypes.Length; i++)
         {
             ToggleWeapon();
+        }
+        var meleeWeapon = activeWeapon.GetComponent<MeleeWeapon>();
+        if (meleeWeapon)
+        {
+            meleeWeaponHandle.sprite = meleeWeapon.GetHandle();
         }
     }
 

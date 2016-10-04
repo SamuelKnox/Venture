@@ -41,9 +41,8 @@ public class WallRoon : WandRoon
     {
         var origin = (Vector2)wand.transform.position + new Vector2(PlayerManager.Player.GetFacingDirection() * range, 0.0f);
 
-        //var raycastAll = Physics2D.RaycastAll(origin, Vector2.down, Mathf.Infinity, obstructionLayers);
-        var raycastAll = Test.RaycastAll(origin, Vector2.down, Mathf.Infinity, obstructionLayers);
-        
+        var raycastAll = Physics2D.RaycastAll(origin, Vector2.down, Mathf.Infinity, obstructionLayers);
+
         Debug.Log(raycastAll.Length);
         var raycastDirection = raycastAll.Length % 2 == 0 ? Vector2.down : Vector2.up;
         Debug.Log(raycastDirection);

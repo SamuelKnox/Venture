@@ -307,7 +307,11 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            jumping = Input.GetButton(InputNames.Jump) && verticalInput > -axisJumpingThreshold;
+            jumping = Input.GetButtonDown(InputNames.Jump) && verticalInput > -axisJumpingThreshold;
+        }
+        if (jumping)
+        {
+            playerView.Jump();
         }
         bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -axisJumpingThreshold;
         platformCharacterController.SetActionState(eControllerActions.Jump, jumping);

@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class MeleeWeapon : Weapon
 {
+    [Tooltip("Handle for when melee weapon is sheathed")]
+    [SerializeField]
+    private Sprite handle;
+
     void OnEnable()
     {
         damage.OnDamageDealt += OnDamageDealt;
@@ -27,6 +31,15 @@ public class MeleeWeapon : Weapon
     public void FinishSwing()
     {
         damage.SetActive(false);
+    }
+
+    /// <summary>
+    /// Gets the sprite used to display the weapon's handle when sheathed
+    /// </summary>
+    /// <returns>Melee Weapon's handle</returns>
+    public Sprite GetHandle()
+    {
+        return handle;
     }
 
     /// <summary>

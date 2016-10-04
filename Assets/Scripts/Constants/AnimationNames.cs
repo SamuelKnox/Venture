@@ -83,6 +83,11 @@
         public static class Triggers
         {
             /// <summary>
+            /// Animation name to trigger player's jump
+            /// </summary>
+            public const string Jump = "Jump";
+
+            /// <summary>
             /// Animation name for player's melee attack
             /// </summary>
             public const string MeleeWeaponAttack = "Melee Weapon Attack";

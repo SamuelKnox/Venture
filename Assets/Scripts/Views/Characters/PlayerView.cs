@@ -19,6 +19,7 @@ public class PlayerView : MonoBehaviour
     private PlatformCharacterController platformCharacterController;
     private PlayerController playerController;
     private Animator animator;
+    private bool jumping;
     private bool climbing;
     private bool attacking;
     private Collectable collectable;
@@ -123,6 +124,27 @@ public class PlayerView : MonoBehaviour
     {
         animator.SetBool(AnimationNames.Player.Bools.Dead, true);
         FinishAttacking();
+    }
+
+    /// <summary>
+    /// Animates the player's jumping
+    /// </summary>
+    public void Jump()
+    {
+        if (jumping)
+        {
+            return;
+        }
+        jumping = true;
+        animator.SetTrigger(AnimationNames.Player.Triggers.Jump);
+    }
+
+    /// <summary>
+    /// Finishes the player's jump
+    /// </summary>
+    public void FinishJumping()
+    {
+        jumping = false;
     }
 
     /// <summary>
