@@ -12,6 +12,22 @@ public class PlayerView : MonoBehaviour
     [SerializeField]
     private bool facingRight = true;
 
+    [Tooltip("Left hand used to change sprite based on weapon equipped")]
+    [SerializeField]
+    private SpriteRenderer leftHand;
+
+    [Tooltip("Sprite for hand when melee weapon is equipped")]
+    [SerializeField]
+    private Sprite meleeWeaponHand;
+
+    [Tooltip("Sprite for hand when bow is equipped")]
+    [SerializeField]
+    private Sprite bowHand;
+
+    [Tooltip("Sprite for hand when wand is equipped")]
+    [SerializeField]
+    private Sprite wandHand;
+
     [Tooltip("Sound effect to play when player is stunned")]
     [SerializeField]
     private AudioClip stunSound;
@@ -76,7 +92,7 @@ public class PlayerView : MonoBehaviour
     /// <summary>
     /// Executes a bow attack
     /// </summary>
-    public void BowAttack()
+    public void BowFire()
     {
         if (!attacking)
         {
@@ -177,6 +193,31 @@ public class PlayerView : MonoBehaviour
             collectable.gameObject.SetActive(false);
             Destroy(collectable);
             FinishAttacking();
+        }
+    }
+
+    /// <summary>
+    /// Changes the sprite for the left hand based on the weapon equipped
+    /// </summary>
+    /// <param name="weapon">Weapon that is equipped</param>
+    public void EquipWeapon(Weapon weapon)
+    {
+        if (weapon.GetComponent<MeleeWeapon>())
+        {
+            leftHand.sprite = meleeWeaponHand;
+        }
+        else if (weapon.GetComponent<Bow>())
+        {
+            leftHand.sprite = bowHand;
+        }
+        else if (weapon.GetComponent<Wand>())
+        {
+            leftHand.sprite = wandHand;
+        }
+        else
+        {
+            Debug.LogError("Could not find correct hand!", gameObject);
+            return;
         }
     }
 

@@ -398,7 +398,7 @@ public class PlayerController : MonoBehaviour
                         bowEffectiveness = Mathf.Min(attackInitiatedTime / bowDrawTime, 1.0f);
                     }
                     PlayerManager.Player.SetBowEffectiveness(bowEffectiveness);
-                    playerView.BowAttack();
+                    playerView.BowFire();
                 }
                 else if (activeWeapon.GetComponent<Wand>())
                 {

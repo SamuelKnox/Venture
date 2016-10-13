@@ -469,6 +469,7 @@ public class Player : Character
         {
             meleeWeaponHandle.sprite = meleeWeapon.GetHandle();
         }
+        playerView.EquipWeapon(weapon);
     }
 
     /// <summary>
@@ -502,6 +503,7 @@ public class Player : Character
         }
         var newActiveWeaponType = WeaponTypes[newWeaponIndex];
         SetActiveWeapon(newActiveWeaponType);
+        playerView.EquipWeapon(activeWeapon);
     }
 
     /// <summary>

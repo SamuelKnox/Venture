@@ -1,15 +1,16 @@
 fileFormatVersion: 2
 guid: 46872e27c397f9e40a8cd15c1cc21e90
-timeCreated: 1475375529
-licenseType: Free
+timeCreated: 1476315150
+licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Bow 01
-    21300002: Sword 01
-    21300004: Arrow 01
-    21300006: Bow String
-    21300008: Wand 01
-    21300010: Sword B01
+    21300000: bow_0
+    21300002: melee_weapon_0
+    21300004: arrow_0
+    21300006: bow_string
+    21300008: wand_0
+    21300010: melee_weapon_0_handle
+    21300012: Sword effect
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -59,7 +60,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Bow 01
+      name: bow_0
       rect:
         serializedVersion: 2
         x: 36
@@ -72,7 +73,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sword 01
+      name: melee_weapon_0
       rect:
         serializedVersion: 2
         x: 582
@@ -85,7 +86,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Arrow 01
+      name: arrow_0
       rect:
         serializedVersion: 2
         x: 1027
@@ -98,7 +99,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Bow String
+      name: bow_string
       rect:
         serializedVersion: 2
         x: 12
@@ -111,7 +112,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Wand 01
+      name: wand_0
       rect:
         serializedVersion: 2
         x: 1027
@@ -124,16 +125,16 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Sword B01
+      name: melee_weapon_0_handle
       rect:
         serializedVersion: 2
         x: 1160
         y: 1
-        width: 433
-        height: 575
+        width: 428
+        height: 542
       alignment: 9
-      pivot: {x: 0.5, y: 0.92865586}
-      border: {x: 0, y: 0, z: 0, w: 30}
+      pivot: {x: 0.5, y: 0.99}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     outline: []
