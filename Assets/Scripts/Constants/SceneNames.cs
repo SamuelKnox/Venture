@@ -11,17 +11,17 @@
     public const string Inventory = "Inventory";
 
     /// <summary>
-    /// Scene name for player to level up runes
+    /// Scene name for player to level up roons
     /// </summary>
     public const string LevelUp = "Level Up";
 
     /// <summary>
-    /// Scene name for rune shop menu
+    /// Scene name for roon shop menu
     /// </summary>
-    public const string RuneShop = "Rune Shop";
+    public const string RoonShop = "Roon Shop";
 
     /// <summary>
-    /// Scene name for equipment shop menu
+    /// Scene name for weapon shop menu
     /// </summary>
-    public const string EquipmentShop = "Equipment Shop";
+    public const string WeaponShop = "Weapon Shop";
 }

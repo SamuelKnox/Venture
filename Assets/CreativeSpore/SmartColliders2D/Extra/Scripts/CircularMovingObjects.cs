@@ -19,10 +19,10 @@ public class CircularMovingObjects : MonoBehaviour
         {
             ObjectList.Add(transform.GetChild(i));
         }
-        FixedUpdate();
+        Update();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         float ang = m_curAng;
         float angOff = 2 * Mathf.PI / ObjectList.Count;

@@ -15,6 +15,10 @@ public abstract class Item : MonoBehaviour
     [SerializeField]
     private Sprite icon;
 
+    [Tooltip("Whether or not this is a unique item, of which there can only be one of")]
+    [SerializeField]
+    private bool unique = false;
+
     [Tooltip("Description of this item")]
     [SerializeField]
     [TextArea(1, 5)]
@@ -86,5 +90,23 @@ public abstract class Item : MonoBehaviour
     public int GetCost()
     {
         return cost;
+    }
+
+    /// <summary>
+    /// Checks whether or not this is a unique item, and there can only be one of them
+    /// </summary>
+    /// <returns>Whether or not unique item</returns>
+    public bool IsUnique()
+    {
+        return unique;
+    }
+
+    /// <summary>
+    /// Sets whether or not this is a unique item, and there can only be one of them
+    /// </summary>
+    /// <param name="unique">Whether or not this is a unique item</param>
+    public void SetUnique(bool unique)
+    {
+        this.unique = unique;
     }
 }

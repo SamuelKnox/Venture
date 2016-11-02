@@ -10,11 +10,11 @@ public class InventoryCharacterView : MonoBehaviour
 {
     [Tooltip("Container storing the ItemButtons for the character")]
     [SerializeField]
-    private RectTransform characterEquipmentContainer;
+    private RectTransform characterWeaponContainer;
 
-    [Tooltip("Description to give for item when there is no equipment selected")]
+    [Tooltip("Description to give for item when there is no weapon selected")]
     [SerializeField]
-    private string noEquipmentDescription;
+    private string noWeaponDescription;
 
     [Tooltip("Short description for the item type selected")]
     [SerializeField]
@@ -33,13 +33,13 @@ public class InventoryCharacterView : MonoBehaviour
     }
 
     /// <summary>
-    /// Enables (or disables) navigation for the equipment view's item buttons
+    /// Enables (or disables) navigation for the weapon view's item buttons
     /// </summary>
     /// <param name="enabled">Whether or not to enable navigation</param>
     public void EnableNavigation(bool enabled)
     {
         var navigationMode = enabled ? Navigation.Mode.Automatic : Navigation.Mode.None;
-        var buttons = characterEquipmentContainer.GetComponentsInChildren<Button>();
+        var buttons = characterWeaponContainer.GetComponentsInChildren<Button>();
         foreach (var button in buttons)
         {
             button.SetNavigation(navigationMode);
@@ -50,21 +50,21 @@ public class InventoryCharacterView : MonoBehaviour
     /// Updates the description for the equipped item
     /// </summary>
     /// <param name="item">Item to describe</param>
-    public void UpdateDescription(Equipment equipment)
+    public void UpdateDescription(Weapon weapon)
     {
         string itemDescription;
-        if (equipment)
+        if (weapon)
         {
-            itemDescription = equipment.GetDescription();
+            itemDescription = weapon.GetDescription();
             if (string.IsNullOrEmpty(itemDescription))
             {
-                Debug.LogError(equipment + " is missing a description!", equipment.gameObject);
+                Debug.LogError(weapon + " is missing a description!", weapon.gameObject);
                 return;
             }
         }
         else
         {
-            itemDescription = noEquipmentDescription;
+            itemDescription = noWeaponDescription;
             if (string.IsNullOrEmpty(itemDescription))
             {
                 Debug.LogError(this + " is missing a description for when there is no item!", gameObject);
@@ -78,9 +78,9 @@ public class InventoryCharacterView : MonoBehaviour
     /// Updates the item buttons for the character view
     /// </summary>
     /// <param name="itemType">Item type to be currently selected</param>
-    public void UpdateEquipment(ItemType itemType = ItemType.MeleeWeapon)
+    public void UpdateWeapon(ItemType itemType = ItemType.MeleeWeapon)
     {
-        var itemButtons = characterEquipmentContainer.GetComponentsInChildren<ItemButton>();
+        var itemButtons = characterWeaponContainer.GetComponentsInChildren<ItemButton>();
         foreach (var itemButtonInstance in itemButtons)
         {
             var item = inventory.GetItems(itemButtonInstance.GetItemType()).Where(i => i.IsEquipped()).FirstOrDefault();
@@ -97,7 +97,7 @@ public class InventoryCharacterView : MonoBehaviour
     /// <returns>The item button</returns>
     public ItemButton GetItemButton(ItemType itemType)
     {
-        var itemButtons = characterEquipmentContainer.GetComponentsInChildren<ItemButton>();
+        var itemButtons = characterWeaponContainer.GetComponentsInChildren<ItemButton>();
         return itemButtons.Where(b => b.GetItemType() == itemType).FirstOrDefault();
     }
 }

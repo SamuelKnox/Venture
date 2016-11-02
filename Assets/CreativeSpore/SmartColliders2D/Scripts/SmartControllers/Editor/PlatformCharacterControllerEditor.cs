@@ -35,8 +35,8 @@ namespace CreativeSpore.SmartColliders
             if(Application.isPlaying)
             {
                 string sInGameInfo =
-                    string.Format("HSpeed: {0:0.####}\t\t RealHSpeed: {1:0.####}", targetObj.PlatformCharacterPhysics.HSpeed, targetObj.RealVelocity.x) + "\n" +
-                    string.Format("VSpeed: {0:0.####}\t\t RealVSpeed: {1:0.####}", targetObj.PlatformCharacterPhysics.VSpeed, targetObj.RealVelocity.y) + "\n" +
+                    string.Format("HSpeed: {0:0.####}\t\t InstantHSpeed: {1:0.####}", targetObj.PlatformCharacterPhysics.HSpeed, targetObj.InstantVelocity.x) + "\n" +
+                    string.Format("VSpeed: {0:0.####}\t\t InstantVSpeed: {1:0.####}", targetObj.PlatformCharacterPhysics.VSpeed, targetObj.InstantVelocity.y) + "\n" +
                     string.Format("IsGrounded: {0}", targetObj.IsGrounded) + "\n" +
                     string.Format("IsClimbing: {0}", targetObj.IsClimbing) + "\n" +
                     string.Format("Slope Angle: {0}", targetObj.SlopeAngle) + "\n" +

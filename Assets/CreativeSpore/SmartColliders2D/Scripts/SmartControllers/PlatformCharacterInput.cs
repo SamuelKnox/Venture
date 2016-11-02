@@ -28,7 +28,7 @@ namespace CreativeSpore.SmartColliders
             m_platformCtrl = GetComponent<PlatformCharacterController>();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             //+++Autodetecting input device. Comment or remove this to manually specify the input management
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))

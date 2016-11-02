@@ -1,0 +1,2 @@
+﻿public class ShieldThrower : Enemy {
+}

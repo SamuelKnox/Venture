@@ -3,10 +3,6 @@ using UnityEngine;
 
 public class StatsView : MonoBehaviour
 {
-    [Tooltip("Player to get stats from")]
-    [SerializeField]
-    private Player player;
-
     [Tooltip("Text display for player health")]
     [SerializeField]
     private TextMeshProUGUI healthText;
@@ -28,25 +24,15 @@ public class StatsView : MonoBehaviour
 
     void Awake()
     {
-        playerHealth = player.GetComponentInChildren<Health>();
-        if (!playerHealth)
-        {
-            Debug.LogError(gameObject + " could not find player health!", gameObject);
-            return;
-        }
-        playerMana = player.GetComponentInChildren<Mana>();
-        if (!playerMana)
-        {
-            Debug.LogError(gameObject + " could not find player mana!", gameObject);
-            return;
-        }
+        playerHealth = PlayerManager.Health; 
+        playerMana = PlayerManager.Mana;
     }
 
     void Update()
     {
         healthText.text = (int)playerHealth.GetCurrentHitPoints() + "/" + (int)playerHealth.GetMaxHitPoints();
         manaText.text = (int)playerMana.GetCurrentManaPoints() + "/" + (int)playerMana.GetMaxManaPoints();
-        prestigeText.text = player.GetPrestige().ToString();
-        goldText.text = player.GetGold().ToString();
+        prestigeText.text = PlayerManager.Player.GetPrestige().ToString();
+        goldText.text = PlayerManager.Player.GetGold().ToString();
     }
 }

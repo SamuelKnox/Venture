@@ -1,10 +1,23 @@
-﻿using System.Collections;
+﻿using CustomUnityLibrary;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class Character : MonoBehaviour
 {
+    [Tooltip("Speed modifier for the Character, where 0.0 is immobile, 0.5 is half speed, 1.0f is normal speed, and 2.0 is double speed.")]
+    [SerializeField]
+    [Range(0.0f, 2.0f)]
+    private float speedModifier = 1.0f;
+
+    [Tooltip("Tint applied to the Character's sprite(s)")]
+    [SerializeField]
+    private Color tint = Color.white;
+
+    private Dictionary<float, float> speedModifiers = new Dictionary<float, float>();
+    private Dictionary<Color, float> tintModifiers = new Dictionary<Color, float>();
+
     protected Health health;
-    protected bool stunned = false;
 
     protected virtual void Awake()
     {
@@ -14,6 +27,18 @@ public abstract class Character : MonoBehaviour
             Debug.LogError(gameObject + " or one of its children must have a Health component!", gameObject);
             return;
         }
+    }
+
+    protected virtual void Start()
+    {
+        tint = ColorUtility.GetMinColor(tint);
+        ApplyTintToSprites();
+    }
+
+    protected virtual void Update()
+    {
+        UpdateSpeed();
+        UpdateTint();
     }
 
     protected virtual void OnEnable()
@@ -29,17 +54,58 @@ public abstract class Character : MonoBehaviour
     /// <summary>
     /// Called when character dies
     /// </summary>
-    protected abstract void Die();
+    public abstract void Die();
+
+    public float GetSpeedModifier()
+    {
+        return speedModifier;
+    }
 
     /// <summary>
-    /// Calls when character is stunned
+    /// Modifies the character's speed where 0 is stunned, 0.5 is half speed, 1.0 is normal speed, and 2.0 is double speed
     /// </summary>
-    protected abstract void EnableStun();
+    /// <param name="intensity">Speed modifier</param>
+    /// <param name="duration">Duration in seconds of speed modification</param>
+    public void AddSpeedModifer(float intensity, float duration)
+    {
+        if (intensity == 1.0f || duration <= 0.0f)
+        {
+            return;
+        }
+        if (speedModifiers.ContainsKey(intensity))
+        {
+            speedModifiers[intensity] += duration;
+        }
+        else
+        {
+            speedModifiers.Add(intensity, duration);
+            speedModifier *= intensity;
+        }
+    }
 
     /// <summary>
-    /// Called when character is no longer stunned
+    /// Adds a tint to the character
     /// </summary>
-    protected abstract void DisableStun();
+    /// <param name="tint">Tint to add</param>
+    /// <param name="duration">Duration to add tint for</param>
+    public void AddTintModifier(Color tint, float duration)
+    {
+        if (tint == Color.white || duration <= 0.0f)
+        {
+            return;
+        }
+        tint = ColorUtility.GetMinColor(tint);
+        if (tintModifiers.ContainsKey(tint))
+        {
+            tintModifiers[tint] += duration;
+        }
+        else
+        {
+            tintModifiers.Add(tint, duration);
+            this.tint *= tint;
+        }
+        ApplyTintToSprites();
+    }
 
     /// <summary>
     /// Called when damage is dealt to the character
@@ -47,14 +113,6 @@ public abstract class Character : MonoBehaviour
     /// <param name="damage">The damage which is dealt</param>
     protected virtual void OnDamageDealt(Damage damage)
     {
-        if (Player.GetStunTime() > 0 && GetComponent<Player>())
-        {
-            Stun(Player.GetStunTime());
-        }
-        else if (Enemy.GetStunTime() > 0 && GetComponent<Enemy>())
-        {
-            Stun(Enemy.GetStunTime());
-        }
         if (health.IsDead())
         {
             Die();
@@ -62,25 +120,52 @@ public abstract class Character : MonoBehaviour
     }
 
     /// <summary>
-    /// Stuns a character for the specified number of seconds
+    /// Updates the Character speed to include the speed modifiers
     /// </summary>
-    /// <param name="duration">Stun duration in seconds</param>
-    private void Stun(float duration)
+    private void UpdateSpeed()
     {
-        StartCoroutine(PerformStun(duration));
+        speedModifiers = speedModifiers.ToDictionary(s => s.Key, s => s.Value - Time.deltaTime);
+        foreach (var speedModifier in speedModifiers)
+        {
+            if (speedModifier.Value <= 0.0f)
+            {
+                this.speedModifier /= speedModifier.Key;
+            }
+        }
+        speedModifiers = speedModifiers.Where(s => s.Value > 0.0f).ToDictionary(s => s.Key, s => s.Value);
     }
 
     /// <summary>
-    /// Enables and disables the characters stun
+    /// Update the Character's tint to include the tint modifiers
     /// </summary>
-    /// <param name="duration">Duration to enable the stun for</param>
-    /// <returns>Required IEnumerator</returns>
-    private IEnumerator PerformStun(float duration)
+    private void UpdateTint()
     {
-        EnableStun();
-        stunned = true;
-        yield return new WaitForSeconds(duration);
-        stunned = false;
-        DisableStun();
+        bool dirty = false;
+        tintModifiers = tintModifiers.ToDictionary(t => t.Key, t => t.Value - Time.deltaTime);
+        foreach (var tintModifier in tintModifiers)
+        {
+            if (tintModifier.Value <= 0.0f)
+            {
+                dirty = true;
+                tint = tint.DivideBy(tintModifier.Key);
+            }
+        }
+        tintModifiers = tintModifiers.Where(t => t.Value > 0.0f).ToDictionary(t => t.Key, t => t.Value);
+        if (dirty)
+        {
+            ApplyTintToSprites();
+        }
+    }
+
+    /// <summary>
+    /// Applies the tint to the Character
+    /// </summary>
+    private void ApplyTintToSprites()
+    {
+        var spriteRenderers = transform.root.GetComponentsInChildren<SpriteRenderer>();
+        foreach (var spriteRenderer in spriteRenderers)
+        {
+            spriteRenderer.color = tint;
+        }
     }
 }

@@ -48,7 +48,7 @@ namespace CreativeSpore.SuperTilemapEditor
         {
             if(SelectedTilemap)
             {
-                SelectedTilemap.SendMessage("DoDrawGizmos");
+                SelectedTilemap.SendMessage("DoDrawGizmos", SendMessageOptions.DontRequireReceiver);
             }
         }
 	    

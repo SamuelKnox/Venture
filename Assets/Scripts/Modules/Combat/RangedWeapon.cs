@@ -156,6 +156,24 @@ public class RangedWeapon : MonoBehaviour
     }
 
     /// <summary>
+    /// Gets the ranged weapon's force
+    /// </summary>
+    /// <returns>Ranged weapon's force</returns>
+    public float GetForce()
+    {
+        return force;
+    }
+
+    /// <summary>
+    /// Sets the force used when firing the ranged weapon
+    /// </summary>
+    /// <param name="force">Force to apply when firing</param>
+    public void SetForce(float force)
+    {
+        this.force = force;
+    }
+
+    /// <summary>
     /// Checks if the ranged weapon is ready to be fired, opposed to still being on cooldown
     /// </summary>
     /// <returns>Whether or not the weapon is ready to fire</returns>

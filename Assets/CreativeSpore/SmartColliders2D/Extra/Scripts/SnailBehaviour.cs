@@ -20,7 +20,7 @@ public class SnailBehaviour : MonoBehaviour
 	}
 
     private float m_turnTimer = 0f;
-	void FixedUpdate() 
+	void Update() 
     {
         if (!IsDying)
         {

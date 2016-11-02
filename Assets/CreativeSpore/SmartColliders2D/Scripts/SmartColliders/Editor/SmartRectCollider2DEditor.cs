@@ -7,6 +7,7 @@ namespace CreativeSpore.SmartColliders
 {
 
     [CustomEditor(typeof(SmartRectCollider2D))]
+    [CanEditMultipleObjects]
     public class SmartRectCollider2DEditor : Editor
     {
         class Styles
@@ -56,6 +57,8 @@ namespace CreativeSpore.SmartColliders
                 EditorUtility.SetDirty(target);
             }
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_updateMode"));
 
             s_showPixelSnap = EditorGUILayout.Foldout(s_showPixelSnap, "Pixel Snap Configuration", Styles.Instance.BoldFoldout);
             if(s_showPixelSnap)

@@ -6,19 +6,19 @@ using UnityEngine.SceneManagement;
 
 public class UILevelUpController : MonoBehaviour
 {
-    [Tooltip("View used to display the runes")]
+    [Tooltip("View used to display the roons")]
     [SerializeField]
-    private LevelUpRunesView runesView;
+    private LevelUpRoonsView roonsView;
 
-    [Tooltip("View used to display the description of the currently selected rune")]
+    [Tooltip("View used to display the description of the currently selected roon")]
     [SerializeField]
-    private LevelUpRuneDescriptionView runeDescriptionView;
+    private LevelUpRoonDescriptionView roonDescriptionView;
 
     [Tooltip("View used to display how much prestige is available")]
     [SerializeField]
     private LevelUpPrestigeView prestigeView;
 
-    [Tooltip("Container to store all of the runes and equipment")]
+    [Tooltip("Container to store all of the roons and weapon")]
     [SerializeField]
     private Transform itemContainer;
 
@@ -26,13 +26,18 @@ public class UILevelUpController : MonoBehaviour
     private GameObject previousSelectedGameObject;
     private int prestige;
     private Item[] items;
-    private Rune[] runes;
+    private Roon[] roons;
 
     void Start()
     {
         LoadData();
-        runesView.CreateTabs(GetRuneTypes());
-        runesView.MoveTab(0, runes);
+        if (roons.Length == 0)
+        {
+            Debug.LogError("Cannot level up roons, because the player doesn't have any!", gameObject);
+            return;
+        }
+        roonsView.CreateTabs(GetRoonTypes());
+        roonsView.MoveTab(0, roons);
         prestigeView.UpdatePrestige(prestige);
         dirty = true;
     }
@@ -57,62 +62,62 @@ public class UILevelUpController : MonoBehaviour
             Debug.LogError("Expecting item in ItemButton!", itemButton.gameObject);
             return;
         }
-        var rune = item.GetComponent<Rune>();
-        if (!rune)
+        var roon = item.GetComponent<Roon>();
+        if (!roon)
         {
-            Debug.LogError("Could not find rune!", item.gameObject);
+            Debug.LogError("Could not find roon!", item.gameObject);
             return;
         }
         if (Input.GetButtonDown(InputNames.Back))
         {
-            FinishLevelingUpRunes();
+            FinishLevelingUpRoons();
         }
-        if (Input.GetButtonDown(InputNames.LevelUpRune))
+        if (Input.GetButtonDown(InputNames.LevelUpRoon))
         {
-            LevelUpRune(rune);
+            LevelUpRoon(roon);
             prestigeView.UpdatePrestige(prestige);
         }
-        if (Input.GetButtonDown(InputNames.TabRight) && GetRuneTypes().Length > 1)
+        if (Input.GetButtonDown(InputNames.TabRight) && GetRoonTypes().Length > 1)
         {
-            runesView.MoveTab(1, runes);
+            roonsView.MoveTab(1, roons);
         }
-        if (Input.GetButtonDown(InputNames.TabLeft) && GetRuneTypes().Length > 1)
+        if (Input.GetButtonDown(InputNames.TabLeft) && GetRoonTypes().Length > 1)
         {
-            runesView.MoveTab(-1, runes);
+            roonsView.MoveTab(-1, roons);
         }
         if (dirty)
         {
             dirty = false;
-            runesView.UpdateDescription(rune);
-            runeDescriptionView.UpdateDescription(rune);
+            roonsView.UpdateDescription(roon);
+            roonDescriptionView.UpdateDescription(roon);
             prestigeView.UpdatePrestige(prestige);
         }
     }
 
     /// <summary>
-    /// Levels up the rune, if possible
+    /// Levels up the roon, if possible
     /// </summary>
-    /// <param name="rune">Rune to level</param>
-    private void LevelUpRune(Rune rune)
+    /// <param name="roon">Roon to level</param>
+    private void LevelUpRoon(Roon roon)
     {
-        if (prestige < rune.GetPrestigeCostToLevelUp())
+        if (prestige < roon.GetPrestigeCostToLevelUp())
         {
             return;
         }
-        int levelUp = rune.GetLevel() + 1;
-        if (levelUp < Rune.GetMinLevel() || levelUp > Rune.GetMaxLevel())
+        int levelUp = roon.GetLevel() + 1;
+        if (levelUp < Roon.GetMinLevel() || levelUp > Roon.GetMaxLevel())
         {
             return;
         }
-        prestige -= rune.GetPrestigeCostToLevelUp();
-        rune.SetLevel(levelUp);
+        prestige -= roon.GetPrestigeCostToLevelUp();
+        roon.SetLevel(levelUp);
         dirty = true;
     }
 
     /// <summary>
-    /// Loads the player's runes
+    /// Loads the player's roons
     /// </summary>
-    /// <returns>All the runes</returns>
+    /// <returns>All the roons</returns>
     private void LoadData()
     {
         prestige = SaveData.LoadPrestige();
@@ -122,34 +127,30 @@ public class UILevelUpController : MonoBehaviour
             item.transform.SetParent(itemContainer);
         }
         itemContainer.gameObject.SetActive(false);
-        runes = items.Where(i => i.GetComponent<Rune>()).Select(r => r.GetComponent<Rune>()).ToArray();
-        if (runes.Count() == 0)
-        {
-            FinishLevelingUpRunes();
-        }
+        roons = items.Where(i => i.GetComponent<Roon>()).Select(r => r.GetComponent<Roon>()).ToArray();
     }
 
     /// <summary>
-    /// Types of runes available
+    /// Types of roons available
     /// </summary>
-    /// <returns>Rune types</returns>
-    private RuneType[] GetRuneTypes()
+    /// <returns>Roon types</returns>
+    private RoonType[] GetRoonTypes()
     {
-        var runeTypes = new List<RuneType>();
-        foreach (var rune in runes)
+        var roonTypes = new List<RoonType>();
+        foreach (var roon in roons)
         {
-            if (!runeTypes.Contains(rune.GetRuneType()))
+            if (!roonTypes.Contains(roon.GetRoonType()))
             {
-                runeTypes.Add(rune.GetRuneType());
+                roonTypes.Add(roon.GetRoonType());
             }
         }
-        return runeTypes.ToArray();
+        return roonTypes.ToArray();
     }
 
     /// <summary>
-    /// Finishes leveling up runes and returns to game
+    /// Finishes leveling up roons and returns to game
     /// </summary>
-    private void FinishLevelingUpRunes()
+    private void FinishLevelingUpRoons()
     {
         SaveData.SaveItems(items);
         SaveData.SavePrestige(prestige);

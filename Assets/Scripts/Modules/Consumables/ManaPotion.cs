@@ -38,13 +38,7 @@ public class ManaPotion : Consumable
     /// </summary>
     private void RestorePlayerMana()
     {
-        var player = FindObjectOfType<Player>();
-        if (!player)
-        {
-            Debug.LogError(gameObject + " could not find Player!", gameObject);
-            return;
-        }
-        var playerMana = player.GetComponentInChildren<Mana>();
+        var playerMana = PlayerManager.Player.GetComponentInChildren<Mana>();
         if (!playerMana)
         {
             Debug.LogError(gameObject + " could not find player mana!", gameObject);

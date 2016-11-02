@@ -12,17 +12,12 @@ public class EnemyView : MonoBehaviour
     [SerializeField]
     private AudioClip hurtSound;
 
-    [Tooltip("Sound effect to play when enemy is stunned")]
-    [SerializeField]
-    private AudioClip stunSound;
-
     [Tooltip("Sound to be played when enemy dies")]
     [SerializeField]
     private AudioClip deathSound;
 
     private Animator animator;
     private Rigidbody2D body2D;
-    private bool stunned;
 
     void Awake()
     {
@@ -72,15 +67,5 @@ public class EnemyView : MonoBehaviour
     {
         animator.SetTrigger(AnimationNames.Enemy.Triggers.Hurt);
         SoundManager.Instance.Play(hurtSound, false, gameObject);
-    }
-
-    /// <summary>
-    /// Sets whether or not the play the stunned animation
-    /// </summary>
-    /// <param name="stunned">Whether or not is stunned</param>
-    public void SetStun(bool stunned)
-    {
-        animator.SetBool(AnimationNames.Enemy.Bools.Stunned, stunned);
-        SoundManager.Instance.Play(stunSound, false, gameObject);
     }
 }

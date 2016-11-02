@@ -10,9 +10,16 @@ namespace CreativeSpore.SmartColliders
     {
 
         /// <summary>
-        /// Min value used for the skin, to make collisions work properly
+        /// Min value used for the skin, to make collisions work properly (use smaller values to avoid jittering)
         /// </summary>
-        public const float k_SkinMinWidth = 0.0001f;
+        public const float k_SkinMinWidth = 1e-005f;
+
+        /// <summary>
+        /// Distance of separation when there is a collision with another collider. If this value is negative, the collision will be triggered every UpdateCollision.
+        /// A negative value is needed to make sure the moving platforms will move the collider, mostly if the UpdateMode is set to OnUpdate.
+        /// The absolute value should be less than the k_SkinMinWidth value
+        /// </summary>
+        public const float k_colliderSeparation = -k_SkinMinWidth / 2f;
 
         /// <summary>
         /// When checking one way collisions, this angle (in radians) is the max angle allowed to consider the collision in one specific direction.
@@ -128,7 +135,7 @@ namespace CreativeSpore.SmartColliders
         /// <summary>
         /// The velocity based on the moving distance between FixedUpdate calls
         /// </summary>
-        public Vector3 RealVelocity { get { return m_relativeVelocity; } }
+        public Vector3 InstantVelocity { get { return m_instantVelocity; } }
 
         /// <summary>
         /// Enables the pixel snap performed before rendering the object using the value of PixelToUnits
@@ -189,7 +196,7 @@ namespace CreativeSpore.SmartColliders
         [SerializeField, Tooltip("Enables the pixel snap performed before rendering the object using the value of PixelToUnits")]
         protected bool m_pixelSnapEnabled = false;
         [SerializeField, Tooltip("How many pixels would equal 1 unit in the world space")]
-        protected float m_pixelToUnits = 100f;
+        protected float m_pixelToUnits = 100f;        
 
         void Start()
         {
@@ -231,16 +238,20 @@ namespace CreativeSpore.SmartColliders
         }
 
         Vector3 m_preRenderPos;
-        bool m_isFirstPreRender = false;
+        protected bool m_fixPositionBeforeRender = false;
         void _OnPreCull(Camera cam)
         {
             // NOTE: Physics are updated after FixedUpdate is called, like gravity. 
             // This is removing the modifications before rendering and restoring it after that.
             // NOTE2: changing position in onPreRender is not working, but it's working with onPreCull
-            if (!m_isFirstPreRender)
+            m_preRenderPos = transform.position;
+            bool isPaused = false;
+#if UNITY_EDITOR
+            // this check allow seeing the object moving when pause button is pressed
+            isPaused = UnityEditor.EditorApplication.isPaused;
+#endif
+            if (m_fixPositionBeforeRender && !isPaused)
             {
-                m_isFirstPreRender = true; // Do this only once
-                m_preRenderPos = transform.position;
                 transform.position = m_prevPos;
                 //Pixel Snap
                 if (PixelSnapEnabled)
@@ -256,21 +267,48 @@ namespace CreativeSpore.SmartColliders
 
         void _OnPostRender(Camera cam)
         {
-            if (m_isFirstPreRender)
+            transform.position = m_preRenderPos;
+        }
+
+        private int m_lastFixedUpdateFrameCount;
+        protected virtual void FixedUpdate()
+        {
+            //if (m_updateMode == eUpdateMode.OnFixedUpdate)
             {
-                m_isFirstPreRender = false;
-                transform.position = m_preRenderPos;
+                if (m_lastFixedUpdateFrameCount != Time.frameCount)
+                {
+                    //NOTE: maybe this should always be true, even if only FixedUpdate is called. The idea of this attribute was, allow moving the collider in the update
+                    // call, but checking the collisions in the FixedUpdate, so FixedUpdate will set the calculated position before render only if a collision was made.
+                    m_fixPositionBeforeRender = false;
+                }
+                m_lastFixedUpdateFrameCount = Time.frameCount;
+                UpdateCollisions();
             }
         }
 
-        protected virtual void FixedUpdate()
+        protected virtual void Update()
         {
-            ResolveCollisions();
+            if (m_updateMode == eUpdateMode.OnUpdate)
+            {                
+                //if (Time.frameCount != m_lastUpdateCollisionFrameCount)
+                {
+                    UpdateCollisions();
+                }
+                m_fixPositionBeforeRender = true;
+            }
+        }
+
+        //NOTE: this avoid updating twice when FixedUpdate already update the collider, but calling it twice helps to avoid jittering when using a rigid body and gravity
+        //private int m_lastUpdateCollisionFrameCount; 
+        protected virtual void UpdateCollisions()
+        {
+            //m_lastUpdateCollisionFrameCount = Time.frameCount;
+            ResolveCollisions();            
         }
 
         void ResolveCollisions()
-        {
-            m_relativeVelocity = (transform.position - m_prevPos) / Time.deltaTime;
+        {            
+			m_instantVelocity = (transform.position - m_prevPos) / Time.deltaTime;
 
             if (m_movingPlatforms.Count > 0)
             {
@@ -596,8 +634,8 @@ namespace CreativeSpore.SmartColliders
                 Vector3 vFinalVeloc = m_rigidBody.velocity;
                 //NOTE: vLocalVeloc is using m_relativeVelocity, not m_rigidBody.velocity, because m_relativeVelocity is the real displacement through time
                 // ((Vector3)m_rigidBody2D.velocity - m_prevVelocity) is added because rigid body velocity could change between fixed update calls ( like calling AddForce)
-                Vector3 vRealVeloc = m_relativeVelocity + (vFinalVeloc - m_prevVelocity);
-                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vRealVeloc : vRealVeloc;
+                Vector3 vInstantVeloc = m_instantVelocity + (vFinalVeloc - m_prevVelocity);
+                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vInstantVeloc : vInstantVeloc;
                 if (rightImpulseDist != 0 && vLocalVeloc.x > 0f || leftImpulseDist != 0 && vLocalVeloc.x < 0f)
                 {
                     vFinalVeloc = Vector3.Project(vFinalVeloc, transform.up); // reset horizontal velocity
@@ -615,8 +653,8 @@ namespace CreativeSpore.SmartColliders
                 Vector3 vFinalVeloc = m_rigidBody2D.velocity;
                 // NOTE: vLocalVeloc is using m_relativeVelocity, not m_rigidBody2D.velocity, because m_relativeVelocity is the real displacement through time
                 // ((Vector3)m_rigidBody2D.velocity - m_prevVelocity) is added because rigid body velocity could change between fixed update calls ( like calling AddForce)
-                Vector3 vRealVeloc = m_relativeVelocity + (vFinalVeloc - m_prevVelocity);
-                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vRealVeloc : vRealVeloc;
+                Vector3 vInstantVeloc = m_instantVelocity + (vFinalVeloc - m_prevVelocity);
+                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vInstantVeloc : vInstantVeloc;
                 if (rightImpulseDist != 0 && vLocalVeloc.x > 0f || leftImpulseDist != 0 && vLocalVeloc.x < 0f)
                 {
                     vFinalVeloc = Vector3.Project(vFinalVeloc, transform.up); // reset horizontal velocity
@@ -637,6 +675,7 @@ namespace CreativeSpore.SmartColliders
                 transform.position += vLeftImpulse + vRightImpulse + vTopImpulse + vBottomImpulse;
             }
 
+            m_fixPositionBeforeRender |= isColliding;
             if (isColliding && OnCollision != null)
             {
                 OnCollision(transform.position - vPrevPos, isHStuck, isVStuck);
@@ -658,7 +697,7 @@ namespace CreativeSpore.SmartColliders
             Vector3 vClosestHitNorm = Vector3.zero;
             Vector3 vClosestHit = Vector3.zero;
             GameObject collidedObject = null;
-            Vector3 vAppliedForce = Vector3.Project(m_relativeVelocity, vSkin) / vCheckPoints.Count;
+            Vector3 vAppliedForce = Vector3.Project(m_instantVelocity, vSkin) / vCheckPoints.Count;
             float fOffsetDist = Vector3.Scale(vOffset, transform.localScale).magnitude;
             LayerMask oneWayLayerMask = (OneWayCollisionDown | OneWayCollisionUp | OneWayCollisionLeft | OneWayCollisionRight);
             for (int i = 0; i < vCheckPoints.Count; ++i)
@@ -755,7 +794,7 @@ namespace CreativeSpore.SmartColliders
             if (collClosestDist < float.MaxValue)
             {
                 //Debug.DrawRay(vClosestHit, vClosestHitNorm * 0.1f, Color.yellow, 0.5f);                
-                float fImpulseDist = (skinMagnitude + fOffsetDist) - collClosestDist + k_SkinMinWidth;
+                float fImpulseDist = (skinMagnitude + fOffsetDist) - collClosestDist + k_colliderSeparation;
                 Vector3 vImpulse = -vSkin.normalized * fImpulseDist; //TODO: Add smooth factor by multiplying vImpulse by this factor ( make climb steps smoother )
 
                 // TODO: if this is slow because of the gravity, a collision is going to be made each fixedUpdate, improve by keeping a list of the hit objects
@@ -765,7 +804,7 @@ namespace CreativeSpore.SmartColliders
                     new SmartContactPoint[] { new SmartContactPoint(vClosestHitNorm, this, vClosestHit) },
                     gameObject,
                     vImpulse,
-                    m_relativeVelocity,
+                    m_instantVelocity,
                     transform,
                     m_rigidBody,
                     m_rigidBody2D);

@@ -14,12 +14,12 @@ namespace CreativeSpore.SmartColliders
         {
             if (m_isOnMovingPlatform) return true;
 
+
+            float dist = SkinBottomWidth * transform.localScale.y + 10f * SmartPlatformCollider.k_SkinMinWidth;
             for (int i = 0; i < BottomCheckPoints.Count; ++i)
             {
                 Vector3 start = transform.TransformPoint(BottomCheckPoints[i]);
                 Vector3 dir = -transform.up;
-                float dist = SkinBottomWidth * transform.localScale.y + SmartPlatformCollider.k_SkinMinWidth;
-
                 SmartRaycastHit smartHit = SmartRaycast(start, dir, dist, LayerCollision | OneWayCollisionDown);
                 if (smartHit != null)
                 {
@@ -29,10 +29,10 @@ namespace CreativeSpore.SmartColliders
             return false;
         }
 
-        protected override void FixedUpdate()
+        protected override void UpdateCollisions()
         {
+            base.UpdateCollisions();
             m_isOnMovingPlatform = m_movingPlatforms.Count > 0;
-            base.FixedUpdate();
         }
 
         /// <summary>
@@ -120,8 +120,8 @@ namespace CreativeSpore.SmartColliders
                 Vector3 vFinalVeloc = m_rigidBody.velocity;
                 //NOTE: vLocalVeloc is using m_relativeVelocity, not m_rigidBody.velocity, because m_relativeVelocity is the real displacement through time
                 // ((Vector3)m_rigidBody2D.velocity - m_prevVelocity) is added because rigid body velocity could change between fixed update calls ( like calling AddForce)
-                Vector3 vRealVeloc = m_relativeVelocity + (vFinalVeloc - m_prevVelocity);
-                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vRealVeloc : vRealVeloc;
+                Vector3 vInstantVeloc = m_instantVelocity + (vFinalVeloc - m_prevVelocity);
+                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vInstantVeloc : vInstantVeloc;
                 if (rightImpulseDist != 0 && vLocalVeloc.x > 0f || leftImpulseDist != 0 && vLocalVeloc.x < 0f)
                 {
                     vFinalVeloc = Vector3.Project(vFinalVeloc, transform.up); // reset horizontal velocity
@@ -139,8 +139,8 @@ namespace CreativeSpore.SmartColliders
                 Vector3 vFinalVeloc = m_rigidBody2D.velocity;
                 // NOTE: vLocalVeloc is using m_relativeVelocity, not m_rigidBody2D.velocity, because m_relativeVelocity is the real displacement through time
                 // ((Vector3)m_rigidBody2D.velocity - m_prevVelocity) is added because rigid body velocity could change between fixed update calls ( like calling AddForce)
-                Vector3 vRealVeloc = m_relativeVelocity + (vFinalVeloc - m_prevVelocity);
-                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vRealVeloc : vRealVeloc;
+                Vector3 vInstantVeloc = m_instantVelocity + (vFinalVeloc - m_prevVelocity);
+                Vector3 vLocalVeloc = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * vInstantVeloc : vInstantVeloc;
                 if (rightImpulseDist != 0 && vLocalVeloc.x > 0f || leftImpulseDist != 0 && vLocalVeloc.x < 0f)
                 {
                     vFinalVeloc = Vector3.Project(vFinalVeloc, transform.up); // reset horizontal velocity
@@ -161,6 +161,7 @@ namespace CreativeSpore.SmartColliders
                 transform.position = vPrevPos + vLeftImpulse + vRightImpulse + vTopImpulse + vBottomImpulse;
             }
 
+            m_fixPositionBeforeRender |= isColliding;
             if (isColliding && OnCollision != null)
             {
                 OnCollision(transform.position - vPrevPos, isHStuck, isVStuck);

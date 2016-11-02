@@ -22,26 +22,22 @@ public enum Tag
 /// </summary>
 public enum ItemType
 {
-    Rune,
+    Roon,
     MeleeWeapon,
-    RangedWeapon,
-    Boots,
-    Gloves,
-    Helmet,
-    Leggings,
+    RangedWeapon
 }
 
 /// <summary>
-/// Types of runes available
+/// Types of roons available
 /// </summary>
-public enum RuneType
+public enum RoonType
 {
     Red,
     Blue,
     Yellow,
-    Purple,
-    Green,
-    Orange
+    MeleeWeapon,
+    Bow,
+    Wand
 }
 
 /// <summary>
@@ -49,8 +45,8 @@ public enum RuneType
 /// </summary>
 public enum InventoryMode
 {
-    EquipmentBrowser,
-    RuneEditor
+    WeaponBrowser,
+    RoonEditor
 }
 
 /// <summary>
@@ -62,4 +58,15 @@ public enum GamePadInputs
     B,
     X,
     Y
+}
+
+/// <summary>
+/// Cardinal Directions
+/// </summary>
+public enum Direction
+{
+    North,
+    South,
+    East,
+    West
 }

@@ -145,6 +145,12 @@ namespace CreativeSpore.SmartColliders
     [AddComponentMenu("")]
     public class SmartCollider2D : MonoBehaviour
     {
+        public enum eUpdateMode
+        {
+            OnFixedUpdate,
+            OnUpdate
+        }
+
         /// <summary>
         /// OnSmartCollisionStay2D is called once per frame for every SmartCollider that is touching collider.
         /// void OnSmartCollisionStay2D( SmartCollision2D collision )
@@ -220,6 +226,14 @@ namespace CreativeSpore.SmartColliders
         public Vector3 LastSolvedPosition { get { return m_prevPos; } }
 
         /// <summary>
+        /// Sets the update mode to set during what message the collisions will be checked.
+        /// </summary>
+        public eUpdateMode UpdateMode { get { return m_updateMode; } set { m_updateMode = value; } }
+
+        [SerializeField]
+        protected eUpdateMode m_updateMode = eUpdateMode.OnUpdate;
+
+        /// <summary>
         /// List of moving platform colliders touched by the right side of the smart collider (see MovingPlatformCollisionUp, MovingPlatformCollisionDown, MovingPlatformCollisionLeft, MovingPlatformCollisionRight)
         /// For each platform, an InverseTransformPoint is saved with the inverse of the transform
         /// </summary>
@@ -238,7 +252,7 @@ namespace CreativeSpore.SmartColliders
         /// <summary>
         /// Relative velocity of the smart collider based on the displacement between FixedUpdate calls
         /// </summary>
-        protected Vector3 m_relativeVelocity;
+        protected Vector3 m_instantVelocity;
 
         /// <summary>
         /// The rigid body of the object containing the smart collider

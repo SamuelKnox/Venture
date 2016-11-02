@@ -1,5 +1,4 @@
 ﻿using CreativeSpore.SmartColliders;
-using CustomUnityLibrary;
 using UnityEngine;
 
 public class Health : MonoBehaviour
@@ -13,6 +12,10 @@ public class Health : MonoBehaviour
     /// Event called when damage is received
     /// </summary>
     public event DamageDealt OnDamageDealt;
+
+    [Tooltip("Whether or not this unit is invincible.  If invincible, Damage will not affect this.")]
+    [SerializeField]
+    private bool invincible = false;
 
     [Tooltip("Current hit points")]
     [SerializeField]
@@ -42,6 +45,11 @@ public class Health : MonoBehaviour
     [Tooltip("Optional health view, used to display the health")]
     [SerializeField]
     private HealthView healthView;
+
+    [Tooltip("How much of the knockback damage is received, where 0 is no knock back, 1 is normal knockback, and 2 is double knockback")]
+    [SerializeField]
+    [Range(0.0f, 2.0f)]
+    private float knockBackReceived = 1.0f;
 
     private float totalInvincibilityCooldown;
 
@@ -79,9 +87,21 @@ public class Health : MonoBehaviour
         return currentHitPoints;
     }
 
+    /// <summary>
+    /// Sets the current hitpoint for this health component
+    /// </summary>
+    /// <param name="hitPoints">Hit points to set to</param>
     public void SetCurrentHitPoints(float hitPoints)
     {
         currentHitPoints = Mathf.Clamp(hitPoints, 0, GetMaxHitPoints());
+        if (OnDamageDealt != null)
+        {
+            OnDamageDealt(null);
+        }
+        if (healthView)
+        {
+            healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+        }
     }
 
     /// <summary>
@@ -103,12 +123,38 @@ public class Health : MonoBehaviour
     }
 
     /// <summary>
+    /// Checks whether or not this Health component can take Damage
+    /// </summary>
+    /// <returns>Whether or not invincible</returns>
+    public bool IsInvincible()
+    {
+        return invincible;
+    }
+
+    /// <summary>
+    /// Sets whether or not this Health component can take Damage
+    /// </summary>
+    /// <param name="invincible">Whether or not invincible</param>
+    public void SetInvincible(bool invincible)
+    {
+        this.invincible = invincible;
+    }
+
+    /// <summary>
     /// Gets the duration of invincibility after taking damage
     /// </summary>
     /// <returns>Seconds</returns>
     public float GetInvincibilityTime()
     {
         return invincibilityCooldown;
+    }
+
+    /// <summary>
+    /// Resets the invincibility time to full invincibility
+    /// </summary>
+    public void ResetInvincibilityTime()
+    {
+        SetInvincibilityTime(totalInvincibilityCooldown);
     }
 
     /// <summary>
@@ -127,43 +173,66 @@ public class Health : MonoBehaviour
     /// <param name="damage">Damage to deal</param>
     public void ApplyDamage(Damage damage)
     {
+        if (invincible)
+        {
+            return;
+        }
         if (!damage)
         {
             Debug.LogError("Cannot apply null damage to " + gameObject + "!", gameObject);
             return;
         }
-        bool harmful = damage.GetBaseDamage() > 0 || damage.GetDamageOverTime() > 0 || damage.GetKnockBack() > 0;
+        bool harmful = damage.GetBaseDamage() > 0 || damage.GetDamageOverTime() > 0 || damage.GetKnockBack() > 0 || (damage.GetSpeedModifierIntensity() > 0 && damage.GetSpeedModifierDuration() > 0);
         bool friendly = TeamUtility.IsFriendly(gameObject, damage.gameObject);
         bool coolingDown = invincibilityCooldown > 0;
         if (!harmful || friendly || coolingDown)
         {
             return;
         }
+        var root = transform.root;
+        invincibilityCooldown = totalInvincibilityCooldown;
+        var orbOfProtection = root.GetComponentInChildren<OrbOfProtection>();
+        if (orbOfProtection)
+        {
+            Destroy(orbOfProtection.gameObject);
+            return;
+        }
         currentHitPoints -= damage.GetBaseDamage();
         damageOverTime += damage.GetDamageOverTime();
         damageOverTimeRate += damage.GetDamageOverTimeRateIncrease();
-        invincibilityCooldown = totalInvincibilityCooldown;
         var knockBackDirection = (transform.position - damage.transform.position).normalized;
-        var knockBack = knockBackDirection * damage.GetKnockBack();
-        var platformCharacterController = GetComponent<PlatformCharacterController>();
+        float knockBackForce = damage.GetKnockBack() * knockBackReceived;
+        var knockBack = knockBackDirection * knockBackForce;
+        var platformCharacterController = root.GetComponentInChildren<PlatformCharacterController>();
         if (platformCharacterController)
         {
-            platformCharacterController.PlatformCharacterPhysics.Velocity = knockBack;
+            platformCharacterController.PlatformCharacterPhysics.Velocity = Vector3.zero;
+            platformCharacterController.PlatformCharacterPhysics.AddAcceleration(knockBack);
+        }
+        else
+        {
+            var body = root.GetComponent<Rigidbody2D>();
+            if (body)
+            {
+                body.AddForce(knockBack);
+            }
+            if (OnDamageDealt != null)
+            {
+                OnDamageDealt(damage);
+            }
+            if (healthView)
+            {
+                healthView.AdjustHealth(currentHitPoints / maxHitPoints);
+            }
+        }
+        var character = root.GetComponentInChildren<Character>();
+        if (!character)
+        {
+            Debug.LogError("Could not find Character associated with " + this, gameObject);
             return;
         }
-        var body = GetComponent<Rigidbody2D>();
-        if (body)
-        {
-            body.AddForce(knockBack);
-        }
-        if (OnDamageDealt != null)
-        {
-            OnDamageDealt(damage);
-        }
-        if (healthView)
-        {
-            healthView.AdjustHealth(currentHitPoints / maxHitPoints);
-        }
+        character.AddSpeedModifer(damage.GetSpeedModifierIntensity(), damage.GetSpeedModifierDuration());
+        character.AddTintModifier(damage.GetTint(), GetInvincibilityTime());
     }
 
     /// <summary>
