@@ -19,7 +19,7 @@ public class PixelPerfectCameraCtrl : MonoBehaviour
 		Camera = GetComponent<Camera>();
 	}
 
-    void Update()
+    void LateUpdate()
     {
         if (Camera != null)
         {

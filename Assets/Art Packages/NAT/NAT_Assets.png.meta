@@ -1,0 +1,409 @@
+fileFormatVersion: 2
+guid: 64c25ce83bb38486e98c727239b63100
+timeCreated: 1477683767
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: NAT_Assets_0
+    21300002: NAT_Assets_1
+    21300004: NAT_Assets_2
+    21300006: NAT_Assets_3
+    21300008: NAT_Assets_4
+    21300010: NAT_Assets_5
+    21300012: NAT_Assets_6
+    21300014: NAT_Assets_7
+    21300016: NAT_Assets_8
+    21300018: NAT_Assets_9
+    21300020: NAT_Assets_10
+    21300022: NAT_Assets_11
+    21300024: NAT_Assets_12
+    21300026: NAT_Assets_13
+    21300028: NAT_Assets_14
+    21300030: NAT_Assets_15
+    21300032: NAT_Assets_16
+    21300034: NAT_Assets_17
+    21300036: NAT_Assets_18
+    21300038: NAT_Assets_19
+    21300040: NAT_Assets_20
+    21300042: NAT_Assets_21
+    21300044: NAT_Assets_22
+    21300046: NAT_Assets_23
+    21300048: NAT_Assets_24
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -3
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: NAT_Assets_0
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 1297
+        width: 945
+        height: 724
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_1
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 1710
+        width: 103
+        height: 260
+      alignment: 9
+      pivot: {x: 0.5, y: 0.7201796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_2
+      rect:
+        serializedVersion: 2
+        x: 1195
+        y: 1707
+        width: 112
+        height: 257
+      alignment: 9
+      pivot: {x: 0.5, y: 0.7338877}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_3
+      rect:
+        serializedVersion: 2
+        x: 1366
+        y: 1705
+        width: 126
+        height: 261
+      alignment: 9
+      pivot: {x: 0.5227167, y: 0.7412699}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_4
+      rect:
+        serializedVersion: 2
+        x: 1552
+        y: 1809
+        width: 448
+        height: 211
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_5
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1360
+        width: 122
+        height: 296
+      alignment: 9
+      pivot: {x: 0.5, y: 0.7030714}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_6
+      rect:
+        serializedVersion: 2
+        x: 1230
+        y: 1399
+        width: 108
+        height: 240
+      alignment: 9
+      pivot: {x: 0.52650285, y: 0.81008655}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_7
+      rect:
+        serializedVersion: 2
+        x: 1386
+        y: 1419
+        width: 106
+        height: 223
+      alignment: 9
+      pivot: {x: 0.5270029, y: 0.80805403}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_8
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 1437
+        width: 462
+        height: 355
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_9
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 492
+        width: 689
+        height: 740
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_10
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 1018
+        width: 100
+        height: 289
+      alignment: 9
+      pivot: {x: 0.52862304, y: 0.7476072}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_11
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 1054
+        width: 74
+        height: 215
+      alignment: 9
+      pivot: {x: 0.5386798, y: 0.7795774}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_12
+      rect:
+        serializedVersion: 2
+        x: 1122
+        y: 958
+        width: 135
+        height: 354
+      alignment: 9
+      pivot: {x: 0.5636077, y: 0.90428483}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_13
+      rect:
+        serializedVersion: 2
+        x: 1333
+        y: 938
+        width: 171
+        height: 406
+      alignment: 9
+      pivot: {x: 0.51673865, y: 0.8172538}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_14
+      rect:
+        serializedVersion: 2
+        x: 1546
+        y: 1040
+        width: 447
+        height: 352
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_15
+      rect:
+        serializedVersion: 2
+        x: 1557
+        y: 806
+        width: 443
+        height: 197
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_16
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 137
+        width: 85
+        height: 260
+      alignment: 9
+      pivot: {x: 0.5000001, y: 0.7421978}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_17
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 226
+        width: 110
+        height: 243
+      alignment: 9
+      pivot: {x: 0.5520425, y: 0.7591417}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_18
+      rect:
+        serializedVersion: 2
+        x: 797
+        y: 70
+        width: 628
+        height: 610
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_19
+      rect:
+        serializedVersion: 2
+        x: 1464
+        y: 360
+        width: 236
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_20
+      rect:
+        serializedVersion: 2
+        x: 1771
+        y: 358
+        width: 247
+        height: 378
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_21
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 128
+        width: 92
+        height: 232
+      alignment: 9
+      pivot: {x: 0.5622247, y: 0.7961039}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_22
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 73
+        width: 93
+        height: 185
+      alignment: 9
+      pivot: {x: 0.4692222, y: 0.79396987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_23
+      rect:
+        serializedVersion: 2
+        x: 1718
+        y: 74
+        width: 96
+        height: 211
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: NAT_Assets_24
+      rect:
+        serializedVersion: 2
+        x: 1912
+        y: 73
+        width: 71
+        height: 211
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,185 @@
+fileFormatVersion: 2
+guid: 8aff1f4238b5846ae81d68e5c0dbfee4
+timeCreated: 1477523831
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Spike_Trap_Assets_0
+    21300002: Spike_Trap_Assets_1
+    21300004: Spike_Trap_Assets_2
+    21300006: Spike_Trap_Assets_3
+    21300008: Spike_Trap_Assets_4
+    21300010: Spike_Trap_Assets_5
+    21300012: Spike_Trap_Assets_6
+    21300014: Spike_Trap_Assets_7
+    21300016: Spike_Trap_Assets_8
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -3
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_0
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 98
+        width: 99
+        height: 788
+      alignment: 9
+      pivot: {x: 0.57725054, y: 0.013116013}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_1
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 179
+        width: 87
+        height: 647
+      alignment: 9
+      pivot: {x: 0.4706982, y: 0.027184017}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_2
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 341
+        width: 92
+        height: 483
+      alignment: 9
+      pivot: {x: 0.50000036, y: 0.024981448}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_3
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 61
+        width: 90
+        height: 816
+      alignment: 9
+      pivot: {x: 0.50000066, y: 0.023574576}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_4
+      rect:
+        serializedVersion: 2
+        x: 635
+        y: 321
+        width: 98
+        height: 497
+      alignment: 9
+      pivot: {x: 0.5130061, y: 0.015280403}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_5
+      rect:
+        serializedVersion: 2
+        x: 757
+        y: 627
+        width: 21
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_6
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 417
+        width: 79
+        height: 393
+      alignment: 9
+      pivot: {x: 0.43546188, y: 0.042688966}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_7
+      rect:
+        serializedVersion: 2
+        x: 713
+        y: 197
+        width: 108
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Spike_Trap_Assets_8
+      rect:
+        serializedVersion: 2
+        x: 711
+        y: 109
+        width: 128
+        height: 39
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

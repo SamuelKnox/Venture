@@ -17,7 +17,7 @@ public class RocketBehaviour : MonoBehaviour
         m_rigidBody2D.isKinematic = true;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (IsDying)
         {
@@ -75,6 +75,8 @@ public class RocketBehaviour : MonoBehaviour
         {
             aColliders[i].enabled = false;
         }
+        RotateTowards rotateTowards = GetComponent<RotateTowards>();
+        if (rotateTowards) rotateTowards.UnlockDistanceToTarget();
         transform.localScale = new Vector3(transform.localScale.x, -transform.localScale.y, transform.localScale.z);
         transform.position = new Vector3(transform.position.x, transform.position.y, -1f);
         m_rigidBody2D.velocity = Vector2.zero;

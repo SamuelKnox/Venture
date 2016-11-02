@@ -114,7 +114,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
         Vector2[] m_uvWithFlags = new Vector2[4];
         int m_lastFrameToken;
-        public virtual Vector2[] GetAnimUVWithFlags()
+        public virtual Vector2[] GetAnimUVWithFlags(float innerPadding = 0f)
         {
             if (GetAnimFrameIdx() == m_lastFrameToken)
                 return m_uvWithFlags;
@@ -129,10 +129,10 @@ namespace CreativeSpore.SuperTilemapEditor
             bool rot90 = (tileData & Tileset.k_TileFlag_Rot90) != 0;
 
             //NOTE: xMinMax and yMinMax is opposite if width or height is negative
-            float u0 = tileUV.xMin + Tileset.AtlasTexture.texelSize.x;// *InnerPadding;
-            float v0 = tileUV.yMin + Tileset.AtlasTexture.texelSize.y;// *InnerPadding;
-            float u1 = tileUV.xMax - Tileset.AtlasTexture.texelSize.x;// *InnerPadding;
-            float v1 = tileUV.yMax - Tileset.AtlasTexture.texelSize.y;// *InnerPadding;
+            float u0 = tileUV.xMin + Tileset.AtlasTexture.texelSize.x * innerPadding;
+            float v0 = tileUV.yMin + Tileset.AtlasTexture.texelSize.y * innerPadding;
+            float u1 = tileUV.xMax - Tileset.AtlasTexture.texelSize.x * innerPadding;
+            float v1 = tileUV.yMax - Tileset.AtlasTexture.texelSize.y * innerPadding;
 
             if (flipV)
             {

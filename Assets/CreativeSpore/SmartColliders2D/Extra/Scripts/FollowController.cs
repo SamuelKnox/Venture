@@ -4,11 +4,23 @@ using CreativeSpore.SmartColliders;
 
 public class FollowController : MonoBehaviour 
 {
+    public enum eUpdateMode
+    {
+        /// <summary>
+        /// Use this if you are updating Target position during Update call
+        /// </summary>
+        LateUpdate,
+        /// <summary>
+        /// Use this if you are updating Target position during FixedUpdate call
+        /// </summary>
+        FixedUpdate
+    }
 
 	public Transform Target;
 	public float DampTime = 0.15f;
     public bool ApplyTargetRotation = false;
     public float RotationDampTime = 0.25f;
+    public eUpdateMode UpdateMode = eUpdateMode.LateUpdate;
 
 
 	private Vector3 velocity = Vector3.zero;
@@ -20,9 +32,21 @@ public class FollowController : MonoBehaviour
             transform.position = new Vector3(Target.position.x, Target.position.y, transform.position.z);
         }
     }
-		
-	// Update is called once per frame
-	void FixedUpdate() 
+	
+    void LateUpdate()
+    {
+        if (UpdateMode == eUpdateMode.LateUpdate)
+            UpdatePosition();
+    }
+    
+	void FixedUpdate()
+    {
+        if (UpdateMode == eUpdateMode.FixedUpdate)
+            UpdatePosition();
+    }
+
+    //NOTE: this has to be always different to the event where the player position is Updated. So if this is LateUpdate, player position should be always changed in Update
+	void UpdatePosition() 
 	{
 		if (Target)
 		{

@@ -1,3 +1,14 @@
+--- v1.1.2 ---
+- Adde new constant for collider separation k_colliderSeparation. Previously k_SkinMinWidth was used instead.
+- Added a update mode for smart colliders. Now it can be updated in FixedUpdate and Update( allowing a smoother movement)
+- The PlayerCharacterController has been updated to work in Update allowing a movement at maximum FPS.
+- Added an update mode in FollowController used by the camera to follow the player allowing to set the right mode depending on when the followed object updates its position.
+- Added support for multi editing in SmartRectCollider
+- Added LockDistanceToTarget to the RotateTowards behaviour because for imprecision errors, the radius was being changed each frame.
+- Renamed Real Velocity to Instance Velocity
+- Fixed jittering issues.
+- Fixed some issues with unity versions 5.3 and 5.4
+
 --- v1.1.1 ---
 - Added Pixel Snap Settings
 - Fixed bug detecting if it's grounded in SmartPlatformCollider.cs

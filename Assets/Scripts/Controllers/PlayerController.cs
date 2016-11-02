@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(PlatformCharacterController))]
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(PlayerView))]
+[RequireComponent(typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
     [Tooltip("Whether or not to use input to determine speed, or snap speed to a constant")]
@@ -21,25 +22,73 @@ public class PlayerController : MonoBehaviour
     [Range(0.0f, 1.0f)]
     private float axisJumpingThreshold = 0.5f;
 
-    [Tooltip("Number of jumps allowed, where 2 means the player can double jump (Once off of the ground, and once while mid-air)")]
+    [Tooltip("The maximum time to draw a bow.  Once this draw time is reached, the bow will fire at full power")]
     [SerializeField]
-    [Range(1, 5)]
-    private int numberJumpsAllowed = 1;
+    [Range(0.0f, 5.0f)]
+    private float bowDrawTime = 1.0f;
 
-    private Player player;
+    [Tooltip("The time required to cast a spell from the wand.  If the button is held for this long, the wand's spell will be cast.  Otherwise, the wand's projectile will be cast.")]
+    [SerializeField]
+    [Range(0.0f, 5.0f)]
+    private float wandPreparationTime = 1.0f;
+
+    [Tooltip("Layers which have a quicksand effect on the player")]
+    [SerializeField]
+    private LayerMask quicksandLayers;
+
+    [Tooltip("Vertical handicap applied to player when quicksand is in effect")]
+    [SerializeField]
+    [Range(1.0f, 100.0f)]
+    private float quicksandSinkRate = 50.0f;
+
+    [Tooltip("Handicap applied to player jumping while in quicksand")]
+    [SerializeField]
+    [Range(1.0f, 100.0f)]
+    private float quicksandJumpHandicap = 25.0f;
+
+    [Tooltip("Layers which have a swimming effect on the player")]
+    [SerializeField]
+    private LayerMask swimmingLayers;
+
+    [Tooltip("Vertical handicap applied to player when swimming is in effect")]
+    [SerializeField]
+    [Range(1.0f, 10.0f)]
+    private float swimmingSinkRate = 2.5f;
+
+    [Tooltip("Handicap applied to player jumping while in water")]
+    [SerializeField]
+    [Range(1.0f, 10.0f)]
+    private float swimmingJumpHandicap = 2.5f;
+
+    [Tooltip("Handicap applied to player horizontal movement while in water")]
+    [SerializeField]
+    [Range(1.0f, 10.0f)]
+    private float swimmingWalkHandicap = 2.5f;
+
     private PlatformCharacterController platformCharacterController;
     private PlayerView playerView;
     private Interactable nearbyInteractable;
     private Health health;
     private QuestsView questsView;
     private bool controllable = true;
+    private bool inQuicksand = false;
+    private bool inWater = false;
+    private Vector3 initialGravity;
+    private float initialWalkSpeed;
+    private float initialJumpSpeed;
+    private Collider2D playerCollider;
+    private bool attackInitiated = false;
+    private float attackInitiatedTime = 0.0f;
 
     void Awake()
     {
-        player = GetComponent<Player>();
         platformCharacterController = GetComponent<PlatformCharacterController>();
         playerView = GetComponent<PlayerView>();
         health = GetComponentInChildren<Health>();
+        playerCollider = GetComponent<Collider2D>();
+        initialGravity = platformCharacterController.PlatformCharacterPhysics.Gravity;
+        initialWalkSpeed = platformCharacterController.WalkingAcc;
+        initialJumpSpeed = platformCharacterController.JumpingSpeed;
         if (!health)
         {
             Debug.LogError("Could not find player health!", gameObject);
@@ -55,7 +104,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        player.Load();
+        PlayerManager.Player.Load();
     }
 
     void Update()
@@ -74,56 +123,114 @@ public class PlayerController : MonoBehaviour
             SetPlayerControllable(true);
             return;
         }
-        if (!controllable || player.IsStunned())
+        if (!controllable || PlayerManager.Player.GetSpeedModifier() <= 0.0f)
         {
             return;
         }
         var directionalInput = GetDirectionalInput();
         Move(directionalInput);
         Jump(directionalInput.y);
-        if (Input.GetButtonDown(InputNames.Attack) && player.IsAttackValid() && !playerView.IsAttacking())
+        if (!attackInitiated && Input.GetButtonDown(InputNames.Attack) && PlayerManager.Player.IsAttackValid() && !playerView.IsAttacking())
         {
-            Attack();
+            attackInitiated = true;
+            InitiateAttack();
         }
-        if (Input.GetButtonDown(InputNames.ToggleWeapon))
+        if (attackInitiated)
         {
-            player.ToggleWeapon();
+            attackInitiatedTime += Time.deltaTime;
+            if (Input.GetButtonUp(InputNames.Attack))
+            {
+                ExecuteAttack(attackInitiatedTime);
+                attackInitiatedTime = 0.0f;
+                attackInitiated = false;
+            }
+        }
+        if (!attackInitiated && !playerView.IsAttacking() && Input.GetButtonDown(InputNames.ToggleWeapon))
+        {
+            PlayerManager.Player.ToggleWeapon();
             playerView.FinishAttacking();
         }
         if (Input.GetButtonDown(InputNames.QuestLeft))
-        {
-            questsView.SwitchQuest(-1);
-        }
-        if (Input.GetButtonDown(InputNames.QuestRight))
         {
             questsView.SwitchQuest(1);
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collider2D)
+    void OnHitboxEnter(Collider2D collider2D)
     {
         var interactable = collider2D.GetComponent<Interactable>();
         if (interactable && !nearbyInteractable)
         {
             nearbyInteractable = interactable;
         }
+        if (quicksandLayers.Contains(collider2D.gameObject.layer))
+        {
+            inQuicksand = true;
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity / quicksandSinkRate;
+            platformCharacterController.PlatformCharacterPhysics.Velocity = platformCharacterController.PlatformCharacterPhysics.Gravity;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed / quicksandJumpHandicap;
+        }
+        if (swimmingLayers.Contains(collider2D.gameObject.layer))
+        {
+            inWater = true;
+            float initialXVelocity = platformCharacterController.PlatformCharacterPhysics.Velocity.x / swimmingWalkHandicap;
+            float initialYVelocity = platformCharacterController.PlatformCharacterPhysics.Velocity.y / swimmingJumpHandicap;
+            float initialZVelocity = platformCharacterController.PlatformCharacterPhysics.Velocity.z;
+            platformCharacterController.PlatformCharacterPhysics.Velocity = new Vector3(initialXVelocity, initialYVelocity, initialZVelocity);
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity / swimmingSinkRate;
+            platformCharacterController.WalkingAcc /= swimmingWalkHandicap;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed / swimmingJumpHandicap;
+        }
     }
 
-    void OnTriggerExit2D(Collider2D collider2D)
+    void OnHitboxStay(Collider2D collider2D)
+    {
+        var collectable = collider2D.GetComponent<Collectable>();
+        if (collectable)
+        {
+            Collect(collectable);
+        }
+        if (quicksandLayers.Contains(collider2D.gameObject.layer))
+        {
+            platformCharacterController.IsGrounded = true;
+            if (playerCollider.bounds.max.y <= collider2D.bounds.max.y)
+            {
+                PlayerManager.Player.Die();
+            }
+        }
+        if (swimmingLayers.Contains(collider2D.gameObject.layer))
+        {
+            platformCharacterController.IsGrounded = true;
+            if (playerCollider.bounds.max.y <= collider2D.bounds.max.y)
+            {
+                PlayerManager.Player.ConsumeOxygen();
+            }
+            else
+            {
+                PlayerManager.Player.RefillOxygen();
+            }
+        }
+    }
+
+    void OnHitboxExit(Collider2D collider2D)
     {
         var interactable = collider2D.GetComponent<Interactable>();
         if (interactable && interactable == nearbyInteractable)
         {
             nearbyInteractable = null;
         }
-    }
-
-    void OnCollectorStay(Collider2D collider2D)
-    {
-        var collectable = collider2D.GetComponent<Collectable>();
-        if (collectable)
+        if (quicksandLayers.Contains(collider2D.gameObject.layer))
         {
-            Collect(collectable);
+            inQuicksand = false;
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed;
+        }
+        if (swimmingLayers.Contains(collider2D.gameObject.layer))
+        {
+            inWater = false;
+            platformCharacterController.PlatformCharacterPhysics.Gravity = initialGravity;
+            platformCharacterController.WalkingAcc = initialWalkSpeed;
+            platformCharacterController.JumpingSpeed = initialJumpSpeed;
         }
     }
 
@@ -158,7 +265,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="item">Item to collect</param>
     public void Collect(Collectable collectable)
     {
-        player.Collect(collectable);
+        PlayerManager.Player.Collect(collectable);
     }
 
     /// <summary>
@@ -166,6 +273,10 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Move(Vector2 input)
     {
+        if (inQuicksand)
+        {
+            input = Vector2.zero;
+        }
         float horizontalMovement = input.x * Mathf.Abs(input.x);
         float absoluteHorizontalMovement = Mathf.Abs(horizontalMovement);
         float verticalMovement = input.y * Mathf.Abs(input.y);
@@ -189,7 +300,19 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Jump(float verticalInput)
     {
-        bool jumping = Input.GetButton(InputNames.Jump) && verticalInput > -axisJumpingThreshold;
+        bool jumping;
+        if (inQuicksand || inWater)
+        {
+            jumping = Input.GetButtonDown(InputNames.Jump);
+        }
+        else
+        {
+            jumping = Input.GetButtonDown(InputNames.Jump) && verticalInput > -axisJumpingThreshold;
+        }
+        if (jumping)
+        {
+            playerView.Jump();
+        }
         bool droppingDown = Input.GetButtonDown(InputNames.Jump) && verticalInput <= -axisJumpingThreshold;
         platformCharacterController.SetActionState(eControllerActions.Jump, jumping);
         platformCharacterController.SetActionState(eControllerActions.PlatformDropDown, droppingDown);
@@ -202,8 +325,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void GameOver()
     {
-        player.Save();
-        if (player.GetPrestige() > 0)
+        PlayerManager.Player.Save();
+        if (PlayerManager.Player.GetPrestige() > 0 && PlayerManager.Player.GetRoons().Length > 0)
         {
             SceneManager.LoadScene(SceneNames.LevelUp);
         }
@@ -216,9 +339,9 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Initiates the player's attack with their currently equipped weapon
     /// </summary>
-    private void Attack()
+    private void InitiateAttack()
     {
-        var activeWeapon = player.GetActiveWeapon();
+        var activeWeapon = PlayerManager.Player.GetActiveWeapon();
         if (!activeWeapon)
         {
             return;
@@ -232,10 +355,54 @@ public class PlayerController : MonoBehaviour
             case ItemType.RangedWeapon:
                 if (activeWeapon.GetComponent<Bow>())
                 {
-                    playerView.BowAttack();
+                    playerView.DrawBow();
                 }
                 else if (activeWeapon.GetComponent<Wand>())
                 {
+                    playerView.PrepareWand();
+                }
+                else
+                {
+                    Debug.LogError("Attempting to attack with a Ranged Weapon that is neither a bow nor a wand!", activeWeapon.gameObject);
+                    return;
+                }
+                break;
+            default:
+                Debug.LogError("An invalid WeaponType is active!", PlayerManager.Player.gameObject);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Executes the player's attack with the currently equipped weapon
+    /// </summary>
+    /// <param name="attackInitiationTime">Duration attack button was held down</param>
+    private void ExecuteAttack(float attackInitiationTime)
+    {
+        var activeWeapon = PlayerManager.Player.GetActiveWeapon();
+        if (!activeWeapon)
+        {
+            return;
+        }
+        var activeWeaponType = activeWeapon.GetItemType();
+        switch (activeWeaponType)
+        {
+            case ItemType.MeleeWeapon:
+                return;
+            case ItemType.RangedWeapon:
+                if (activeWeapon.GetComponent<Bow>())
+                {
+                    float bowEffectiveness = 1.0f;
+                    if (bowDrawTime > 0.0f)
+                    {
+                        bowEffectiveness = Mathf.Min(attackInitiatedTime / bowDrawTime, 1.0f);
+                    }
+                    PlayerManager.Player.SetBowEffectiveness(bowEffectiveness);
+                    playerView.BowFire();
+                }
+                else if (activeWeapon.GetComponent<Wand>())
+                {
+                    PlayerManager.Player.SetWandCharged(attackInitiatedTime >= wandPreparationTime);
                     playerView.WandAttack();
                 }
                 else
@@ -245,7 +412,7 @@ public class PlayerController : MonoBehaviour
                 }
                 break;
             default:
-                Debug.LogError("An invalid WeaponType is active!", player.gameObject);
+                Debug.LogError("An invalid WeaponType is active!", PlayerManager.Player.gameObject);
                 return;
         }
     }

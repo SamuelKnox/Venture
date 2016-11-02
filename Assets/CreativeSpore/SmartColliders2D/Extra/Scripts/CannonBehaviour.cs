@@ -36,7 +36,9 @@ public class CannonBehaviour : MonoBehaviour
         RotateTowards parentRotateTowards = GetComponent<RotateTowards>();
         if( parentRotateTowards != null )
         {
-            rocket.AddComponent<RotateTowards>().Target = parentRotateTowards.Target;
+            RotateTowards rotateTowardsComp = rocket.AddComponent<RotateTowards>();
+            rotateTowardsComp.Target = parentRotateTowards.Target;
+            rotateTowardsComp.LockDistanceToTarget();
             rocket.transform.localScale = transform.localScale;
         }
     }

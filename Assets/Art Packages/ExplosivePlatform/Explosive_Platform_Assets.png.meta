@@ -1,0 +1,759 @@
+fileFormatVersion: 2
+guid: 319cabfb115734bad84cf589fc61d1a4
+timeCreated: 1477604038
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Explosive_Platform_Assets_0
+    21300002: Explosive_Platform_Assets_1
+    21300004: Explosive_Platform_Assets_2
+    21300006: Explosive_Platform_Assets_3
+    21300008: Explosive_Platform_Assets_4
+    21300010: Explosive_Platform_Assets_5
+    21300012: Explosive_Platform_Assets_6
+    21300014: Explosive_Platform_Assets_7
+    21300016: Explosive_Platform_Assets_8
+    21300018: Explosive_Platform_Assets_9
+    21300020: Explosive_Platform_Assets_10
+    21300022: Explosive_Platform_Assets_11
+    21300024: Explosive_Platform_Assets_12
+    21300026: Explosive_Platform_Assets_13
+    21300028: Explosive_Platform_Assets_14
+    21300030: Explosive_Platform_Assets_15
+    21300032: Explosive_Platform_Assets_16
+    21300034: Explosive_Platform_Assets_17
+    21300036: Explosive_Platform_Assets_18
+    21300038: Explosive_Platform_Assets_19
+    21300040: Explosive_Platform_Assets_20
+    21300042: Explosive_Platform_Assets_21
+    21300044: Explosive_Platform_Assets_22
+    21300046: Explosive_Platform_Assets_23
+    21300048: Explosive_Platform_Assets_24
+    21300050: Explosive_Platform_Assets_25
+    21300052: Explosive_Platform_Assets_26
+    21300054: Explosive_Platform_Assets_27
+    21300056: Explosive_Platform_Assets_28
+    21300058: Explosive_Platform_Assets_29
+    21300060: Explosive_Platform_Assets_30
+    21300062: Explosive_Platform_Assets_31
+    21300064: Explosive_Platform_Assets_32
+    21300066: Explosive_Platform_Assets_33
+    21300068: Explosive_Platform_Assets_34
+    21300070: Explosive_Platform_Assets_35
+    21300072: Explosive_Platform_Assets_36
+    21300074: Explosive_Platform_Assets_37
+    21300076: Explosive_Platform_Assets_38
+    21300078: Explosive_Platform_Assets_39
+    21300080: Explosive_Platform_Assets_40
+    21300082: Explosive_Platform_Assets_41
+    21300084: Explosive_Platform_Assets_42
+    21300086: Explosive_Platform_Assets_43
+    21300088: Explosive_Platform_Assets_44
+    21300090: Explosive_Platform_Assets_45
+    21300092: Explosive_Platform_Assets_46
+    21300094: Explosive_Platform_Assets_47
+    21300096: Explosive_Platform_Assets_48
+    21300098: Explosive_Platform_Assets_49
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -3
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_0
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 1789
+        width: 266
+        height: 168
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_1
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 1789
+        width: 269
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_2
+      rect:
+        serializedVersion: 2
+        x: 846
+        y: 1766
+        width: 257
+        height: 159
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_3
+      rect:
+        serializedVersion: 2
+        x: 1240
+        y: 1782
+        width: 238
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_4
+      rect:
+        serializedVersion: 2
+        x: 1787
+        y: 1791
+        width: 106
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_5
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 1535
+        width: 231
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_6
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 1528
+        width: 245
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_7
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 1495
+        width: 303
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_8
+      rect:
+        serializedVersion: 2
+        x: 1276
+        y: 1491
+        width: 221
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_9
+      rect:
+        serializedVersion: 2
+        x: 1781
+        y: 1593
+        width: 129
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_10
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 1233
+        width: 186
+        height: 189
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_11
+      rect:
+        serializedVersion: 2
+        x: 1757
+        y: 1413
+        width: 165
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_12
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 1226
+        width: 230
+        height: 153
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_13
+      rect:
+        serializedVersion: 2
+        x: 819
+        y: 1238
+        width: 356
+        height: 154
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_14
+      rect:
+        serializedVersion: 2
+        x: 1283
+        y: 1196
+        width: 307
+        height: 205
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_15
+      rect:
+        serializedVersion: 2
+        x: 1750
+        y: 1190
+        width: 164
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_16
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 941
+        width: 320
+        height: 194
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_17
+      rect:
+        serializedVersion: 2
+        x: 555
+        y: 938
+        width: 343
+        height: 203
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_18
+      rect:
+        serializedVersion: 2
+        x: 1035
+        y: 940
+        width: 262
+        height: 202
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_19
+      rect:
+        serializedVersion: 2
+        x: 1769
+        y: 976
+        width: 138
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_20
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 709
+        width: 129
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_21
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 762
+        width: 53
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_22
+      rect:
+        serializedVersion: 2
+        x: 442
+        y: 680
+        width: 72
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_23
+      rect:
+        serializedVersion: 2
+        x: 595
+        y: 676
+        width: 148
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_24
+      rect:
+        serializedVersion: 2
+        x: 1209
+        y: 718
+        width: 160
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_25
+      rect:
+        serializedVersion: 2
+        x: 1709
+        y: 717
+        width: 224
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_26
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 520
+        width: 115
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_27
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 608
+        width: 50
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_28
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 494
+        width: 160
+        height: 121
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_29
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 498
+        width: 152
+        height: 124
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_30
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 525
+        width: 44
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_31
+      rect:
+        serializedVersion: 2
+        x: 1140
+        y: 521
+        width: 108
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_32
+      rect:
+        serializedVersion: 2
+        x: 1364
+        y: 532
+        width: 154
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_33
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 403
+        width: 55
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_34
+      rect:
+        serializedVersion: 2
+        x: 1692
+        y: 451
+        width: 243
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_35
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 297
+        width: 89
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_36
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 244
+        width: 130
+        height: 123
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_37
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 264
+        width: 80
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_38
+      rect:
+        serializedVersion: 2
+        x: 619
+        y: 315
+        width: 111
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_39
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 288
+        width: 115
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_40
+      rect:
+        serializedVersion: 2
+        x: 1147
+        y: 340
+        width: 97
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_41
+      rect:
+        serializedVersion: 2
+        x: 1406
+        y: 333
+        width: 116
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_42
+      rect:
+        serializedVersion: 2
+        x: 596
+        y: 67
+        width: 99
+        height: 173
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_43
+      rect:
+        serializedVersion: 2
+        x: 1723
+        y: 220
+        width: 191
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_44
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 71
+        width: 139
+        height: 148
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_45
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 80
+        width: 83
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_46
+      rect:
+        serializedVersion: 2
+        x: 868
+        y: 86
+        width: 77
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_47
+      rect:
+        serializedVersion: 2
+        x: 1150
+        y: 150
+        width: 99
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_48
+      rect:
+        serializedVersion: 2
+        x: 1406
+        y: 141
+        width: 86
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Explosive_Platform_Assets_49
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 65
+        width: 71
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

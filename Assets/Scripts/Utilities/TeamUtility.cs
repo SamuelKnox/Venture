@@ -11,6 +11,6 @@ public static class TeamUtility
     public static bool IsFriendly(GameObject gameObject0, GameObject gameObject1)
     {
         bool neutral = gameObject0.tag == Tag.Neutral.ToString() || gameObject1.tag == Tag.Neutral.ToString();
-        return neutral || gameObject0.tag == gameObject1.tag;
+        return !neutral && gameObject0.tag == gameObject1.tag;
     }
 }

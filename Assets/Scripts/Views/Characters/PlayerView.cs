@@ -12,6 +12,22 @@ public class PlayerView : MonoBehaviour
     [SerializeField]
     private bool facingRight = true;
 
+    [Tooltip("Left hand used to change sprite based on weapon equipped")]
+    [SerializeField]
+    private SpriteRenderer leftHand;
+
+    [Tooltip("Sprite for hand when melee weapon is equipped")]
+    [SerializeField]
+    private Sprite meleeWeaponHand;
+
+    [Tooltip("Sprite for hand when bow is equipped")]
+    [SerializeField]
+    private Sprite bowHand;
+
+    [Tooltip("Sprite for hand when wand is equipped")]
+    [SerializeField]
+    private Sprite wandHand;
+
     [Tooltip("Sound effect to play when player is stunned")]
     [SerializeField]
     private AudioClip stunSound;
@@ -19,7 +35,7 @@ public class PlayerView : MonoBehaviour
     private PlatformCharacterController platformCharacterController;
     private PlayerController playerController;
     private Animator animator;
-    private Player player;
+    private bool jumping;
     private bool climbing;
     private bool attacking;
     private Collectable collectable;
@@ -29,7 +45,6 @@ public class PlayerView : MonoBehaviour
         platformCharacterController = GetComponent<PlatformCharacterController>();
         playerController = GetComponent<PlayerController>();
         animator = GetComponent<Animator>();
-        player = GetComponent<Player>();
     }
 
     void Update()
@@ -62,28 +77,63 @@ public class PlayerView : MonoBehaviour
     }
 
     /// <summary>
-    /// Initiates a bow attack
+    /// Initiates the bow attack
     /// </summary>
-    public void BowAttack()
+    public void DrawBow()
     {
         if (attacking)
         {
             return;
         }
         attacking = true;
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
+        animator.SetTrigger(AnimationNames.Player.Triggers.BowDraw);
+    }
+
+    /// <summary>
+    /// Executes a bow attack
+    /// </summary>
+    public void BowFire()
+    {
+        if (!attacking)
+        {
+            Debug.LogError("Player is attemping to fire their bow, but the Player is not in the attacking state!", gameObject);
+            return;
+        }
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
         animator.SetTrigger(AnimationNames.Player.Triggers.BowAttack);
     }
 
     /// <summary>
     /// Initiates a wand attack
     /// </summary>
-    public void WandAttack()
+    public void PrepareWand()
     {
         if (attacking)
         {
             return;
         }
         attacking = true;
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
+        animator.SetTrigger(AnimationNames.Player.Triggers.WandPreparation);
+    }
+
+    /// <summary>
+    /// Executes a wand attack
+    /// </summary>
+    public void WandAttack()
+    {
+        if (!attacking)
+        {
+            Debug.LogError("Player is attemping to cast a spell, but the Player is not in the attacking state!", gameObject);
+            return;
+        }
+        attacking = true;
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
         animator.SetTrigger(AnimationNames.Player.Triggers.WandAttack);
     }
 
@@ -94,6 +144,27 @@ public class PlayerView : MonoBehaviour
     {
         animator.SetBool(AnimationNames.Player.Bools.Dead, true);
         FinishAttacking();
+    }
+
+    /// <summary>
+    /// Animates the player's jumping
+    /// </summary>
+    public void Jump()
+    {
+        if (jumping)
+        {
+            return;
+        }
+        jumping = true;
+        animator.SetTrigger(AnimationNames.Player.Triggers.Jump);
+    }
+
+    /// <summary>
+    /// Finishes the player's jump
+    /// </summary>
+    public void FinishJumping()
+    {
+        jumping = false;
     }
 
     /// <summary>
@@ -113,7 +184,7 @@ public class PlayerView : MonoBehaviour
         if (collectable.IsSpecialItem() && !this.collectable)
         {
             this.collectable = collectable;
-            var equippedWeapon = player.GetActiveWeapon();
+            var equippedWeapon = PlayerManager.Player.GetActiveWeapon();
             if (equippedWeapon)
             {
                 equippedWeapon.gameObject.SetActive(false);
@@ -130,12 +201,37 @@ public class PlayerView : MonoBehaviour
     }
 
     /// <summary>
+    /// Changes the sprite for the left hand based on the weapon equipped
+    /// </summary>
+    /// <param name="weapon">Weapon that is equipped</param>
+    public void EquipWeapon(Weapon weapon)
+    {
+        if (weapon.GetComponent<MeleeWeapon>())
+        {
+            leftHand.sprite = meleeWeaponHand;
+        }
+        else if (weapon.GetComponent<Bow>())
+        {
+            leftHand.sprite = bowHand;
+        }
+        else if (weapon.GetComponent<Wand>())
+        {
+            leftHand.sprite = wandHand;
+        }
+        else
+        {
+            Debug.LogError("Could not find correct hand!", gameObject);
+            return;
+        }
+    }
+
+    /// <summary>
     /// Sets whether or not the play the stunned animation
     /// </summary>
     /// <param name="stunned">Whether or not is stunned</param>
     public void SetStun(bool stunned)
     {
-        animator.SetBool(AnimationNames.Enemy.Bools.Stunned, stunned);
+        animator.SetBool(AnimationNames.Player.Bools.Stunned, stunned);
         SoundManager.Instance.Play(stunSound, false, gameObject);
     }
 
@@ -149,7 +245,7 @@ public class PlayerView : MonoBehaviour
             return;
         }
         collectable.gameObject.SetActive(false);
-        var equippedWeapon = player.GetActiveWeapon();
+        var equippedWeapon = PlayerManager.Player.GetActiveWeapon();
         equippedWeapon.gameObject.SetActive(true);
         Destroy(collectable);
         FinishAttacking();
@@ -170,8 +266,8 @@ public class PlayerView : MonoBehaviour
     {
         if (!climbing)
         {
-            float x = platformCharacterController.RealVelocity.x;
-            float y = platformCharacterController.RealVelocity.y;
+            float x = platformCharacterController.InstantVelocity.x;
+            float y = platformCharacterController.InstantVelocity.y;
             animator.SetFloat(AnimationNames.Player.Floats.HorizontalSpeed, x);
             animator.SetFloat(AnimationNames.Player.Floats.VerticalSpeed, y);
         }

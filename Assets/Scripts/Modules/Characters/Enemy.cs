@@ -1,5 +1,4 @@
-﻿using System;
-using LevelGenerator2D;
+﻿using LevelGenerator2D;
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyView))]
@@ -18,8 +17,6 @@ public abstract class Enemy : Character
 
     private static readonly Vector2 RewardForce = new Vector2(250.0f, 500.0f);
 
-    private static float stunTime;
-
     protected EnemyView enemyView;
 
     protected override void Awake()
@@ -29,44 +26,9 @@ public abstract class Enemy : Character
     }
 
     /// <summary>
-    /// Gets the amount of time the enemy should be stunned for on damage dealt
-    /// </summary>
-    /// <returns>Stun duration in seconds</returns>
-    public static float GetStunTime()
-    {
-        return stunTime;
-    }
-
-    /// <summary>
-    /// Sets the amount of time the enemy should be stunned for on damage dealt
-    /// </summary>
-    /// <param name="stunTime">Stun duration in seconds</param>
-    public static void SetStunTime(float stunTime)
-    {
-        Enemy.stunTime = stunTime;
-    }
-
-    /// <summary>
-    /// Receives damage
-    /// </summary>
-    /// <param name="damage">Damage dealt</param>
-    protected override void OnDamageDealt(Damage damage)
-    {
-        base.OnDamageDealt(damage);
-        if (health.IsDead())
-        {
-            enemyView.Die();
-        }
-        else
-        {
-            enemyView.Hurt();
-        }
-    }
-
-    /// <summary>
     /// Death for enemy
     /// </summary>
-    protected override void Die()
+    public override void Die()
     {
         if (OnDeath != null)
         {
@@ -92,18 +54,19 @@ public abstract class Enemy : Character
     }
 
     /// <summary>
-    /// Stuns the enemy
+    /// Receives damage
     /// </summary>
-    protected override void EnableStun()
+    /// <param name="damage">Damage dealt</param>
+    protected override void OnDamageDealt(Damage damage)
     {
-        enemyView.SetStun(true);
-    }
-
-    /// <summary>
-    /// Disables the enemy's stun
-    /// </summary>
-    protected override void DisableStun()
-    {
-        enemyView.SetStun(false);
+        base.OnDamageDealt(damage);
+        if (health.IsDead())
+        {
+            enemyView.Die();
+        }
+        else
+        {
+            enemyView.Hurt();
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CreativeSpore.SmartColliders
 {
-    [RequireComponent(typeof(SmartRectCollider2D))]
+    [RequireComponent(typeof(SmartPlatformCollider))]
     [RequireComponent(typeof(Rigidbody2D))]
     public class SmartPlatformController : MonoBehaviour
     {
@@ -79,7 +79,8 @@ namespace CreativeSpore.SmartColliders
         /// </summary>
         public float PlatformDropTime = 0.15f;
         /// <summary>
-        /// Drag applied to rigid body when player is swimming
+        /// Drag applied to rigid body when 
+        /// is swimming
         /// </summary>
         public float SwimmingDrag = 25f;
         /// <summary>
@@ -119,7 +120,7 @@ namespace CreativeSpore.SmartColliders
 
         #region Private Attributes 
         private Rigidbody2D m_rigidBody2D;
-        private SmartRectCollider2D m_smartRectCollider;
+        private SmartPlatformCollider m_smartRectCollider;
         private SpriteRenderer m_spriteRenderer;
 
         private Animator m_animator;
@@ -140,18 +141,13 @@ namespace CreativeSpore.SmartColliders
 
         #region MonoBehaviour Methods
 
-        void OnLevelWasLoaded(int level)
-        {
-            m_currentClimbingCollider = null;
-        }
-
         // Use this for initialization
         void Start()
         {
             m_rigidBody2D = GetComponent<Rigidbody2D>();
             m_spriteRenderer = GetComponent<SpriteRenderer>();
             m_animator = GetComponent<Animator>();
-            m_smartRectCollider = GetComponent<SmartRectCollider2D>();
+            m_smartRectCollider = GetComponent<SmartPlatformCollider>();
             m_smartRectCollider.OnCollision += _OnSmartCollision;
             m_smartRectCollider.OnSideCollision += _OnSideCollision;
             m_walkingDrag = m_rigidBody2D.drag;
@@ -284,7 +280,7 @@ namespace CreativeSpore.SmartColliders
                     else if (VPad.IsActionJump() && m_jumpReleased && (m_isGrounded || m_isSwimming || m_isClimbing || m_fallingJumpToleranceTimer > 0))
                     {
                         StopClimbing();
-                        m_jumpSpeed = (m_isSwimming? SwimmingJumpSpeed : JumpSpeed) * Mathf.Clamp01(1 - m_rigidBody2D.drag * JumpDragFactor * Time.fixedDeltaTime);
+                        m_jumpSpeed = (m_isSwimming? SwimmingJumpSpeed : JumpSpeed) * Mathf.Clamp01(1 - m_rigidBody2D.drag * JumpDragFactor * Time.deltaTime);
                         m_jumpReleased = false;
                     }
                 }
@@ -312,10 +308,10 @@ namespace CreativeSpore.SmartColliders
                 return;
             }
 
-            Vector3 vLocVelocity = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * m_smartRectCollider.RealVelocity : m_smartRectCollider.RealVelocity;
+            Vector3 vLocVelocity = transform.rotation != Quaternion.identity ? Quaternion.Inverse(transform.rotation) * m_smartRectCollider.InstantVelocity : m_smartRectCollider.InstantVelocity;
 
             m_isGrounded = m_smartRectCollider.enabled &&
-                m_smartRectCollider.SkinBottomRayContacts.Contains(true) &&
+                m_smartRectCollider.IsGrounded() &&
                 vLocVelocity.y <= Vector3.kEpsilon;
 
             if (m_isGrounded)
@@ -378,7 +374,7 @@ namespace CreativeSpore.SmartColliders
                     fHorAxis = Mathf.Sign(fHorAxis) * Mathf.Max( Mathf.Abs(fHorAxis), 0.4f);
                     if (isWalking)
                     {
-                        SetNextState( m_isGrounded ? eState.Walking : (m_smartRectCollider.RealVelocity.y > 0f? eState.Jumping : eState.Falling));
+                        SetNextState( m_isGrounded ? eState.Walking : (m_smartRectCollider.InstantVelocity.y > 0f? eState.Jumping : eState.Falling));
                         float walkAcc = fHorAxis > 0 ? WalkAcc : -WalkAcc;
                         float fHorAxisAbs = Mathf.Abs(fHorAxis);
                         if (Mathf.Sign(fHorAxis) != Mathf.Sign(m_walkVeloc.x) && m_walkVeloc.x != 0)
@@ -401,7 +397,7 @@ namespace CreativeSpore.SmartColliders
                     }
                     else
                     {
-                        SetNextState(m_isGrounded ? eState.Idle : (m_smartRectCollider.RealVelocity.y > 0f ? eState.Jumping : eState.Falling));
+                        SetNextState(m_isGrounded ? eState.Idle : (m_smartRectCollider.InstantVelocity.y > 0f ? eState.Jumping : eState.Falling));
                         m_walkVeloc *= Mathf.Clamp01(1 - m_rigidBody2D.drag * Time.deltaTime);
                     }
 
@@ -515,11 +511,11 @@ namespace CreativeSpore.SmartColliders
         /// <returns></returns>
         private Collider2D GetClimbingColliderBelow(float SkinBottomWidthFactor = 1.1f)
         {
+            float dist = (m_smartRectCollider.SkinBottomWidth * SkinBottomWidthFactor + SmartRectCollider2D.k_SkinMinWidth) * transform.localScale.y;
             //for (int i = 0; i < m_smartRectCollider.BottomCheckPoints.Count; ++i)
             int i = (m_smartRectCollider.BottomCheckPoints.Count+1)/2;
             { //NOTE: the distance is (SkinBottomWidth + k_SkinMinWidth) because when resolving collisions, the smart rect is placed over the below collider, not touching it
                 Vector3 vCheckPoint = transform.TransformPoint(m_smartRectCollider.BottomCheckPoints[i]);
-                float dist = (m_smartRectCollider.SkinBottomWidth * SkinBottomWidthFactor + SmartRectCollider2D.k_SkinMinWidth) * transform.localScale.y;
                 RaycastHit2D hit = Physics2D.Raycast(vCheckPoint, -transform.up, dist, ClimbingLayers);
                 if (hit.collider != null)
                 {
@@ -535,11 +531,11 @@ namespace CreativeSpore.SmartColliders
         /// <returns></returns>
         private Collider2D GetClimbingColliderAbove()
         {
+            float dist = SmartRectCollider2D.k_SkinMinWidth * transform.localScale.y;
             //for (int i = 0; i < m_smartRectCollider.TopCheckPoints.Count; ++i)
             int i = (m_smartRectCollider.TopCheckPoints.Count + 1) / 2;
             {
                 Vector3 vCheckPoint = transform.TransformPoint(m_smartRectCollider.TopCheckPoints[i]);
-                float dist = SmartRectCollider2D.k_SkinMinWidth * transform.localScale.y;
                 RaycastHit2D hit = Physics2D.Raycast(vCheckPoint, -transform.up, dist, ClimbingLayers);
                 if (hit.collider != null)
                 {
@@ -561,11 +557,11 @@ namespace CreativeSpore.SmartColliders
                 {
                     aColliders[i].enabled = true;
                 }
-                m_smartRectCollider.TeleportTo(new Vector3(CheckPoint.position.x, CheckPoint.position.y, transform.position.z));
+                m_smartRectCollider.TeleportTo(new Vector3(CheckPoint.position.x, CheckPoint.position.y, 0f));
             }
             else
             {
-#if UNITY_5_3
+#if UNITY_5_3 || UNITY_5_3_OR_NEWER
                 UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
 #else
                 Application.LoadLevel(Application.loadedLevel);
@@ -594,8 +590,8 @@ namespace CreativeSpore.SmartColliders
                 m_isClimbing = false;
                 m_currentClimbingCollider = null;
                 m_rigidBody2D.gravityScale = m_savedGravScale;
-                // fix an issue when reaching top of leadder it is alternating between grounded and not grounded
-                transform.position -= new Vector3(0f, 10*SmartRectCollider2D.k_SkinMinWidth);
+                // fix an issue when reaching top of ladder it is alternating between grounded and not grounded
+                transform.position -= new Vector3(0f, 10f*SmartRectCollider2D.k_SkinMinWidth);
             }
         }
 

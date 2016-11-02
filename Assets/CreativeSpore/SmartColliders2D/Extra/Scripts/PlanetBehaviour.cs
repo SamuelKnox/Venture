@@ -31,7 +31,7 @@ public class PlanetBehaviour : MonoBehaviour
         m_playerCtrl = FindObjectOfType<SmartPlatformController>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
 
         // FindObjectsOfType<SmartRectCollider2D>() will be called once per frame, instead make every PlanetBehaviour call it
@@ -75,7 +75,7 @@ public class PlanetBehaviour : MonoBehaviour
                     SmartPlatformController playerCtrl = smartRectCollider.gameObject.GetComponent<SmartPlatformController>();
                     if (playerCtrl != null)
                     {
-#if UNITY_5_3
+#if UNITY_5_3 || UNITY_5_3_OR_NEWER
                         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex); 
 #else
                         Application.LoadLevel(Application.loadedLevel);

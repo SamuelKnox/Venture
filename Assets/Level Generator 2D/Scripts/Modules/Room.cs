@@ -78,6 +78,22 @@ namespace LevelGenerator2D
             InitializeDoors();
         }
 
+        void Start()
+        {
+#if USING_SUPER_TILEMAP_EDITOR
+            ClearOverflowTiles();
+#endif
+        }
+
+        void Update()
+        {
+            UpdatePosition();
+            if (!Application.isPlaying && GetChildlock())
+            {
+                EncompassChildren();
+            }
+        }
+
         void OnValidate()
         {
             UpdatePosition();
@@ -93,15 +109,6 @@ namespace LevelGenerator2D
         {
             DrawDoors();
             DrawOutline();
-        }
-
-        void Update()
-        {
-            UpdatePosition();
-            if (!Application.isPlaying && GetChildlock())
-            {
-                EncompassChildren();
-            }
         }
 
         /// <summary>
@@ -690,7 +697,8 @@ namespace LevelGenerator2D
             foreach (Transform child in descendents)
             {
 #if USING_SUPER_TILEMAP_EDITOR
-                if (child.GetComponentsInParent<Tilemap>().Length > 0)
+                var tilemap = child.GetComponentInParent<Tilemap>();
+                if (tilemap)
                 {
                     continue;
                 }
@@ -723,6 +731,128 @@ namespace LevelGenerator2D
                 child.transform.position = new Vector2(newX, newY);
             }
         }
+
+#if USING_SUPER_TILEMAP_EDITOR
+        private void ClearOverflowTiles()
+        {
+            var tilemaps = GetComponentsInChildren<Tilemap>();
+            int minRoomX = (int)(-width / 2.0f * Level.GridSize);
+            int maxRoomX = (int)(width / 2.0f * Level.GridSize);
+            int minRoomY = (int)(-height / 2.0f * Level.GridSize);
+            int maxRoomY = (int)(height / 2.0f * Level.GridSize);
+            foreach (var tilemap in tilemaps)
+            {
+                for (int x = minRoomX; x <= maxRoomX; x++)
+                {
+                    for (int y = minRoomY; y <= maxRoomY; y++)
+                    {
+                        uint tileData = tilemap.GetTileData(x, y);
+                        tileData &= ~Tileset.k_TileDataMask_BrushId;
+                        tilemap.SetTileData(x, y, tileData);
+                    }
+                }
+                for (int x = tilemap.MinGridX; x <= tilemap.MaxGridX; x++)
+                {
+                    for (int y = tilemap.MinGridY; y <= tilemap.MaxGridY; y++)
+                    {
+                        bool interiorX = x >= minRoomX && x <= maxRoomX;
+                        bool interiorY = y >= minRoomY && y <= maxRoomY;
+                        if (interiorX && interiorY)
+                        {
+                            continue;
+                        }
+                        tilemap.Erase(x, y);
+                    }
+                }
+            }
+        }
+#endif
+
+
+        //int[,] roomTilePoints = new int[(int)(width * Level.GridSize), (int)(height * Level.GridSize)];
+        //for (int x = (int)(-width / 2.0f * Level.GridSize); x <= (int)(width / 2.0f * Level.GridSize); x++)
+        //{
+        //    for (int y = (int)(-height / 2.0f * Level.GridSize); y <= (int)(height / 2.0f * Level.GridSize); y++)
+        //    {
+
+        //    }
+        //}
+        //foreach (var tilemap in tilemaps)
+        //{
+        //    for (int x = (int)(-width / 2.0f * Level.GridSize); x <= (int)(width / 2.0f * Level.GridSize); x++)
+        //    {
+        //        for (int y = (int)(-height / 2.0f * Level.GridSize); y <= (int)(height / 2.0f * Level.GridSize); y++)
+        //        {
+        //            //        bool interiorX = x > (int)(-width / 2.0f * Level.GridSize) && x < (int)(width / 2.0f * Level.GridSize);
+        //            //        bool interiorY = y > (int)(-height / 2.0f * Level.GridSize) && y < (int)(height / 2.0f * Level.GridSize);
+        //            //        if (interiorX && interiorY)
+        //            //        {
+        //            //            continue;
+        //            //        }
+        //            uint tileData = tilemap.GetTileData(x, y);
+        //            tileData &= ~Tileset.k_TileDataMask_BrushId;
+        //            tilemap.SetTileData(x, y, tileData);
+        //        }
+        //    }
+        //    for (int x = tilemap.MinGridX; x <= tilemap.MaxGridX; x++)
+        //    {
+        //        for (int y = tilemap.MinGridY; y <= tilemap.MaxGridY; y++)
+        //        {
+        //            uint tileData = tilemap.GetTileData(x, y);
+        //            tileData &= ~Tileset.k_TileDataMask_BrushId;
+        //            tilemap.SetTileData(x, y, tileData);
+        //        }
+        //    }
+        //}
+
+
+        //int x = (int)(-width / 2.0f * Level.GridSize);
+        //int y = (int)(-height / 2.0f * Level.GridSize);
+        //uint rawTileData = tilemap.GetTileData(x, y);
+        ////TileData tileData = new TileData(rawTileData);
+        ////tileData.brushId = -1;
+
+        ////tileData.SetData(new TileData());
+
+        ////var tileData = new TileData();
+
+
+        //var tile = tilemap.GetTile(x, y);
+        //tilemap.InvalidateChunkAt(x, y);
+        //tilemap.tile
+        //Destroy(child.GetChild<Tile>());
+
+        //Destroy(tile);
+        //tilemap.SetTileData(x, y, tileData.BuildData());
+
+        //tileData.SetData(0);
+        //tilemap.Erase(x, y);
+        //tileData.BuildData();
+        //tilemap.UpdateMesh();
+        //bool flipVertical = data.flipVertical;
+        //bool flipHorizontal = data.flipHorizontal;
+        //bool rot90 = data.rot90;
+        //bool brushId = data.brushId;
+        //bool tileId = data.tileId;
+        //}
+
+
+        //if (child.GetComponentsInParent<Tilemap>().Length > 0)
+        //{
+        //    //TileData x = child.GetComponentInChildren<TileData>();
+        //    //if (x != null)
+        //    //{
+        //    //    Debug.LogError("TES!");
+        //    //}
+        //    //if(child.localPosition == Vector3.zero)
+        //    //{
+        //    //    continue;
+        //    //}
+        //    //Debug.Log(child.localPosition);
+        //    continue;
+        //}
+        //}
+        //}
 
         /// <summary>
         /// Draw debug lines to show the walls

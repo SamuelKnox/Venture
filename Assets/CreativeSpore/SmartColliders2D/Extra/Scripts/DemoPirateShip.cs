@@ -9,14 +9,7 @@ public class DemoPirateShip : MonoBehaviour
     public float NoiseScale = 1f;
     public float SlerpTime = 0.2f;
 
-	// Use this for initialization
-	void Start () 
-    {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () 
+	void FixedUpdate () 
     {
         float noise = Mathf.PerlinNoise(TimeScale * Time.timeSinceLevelLoad, 0f) - 0.5f; // noise = [-0.5, 0.5]
 

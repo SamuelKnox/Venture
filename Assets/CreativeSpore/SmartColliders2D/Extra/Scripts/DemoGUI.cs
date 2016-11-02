@@ -124,7 +124,7 @@ public class DemoGUI : MonoBehaviour
 
     string GetLoadedLevelName()
     {
-#if UNITY_5_3
+#if UNITY_5_3 || UNITY_5_3_OR_NEWER
         return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 #else
         return Application.loadedLevelName;
@@ -133,7 +133,7 @@ public class DemoGUI : MonoBehaviour
 
     int GetLoadedLevelId()
     {
-#if UNITY_5_3
+#if UNITY_5_3 || UNITY_5_3_OR_NEWER
         return UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
 #else
         return Application.loadedLevel;
@@ -142,7 +142,7 @@ public class DemoGUI : MonoBehaviour
 
     void LoadLevel( int idx )
     {
-#if UNITY_5_3
+#if UNITY_5_3 || UNITY_5_3_OR_NEWER
         UnityEngine.SceneManagement.SceneManager.LoadScene(idx);        
 #else
         Application.LoadLevel(idx);
@@ -151,7 +151,7 @@ public class DemoGUI : MonoBehaviour
 
     void LoadLevel(string name)
     {
-#if UNITY_5_3
+#if UNITY_5_3 || UNITY_5_3_OR_NEWER
         UnityEngine.SceneManagement.SceneManager.LoadScene(name);
 #else
         Application.LoadLevel(name);

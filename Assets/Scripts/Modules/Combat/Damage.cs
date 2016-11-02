@@ -33,10 +33,19 @@ public class Damage : MonoBehaviour
     [Range(0.0f, 1.0f)]
     private float damageOverTimeRateIncrease = 0.0f;
 
-    [Tooltip("Stun duration dealt by this damage")]
+    [Tooltip("Speed intensity change in percentage dealt by this damage")]
+    [SerializeField]
+    [Range(0.0f, 1.0f)]
+    private float speedModifierIntensity = 1.0f;
+
+    [Tooltip("Speed duration change in seconds dealt by this damage")]
     [SerializeField]
     [Range(0.0f, 10.0f)]
-    private float stun;
+    private float speedModifierDuration = 0.0f;
+
+    [Tooltip("The tint applied to the recipient of the damage for the duration of their invunerability")]
+    [SerializeField]
+    private Color tint = Color.white;
 
     [Tooltip("Whether or not this damage component is active and will actually deal damage")]
     [SerializeField]
@@ -48,13 +57,23 @@ public class Damage : MonoBehaviour
         {
             return;
         }
-        var health = other.GetComponent<Health>();
-        if (!health)
+        bool friendly = TeamUtility.IsFriendly(gameObject, other.gameObject);
+        if (friendly)
         {
             return;
         }
-        var friendly = TeamUtility.IsFriendly(gameObject, health.gameObject);
-        if (!friendly)
+        var shield = other.GetComponent<Shield>();
+        if (shield)
+        {
+            shield.ApplyDamage(this);
+            var shieldedHealth = other.transform.root.GetComponentInChildren<Health>();
+            if (shieldedHealth)
+            {
+                shieldedHealth.ResetInvincibilityTime();
+            }
+        }
+        var health = other.GetComponent<Health>();
+        if (health)
         {
             health.ApplyDamage(this);
             if (OnDamageDealt != null)
@@ -74,12 +93,49 @@ public class Damage : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the amount of damage dealt by this
+    /// Merges another Damage with this Damage
+    /// </summary>
+    /// <param name="damage">Damage to merge with this damage</param>
+    public void AddDamage(Damage damage)
+    {
+        SetBaseDamage(GetBaseDamage() + damage.GetBaseDamage());
+        SetKnockBack(GetKnockBack() + damage.GetKnockBack());
+        SetDamageOverTime(GetDamageOverTime() + damage.GetDamageOverTime());
+        SetDamageOverTimeRateIncrease(GetDamageOverTimeRateIncrease() * damage.GetDamageOverTimeRateIncrease());
+        SetSpeedModifierIntensity(GetSpeedModifierIntensity() * damage.GetSpeedModifierIntensity());
+        SetSpeedModifierDuration(GetSpeedModifierDuration() + damage.GetSpeedModifierDuration());
+    }
+
+    /// <summary>
+    /// Modifies the effectiveness of this damage by a percent, where 0.5 is half effectiveness, 2.0 is double effectiveness, and 1.0f is normal effectiveness.
+    /// </summary>
+    /// <param name="percent">Percent to modify damage by</param>
+    public void Modify(float percent)
+    {
+        SetBaseDamage(GetBaseDamage() * percent);
+        SetKnockBack(GetKnockBack() * percent);
+        SetDamageOverTime(GetDamageOverTime() * percent);
+        SetDamageOverTimeRateIncrease(GetDamageOverTimeRateIncrease() * percent);
+        SetSpeedModifierIntensity(GetSpeedModifierIntensity() * percent);
+        SetSpeedModifierDuration(GetSpeedModifierDuration() * percent);
+    }
+
+    /// <summary>
+    /// Gets the amount of damage dealt
     /// </summary>
     /// <returns>Damage points</returns>
     public float GetBaseDamage()
     {
         return baseDamage;
+    }
+
+    /// <summary>
+    /// Sets the amount of damage dealt
+    /// </summary>
+    /// <param name="baseDamage">Damage points</param>
+    public void SetBaseDamage(float baseDamage)
+    {
+        this.baseDamage = baseDamage;
     }
 
     /// <summary>
@@ -89,6 +145,15 @@ public class Damage : MonoBehaviour
     public float GetKnockBack()
     {
         return knockBack;
+    }
+
+    /// <summary>
+    /// Sets the amount of knock back done by this Damage
+    /// </summary>
+    /// <param name="knockBack">Knock back force</param>
+    public void SetKnockBack(float knockBack)
+    {
+        this.knockBack = knockBack;
     }
 
     /// <summary>
@@ -128,11 +193,56 @@ public class Damage : MonoBehaviour
     }
 
     /// <summary>
-    /// Stun dealt by this damage
+    /// Gets the modifier by which this damage will affect the target's speed, where 0.5 is half speed and 2.0 is double speed
     /// </summary>
-    /// <returns>Stun duration in seconds</returns>
-    public float GetStun()
+    /// <returns>Speed modifier</returns>
+    public float GetSpeedModifierIntensity()
     {
-        return stun;
+        return speedModifierIntensity;
+    }
+
+    /// <summary>
+    /// Sets the speed modifier by which teh target is affected by this damage. 0.5 is half speed, and 2.0 is double speed.
+    /// </summary>
+    /// <param name="speedModifierIntensity"></param>
+    public void SetSpeedModifierIntensity(float speedModifierIntensity)
+    {
+        this.speedModifierIntensity = speedModifierIntensity;
+    }
+
+    /// <summary>
+    /// Gets the duration in seconds for which the speed modifier intensity will be applied
+    /// </summary>
+    /// <returns>Duration in seconds of speed modifier</returns>
+    public float GetSpeedModifierDuration()
+    {
+        return speedModifierDuration;
+    }
+
+    /// <summary>
+    /// Sets the duration in seconds for which the speed modifier intensity will be applied
+    /// </summary>
+    /// <param name="speedModifierDuration">Speed modifier duration</param>
+    public void SetSpeedModifierDuration(float speedModifierDuration)
+    {
+        this.speedModifierDuration = speedModifierDuration;
+    }
+
+    /// <summary>
+    /// Gets the tint this damage applies on dealing damage
+    /// </summary>
+    /// <returns>Color applied on damage added</returns>
+    public Color GetTint()
+    {
+        return tint;
+    }
+
+    /// <summary>
+    /// Sets the tint this damage applies when dealing damage
+    /// </summary>
+    /// <param name="tint">Tint applies when damage is dealt</param>
+    public void SetTint(Color tint)
+    {
+        this.tint = tint;
     }
 }

@@ -13,6 +13,12 @@
     [DisallowMultipleComponent]
     public class Level : MonoBehaviour
     {
+        private const string OnRoomEnterMessageName = "OnRoomEnter";
+        private const string OnRoomStayMessageName = "OnRoomStay";
+        private const string OnRoomExitMessageName = "OnRoomExit";
+
+        private Dictionary<Component, Room> listeners = new Dictionary<Component, Room>();
+
         /// <summary>
         /// Size of a single grid segment in Unity units
         /// </summary>
@@ -60,6 +66,7 @@
             {
                 RemoveOutOfScopeRooms();
             }
+            Listen();
         }
 
         void Reset()
@@ -104,6 +111,16 @@
         }
 
         /// <summary>
+        /// Gets the global point of the world space position
+        /// </summary>
+        /// <param name="position">World space position</param>
+        /// <returns>Global point within the level</returns>
+        public static Point2 GetPoint(Vector2 position)
+        {
+            return new Point2(Mathf.RoundToInt(position.x / GridSize), Mathf.RoundToInt(position.y / GridSize));
+        }
+
+        /// <summary>
         /// Gets the global point of the Main Camera based on the level's grid size
         /// </summary>
         /// <returns>The point of the camera</returns>
@@ -114,7 +131,7 @@
                 camera = Camera.main;
             }
             var cameraPosition = camera.transform.position;
-            var cameraPoint = new Point2(Mathf.RoundToInt(cameraPosition.x / GridSize), Mathf.RoundToInt(cameraPosition.y / GridSize));
+            var cameraPoint = GetPoint(cameraPosition);
             return cameraPoint;
         }
 
@@ -522,6 +539,36 @@
                 }
             }
             return neighborsAdded.ToArray();
+        }
+
+        /// <summary>
+        /// Listens for when a Component enters, stays, or exits a room
+        /// </summary>
+        /// <param name="listener">Component to listen</param>
+        public void AddListener(Component listener)
+        {
+            if (listeners.ContainsKey(listener))
+            {
+                Debug.LogError("Already listening for " + listener + "!", listener.gameObject);
+                return;
+            }
+            if (!listener.ContainsMethod(OnRoomEnterMessageName) && !listener.ContainsMethod(OnRoomStayMessageName) && !listener.ContainsMethod(OnRoomExitMessageName))
+            {
+                Debug.LogError(listener.name + " must contain either the public " + OnRoomEnterMessageName + "(Room), public " + OnRoomStayMessageName + "(Room), or public " + OnRoomExitMessageName + "(Room) method!", listener);
+                return;
+            }
+            var room = GetRoom(GetPoint(listener.transform.position));
+            listeners.Add(listener, room);
+        }
+
+        /// <summary>
+        /// Removes the listener from listening to room changes
+        /// </summary>
+        /// <param name="listener">Listener to remove</param>
+        /// <returns></returns>
+        public bool RemoveListener(Component listener)
+        {
+            return listeners.Remove(listener);
         }
 
         /// <summary>
@@ -979,6 +1026,36 @@
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Sends messages to all of the listening GameObjects for when a room is entered, stayed in, or exited
+        /// </summary>
+        private void Listen()
+        {
+            var changedListeners = new Dictionary<Component, Room>();
+            foreach (var listener in listeners)
+            {
+                if (listener.Key.transform.hasChanged)
+                {
+                    var currentRoom = GetRoom(GetPoint(listener.Key.transform.position));
+                    bool changedRooms = listener.Value != currentRoom;
+                    if (changedRooms)
+                    {
+                        listener.Key.SendMessage(OnRoomExitMessageName, listener.Value, SendMessageOptions.DontRequireReceiver);
+                        listener.Key.SendMessage(OnRoomEnterMessageName, currentRoom, SendMessageOptions.DontRequireReceiver);
+                        changedListeners.Add(listener.Key, currentRoom);
+                    }
+                    else
+                    {
+                        listener.Key.SendMessage(OnRoomStayMessageName, currentRoom, SendMessageOptions.DontRequireReceiver);
+                    }
+                }
+            }
+            foreach (var listener in changedListeners)
+            {
+                listeners[listener.Key] = listener.Value;
+            }
         }
     }
 }
