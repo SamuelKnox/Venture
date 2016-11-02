@@ -2,6 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SmasherView))]
 public class Smasher : Enemy
 {
     [Tooltip("Direction smasher moves when the player is detected within its vision")]
@@ -28,11 +29,13 @@ public class Smasher : Enemy
     private Vector2 returnVelocity;
     private bool attacking = false;
     private bool returning = false;
+    private SmasherView smasherView;
 
     protected override void Awake()
     {
         base.Awake();
         body = GetComponent<Rigidbody2D>();
+        smasherView = GetComponent<SmasherView>();
         SetUpBody();
         startingPosition = transform.position;
         InitializeVelocities();
@@ -43,9 +46,7 @@ public class Smasher : Enemy
         base.Update();
         if (attacking && body.velocity == Vector2.zero)
         {
-            body.velocity = returnVelocity;
-            attacking = false;
-            returning = true;
+            Retreat();
         }
         if (returning)
         {
@@ -57,10 +58,29 @@ public class Smasher : Enemy
     {
         if (collider.GetComponent<Player>() && (!attacking && !returning || attackOnSight))
         {
-            Debug.Log(attackVelocity);
-            body.velocity = attackVelocity;
-            StartCoroutine(EnableAttacking());
+            Attack();
         }
+    }
+
+    /// <summary>
+    /// Initiates the attack
+    /// </summary>
+    private void Attack()
+    {
+        body.velocity = attackVelocity;
+        StartCoroutine(EnableAttacking());
+        smasherView.Attack();
+    }
+
+    /// <summary>
+    /// Initiates the retreat
+    /// </summary>
+    private void Retreat()
+    {
+        body.velocity = returnVelocity;
+        attacking = false;
+        returning = true;
+        smasherView.Retreat();
     }
 
     /// <summary>
@@ -108,6 +128,7 @@ public class Smasher : Enemy
         {
             body.velocity = Vector2.zero;
             returning = false;
+            smasherView.Idle();
         }
     }
 

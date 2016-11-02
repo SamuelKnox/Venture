@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[RequireComponent(typeof(GrassBirdView))]
 public class GrassBird : Enemy
 {
     [Tooltip("Destination landing points for grass bird")]
@@ -26,6 +27,7 @@ public class GrassBird : Enemy
     private Vector2 playerPosition;
     private Vector2 destination;
     private float flightTime = 0.0f;
+    private GrassBirdView grassBirdView;
 
     protected override void Awake()
     {
@@ -40,6 +42,7 @@ public class GrassBird : Enemy
             return;
         }
         landingPositions.Add(transform.position);
+        grassBirdView = GetComponent<GrassBirdView>();
     }
 
     protected override void Update()
@@ -103,6 +106,7 @@ public class GrassBird : Enemy
         var potentialDestinations = landingPositions.Where(p => p != origin).ToArray();
         destination = potentialDestinations[Random.Range(0, potentialDestinations.Length)];
         health.SetInvincible(true);
+        grassBirdView.Launch();
     }
 
     /// <summary>
@@ -129,5 +133,6 @@ public class GrassBird : Enemy
         health.SetInvincible(false);
         flightTime = 0.0f;
         landingDuration = totalLandingDuration;
+        grassBirdView.Land();
     }
 }

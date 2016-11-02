@@ -1,0 +1,28 @@
+Tileset Art Asset List
+
+2048x2048 sprite sheet
+Each tile must be exactly 100x100 pixels
+Each tile must be placed exactly within their cell, starting at the top left corner
+This means the last 48 pixels on the right and the last 48 pixels on the bottom must remain empty
+So pixels (0,0) thru (99,99) will have a single tile, pixels (100,0) thru (199,99) will have a single tile, pixels (0,100) thru (99,199) will have a single tile, etc.
+Tiles can be organized within their cells, and blank/extra cells between sets are fine. But their cell can never change in the future.
+Each tile must be on a separate layer.
+More tilesets to come, including Castle, Water World, and Ice World. The tile-types must match the same positions across worlds.
+
+Tilesets:
+
+GRASSLAND
+Primary tiles. Pleasant and colorful.  Seemingly peaceful area, altho it will have a lot of monsters. 9-slice + 4 interior tiles.
+Hills. Grassland tiles that are angled.  Always connected to center-slice of primary tiles.  One for each angle.  (They are triangular). 4 tiles.
+Water, for swimming in grassland. Top of water, and middle of water.  Will be connected to sides of primary tiles. 2 tiles.
+Quicksand. Dangerous. To be placed with the grasslands. Top of quicksand, and middle of quicksand.  Will be connected to sides of primary tiles. 2 tiles.
+One-way platforms. To match grassland tileset. For horizontal 1x1 and Nx1.  Always floating in the sky.  Skinnier than primary tile.  Only takes up roughly the top 20-50% of the cell.
+Ladder, to be attached to grassland sides.  (can be vines, or ladder, or whatever. just something climbable). For vertical 1x1 and 1xN
+
+13 Primary tiles
+4 Hills
+2 Water tiles
+2 Quicksand tiles
+4 One-way platform tiles
+4 Ladder tiles
+TOTAL: 29 Tiles

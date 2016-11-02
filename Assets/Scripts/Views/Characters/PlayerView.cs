@@ -86,6 +86,8 @@ public class PlayerView : MonoBehaviour
             return;
         }
         attacking = true;
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
         animator.SetTrigger(AnimationNames.Player.Triggers.BowDraw);
     }
 
@@ -114,6 +116,8 @@ public class PlayerView : MonoBehaviour
             return;
         }
         attacking = true;
+        animator.SetFloat(AnimationNames.Player.Floats.HorizontalInput, Input.GetAxis(InputNames.Horizontal));
+        animator.SetFloat(AnimationNames.Player.Floats.VerticalInput, Input.GetAxis(InputNames.Vertical));
         animator.SetTrigger(AnimationNames.Player.Triggers.WandPreparation);
     }
 
